@@ -70,11 +70,11 @@ const New = () => {
   ];
 
   return (
-    <div className="pb-10">
+    <div className="pb-10 overflow-x-auto">
       <div className="justify-between flex max-w-[700px] w-full ">
         <h2 className="text-xl font-semibold mb-4">Ürün Ekle</h2>
       </div>
-      <div className="box max-w-[700px] w-full flex flex-col gap-5 relative">
+      <div className="box max-w-[750px] w-full flex flex-col gap-5 relative">
         <div className="flex gap-4 items-end ">
           <div className=" flex-1">
             <SelectInput
@@ -185,7 +185,7 @@ const New = () => {
           />
         </div>
       </div>
-      <div className="w-[70%] text-right mt-4 ">
+      <div className="max-w-[750px] w-full text-right mt-4 ">
         <Button>Kaydet</Button>
       </div>
     </div>

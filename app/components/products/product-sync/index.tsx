@@ -16,44 +16,46 @@ const index = () => {
             <div className="flex gap-5 text-sm">
               <div>
                 <p className="text-foreground">Urun Adi</p>
-                <span className="text-xs">
+                <span className="text-xs text-secondary-foreground">
                   Apple Macbook Pro M4 Pro 24GB RAM 512GB SSD
                 </span>
               </div>
               <div>
                 <p className="text-foreground">Urun Kodu</p>
-                <span className="text-xs">hl-29jdm1</span>
+                <span className="text-xs text-secondary-foreground">
+                  hl-29jdm1
+                </span>
               </div>
             </div>
           </div>
           <div className="flex gap-2">
             <div className="flex flex-col items-center gap-1">
               <div className="w-8 h-8 rounded-full bg-gray-500 overflow-hidden"></div>
-              <div className="px-1 rounded-sm border border-green-900 text-[9px]">
+              <div className="px-1 rounded-sm border border-green-600 text-[10px] text-green-600">
                 Aktif
               </div>
             </div>
             <div className="flex flex-col items-center gap-1">
               <div className="w-8 h-8 rounded-full bg-gray-500 overflow-hidden"></div>
-              <div className="px-1 rounded-sm border border-green-900 text-[9px]">
+              <div className="px-1 rounded-sm border border-green-600 text-[10px] text-green-600">
                 Aktif
               </div>
             </div>
             <div className="flex flex-col items-center gap-1">
               <div className="w-8 h-8 rounded-full bg-gray-500 overflow-hidden"></div>
-              <div className="px-1 rounded-sm border border-green-900 text-[9px]">
+              <div className="px-1 rounded-sm border border-green-600 text-[10px] text-green-600">
                 Aktif
               </div>
             </div>
             <div className="flex flex-col items-center gap-1">
               <div className="w-8 h-8 rounded-full bg-gray-500 overflow-hidden"></div>
-              <div className="px-1 rounded-sm border border-green-900 text-[9px]">
+              <div className="px-1 rounded-sm border border-green-600 text-[10px] text-green-600">
                 Aktif
               </div>
             </div>
             <div className="flex flex-col items-center gap-1">
               <div className="w-8 h-8 rounded-full bg-gray-500 overflow-hidden"></div>
-              <div className="px-1 rounded-sm border border-green-900 text-[9px]">
+              <div className="px-1 rounded-sm border border-green-600 text-[10px] text-green-600">
                 Aktif
               </div>
             </div>
@@ -75,7 +77,7 @@ function Integration() {
   return (
     <div className="integration rounded-lg bg-card flex w-full h-[100px] mt-3">
       <div
-        className="logo border-r border-l border-l-yellow-500 min-w-[120px] p-4"
+        className="logo border-r min-w-[120px] p-4"
         style={{
           borderRadius: "10px 0px 0 10px",
         }}

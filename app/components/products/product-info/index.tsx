@@ -70,7 +70,7 @@ const Info = () => {
   ];
 
   return (
-    <div className="pb-10">
+    <div className="pb-10 overflow-x-auto">
       <h2 className="text-xl font-semibold mb-4">Ürün Bilgileri</h2>
       <div className="box max-w-[750px] w-full flex flex-col gap-5 relative">
         <div className="justify-between  flex max-w-[100%] w-full h-[85px]">
@@ -208,7 +208,7 @@ const Info = () => {
           />
         </div>
       </div>
-      <div className="w-[70%] text-right mt-4 ">
+      <div className="max-w-[750px] w-full text-right mt-4 ">
         <Button>Kaydet</Button>
       </div>
     </div>

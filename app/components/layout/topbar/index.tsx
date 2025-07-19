@@ -17,9 +17,6 @@ export function Topbar() {
           type="button"
           onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
         >
-          {theme !== "light" && theme !== "dark" && (
-            <span className="sr-only">Toggle theme</span>
-          )}
           {theme === "dark" && (
             <svg
               className={"w-5 h-5 "}

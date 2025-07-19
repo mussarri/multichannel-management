@@ -96,7 +96,7 @@ label.text-sm {
 }
 
 .box {
-  @apply p-4 bg-card border rounded-lg text-card-foreground;
+  @apply p-4 bg-card border rounded-lg text-card-foreground min-w-[536px] w-full;
 }
 
 input,
@@ -151,4 +151,17 @@ div > button.fr-command {
 
 .fr-toolbar .fr-command.fr-btn svg path {
   fill: var(--secondary-foreground) !important;
+}
+
+.fr-box.fr-basic .fr-element {
+  color: unset !important;
+}
+
+div.fr-box a.fr-floating-btn {
+  display: flex;
+  margin-right: -10px;
+}
+
+#fr-logo {
+  display: none !important;
 }
