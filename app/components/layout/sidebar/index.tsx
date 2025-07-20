@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
 import Link from "next/link";
@@ -7,6 +8,7 @@ import { useEffect, useState } from "react";
 import { Blocks, ChevronDown, ChevronRight } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Home, Package, Users, Settings } from "lucide-react";
+import { useMediaQuery } from "usehooks-ts";
 
 const menuItems = [
   {
@@ -65,71 +67,93 @@ const menuItems = [
 export function Sidebar() {
   const pathname = usePathname();
   const isActive = (href: string) => pathname === href;
+  const mobile = useMediaQuery("(max-width: 1024px)");
 
-  return (
-    <aside className="h-full w-64 bg-sidebar border-r px-2 py-4 overflow-y-auto space-y-2">
-      <div className="pb-3">
-        <Link
-          href="/dashboard/overview"
-          className="text-lg font-bold px-2 mb-2 text-primary"
-        >
-          SmartHub
-        </Link>
-      </div>
-
-      {menuItems.map((item) =>
-        item.submenu ? (
-          <div key={item.label} className="">
-            <Link
-              key={item.label}
-              href={item.href}
-              className={
-                "w-full flex items-center justify-between py-3 px-4 text-sm rounded hover:bg-hover " +
-                (pathname.startsWith(item.href) && " active font-semibold")
-              }
-            >
-              <div className="flex items-center gap-2">
-                {item.icon}
-                {item.label}
-              </div>
-              {pathname.startsWith(item.href) ? (
-                <ChevronDown size={16} />
-              ) : (
-                <ChevronRight size={16} />
-              )}
-            </Link>
-
-            {pathname.startsWith(item.href) && (
-              <div className="mt-1 ml-6 flex flex-col space-y-1">
-                {item.submenu.map((sub) => (
-                  <Link
-                    key={sub.href}
-                    href={sub.href}
-                    className={cn(
-                      "text-sm gap-2 px-3 py-2 rounded hover:bg-hover",
-                      isActive(sub.href) && " active font-semibold"
-                    )}
-                  >
-                    {sub.label}
-                  </Link>
-                ))}
-              </div>
-            )}
-          </div>
-        ) : (
+  if (mobile) return <Mobile menuItems={menuItems} isActive={isActive} />;
+  else
+    return (
+      <aside className="h-full w-64 bg-sidebar border-r px-2 py-4 overflow-y-auto space-y-2">
+        <div className="pb-3">
           <Link
-            key={item.href}
-            href={item.href}
-            className={cn(
-              "w-full flex items-center gap-2 px-4 py-3 rounded text-sm hover:bg-hover",
-              isActive(item.href) && " active font-semibold"
-            )}
+            href="/dashboard/overview"
+            className="text-lg font-bold px-2 mb-2 text-primary logo lowercase"
           >
-            {item.icon}
-            {item.label}
+            SmartHub
           </Link>
-        )
-      )}
+        </div>
+
+        {menuItems.map((item) =>
+          item.submenu ? (
+            <div key={item.label} className="">
+              <Link
+                key={item.label}
+                href={item.href}
+                className={
+                  "w-full flex items-center justify-between py-3 px-4 text-sm rounded hover:bg-hover " +
+                  (pathname.startsWith(item.href) && " active font-semibold")
+                }
+              >
+                <div className="flex items-center gap-2">
+                  {item.icon}
+                  {item.label}
+                </div>
+                {pathname.startsWith(item.href) ? (
+                  <ChevronDown size={16} />
+                ) : (
+                  <ChevronRight size={16} />
+                )}
+              </Link>
+
+              {pathname.startsWith(item.href) && (
+                <div className="mt-1 ml-6 flex flex-col space-y-1">
+                  {item.submenu.map((sub) => (
+                    <Link
+                      key={sub.href}
+                      href={sub.href}
+                      className={cn(
+                        "text-sm gap-2 px-3 py-2 rounded hover:bg-hover",
+                        isActive(sub.href) && " active font-semibold"
+                      )}
+                    >
+                      {sub.label}
+                    </Link>
+                  ))}
+                </div>
+              )}
+            </div>
+          ) : (
+            <Link
+              key={item.href}
+              href={item.href}
+              className={cn(
+                "w-full flex items-center gap-2 px-4 py-3 rounded text-sm hover:bg-hover",
+                isActive(item.href) && " active font-semibold"
+              )}
+            >
+              {item.icon}
+              {item.label}
+            </Link>
+          )
+        )}
+      </aside>
+    );
+}
+
+function Mobile({ menuItems, isActive }: { menuItems: any; isActive: any }) {
+  return (
+    <aside className={"bg-sidebar mobile"}>
+      {menuItems.map((item: any) => (
+        <Link
+          key={item.href}
+          href={item.href}
+          className={cn(
+            "w-full flex items-center gap-2 px-4 py-3 rounded text-sm hover:bg-hover",
+            isActive(item.href) && " active font-semibold"
+          )}
+        >
+          {item.icon}
+        </Link>
+      ))}
     </aside>
   );
 }

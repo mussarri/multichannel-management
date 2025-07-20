@@ -4,6 +4,7 @@ import { Topbar } from "@/app/components/layout/topbar";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Suspense } from "react";
+import { useMediaQuery } from "usehooks-ts";
 
 export default function DashboardLayout({
   children,
@@ -12,16 +13,23 @@ export default function DashboardLayout({
 }) {
   const pathname = usePathname();
   const array = pathname.split("/").slice(1);
+  const mobile = useMediaQuery("(max-width: 840px)");
+
   return (
-    <div className="flex h-screen overflow-hidden bg-muted/40">
+    <div className="flex h-screen overflow-hidden ">
       <Sidebar />
 
-      <div className="flex flex-col flex-1">
+      <div className={"flex flex-col flex-1 overflow-hidden "}>
         <Suspense fallback={<span>Loading...</span>}>
           <Topbar />
         </Suspense>
 
-        <main className="flex-1 overflow-y-auto p-4 px-8">
+        <main
+          className={
+            "flex-1 overflow-y-auto overflow-x-hidden p-4 " +
+            (mobile ? " px-4" : "px-8")
+          }
+        >
           <ol className="flex items-center whitespace-nowrap mb-4">
             {array.map((item, idx) => (
               <li key={idx} className="inline-flex items-center">

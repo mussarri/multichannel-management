@@ -1,0 +1,353 @@
+/* eslint-disable react-hooks/rules-of-hooks */
+/* eslint-disable @typescript-eslint/no-explicit-any */
+import { Button } from "@/components/ui/button";
+import { BlocksIcon, RefreshCwIcon, Trash } from "lucide-react";
+import React, { useState } from "react";
+
+const index = ({ optionList }: { optionList: any[] }) => {
+  const list = optionList.filter((item) => item.name !== "");
+
+  function cartesianProduct(arrays: any[]) {
+    return arrays.reduce(
+      (acc, curr) => acc.flatMap((a: any) => curr.map((b: any) => [...a, b])),
+      [[]]
+    );
+  }
+
+  const combinations = cartesianProduct(list.map((opt) => opt.values)).map(
+    (combo: any[]) => combo.join("-")
+  );
+
+  const [formData, setFormData] = useState(() =>
+    combinations.map((option: any) => ({
+      option,
+      barkod: "",
+      stockCode: "",
+      stock: "",
+      price: "",
+      n11Price: "",
+      trendyolPrice: "",
+      trendyolSalePrice: "",
+      unitCount: "",
+    }))
+  );
+
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const handleChange = (index: number, field: string, value: string) => {
+    setFormData((prev: any) =>
+      prev.map((item: any, i: number) =>
+        i === index ? { ...item, [field]: value } : item
+      )
+    );
+  };
+
+  const [bulkModal, setBulkModal] = useState({
+    open: false,
+    field: "",
+    value: "",
+  });
+
+  const applyBulkUpdate = () => {
+    setFormData((prev: any[]) =>
+      prev.map((item) => ({
+        ...item,
+        [bulkModal.field]: bulkModal.value,
+      }))
+    );
+    setBulkModal({ open: false, field: "", value: "" }); // Modal'ı kapat
+  };
+
+  const handleSave = () => {
+    const hasEmpty = formData.some(
+      (item: { [s: string]: unknown } | ArrayLike<unknown>) =>
+        Object.values(item).some((val) => val === "")
+    );
+
+    if (hasEmpty) {
+      alert("Lütfen tüm alanları doldurun.");
+      return;
+    }
+
+    console.log("Kayıt verisi:", formData);
+  };
+
+  const generateBarcode = () => {
+    return (
+      "BC-" + Date.now().toString().slice(-6) + Math.floor(Math.random() * 100)
+    );
+  };
+
+  const handleGenerateBarcode = () => {
+    setFormData((prev: any[]) =>
+      prev.map(function (item) {
+        const newBarcode = generateBarcode();
+        return { ...item, barkod: newBarcode };
+      })
+    );
+  };
+
+  const handleDeleteVariant = (index: number) => {
+    setFormData((prev: any) => prev.filter((_: any, i: number) => i !== index));
+  };
+
+  const handleClearVariants = () => {
+    setFormData((prev: any[]) =>
+      prev.map((item) => ({
+        ...item,
+        barkod: "",
+        stockCode: "",
+        stock: "",
+        price: "",
+        n11Price: "",
+        trendyolPrice: "",
+        trendyolSalePrice: "",
+        unitCount: "",
+      }))
+    );
+  };
+
+  const handleDeleteAllVariants = () => {
+    setFormData([]);
+  };
+
+  return (
+    <div className="w-full overflow-auto mt-5 py-2 box">
+      <div className="flex items-center justify-between pb-5 w-full">
+        <h2 className="text-xl font-semibold min-w-[250px]">
+          {" "}
+          Seçenek Grupları{" "}
+        </h2>
+        <div className="flex gap-2 text-sm variant-table-buttons">
+          <button>
+            <BlocksIcon size={16} />
+            Trendyol Seçenek Eşitle
+          </button>
+          <button>
+            <BlocksIcon size={16} />
+            Gittigidiyor Seçenek Eşitle
+          </button>
+          <button onClick={handleDeleteAllVariants}>
+            {" "}
+            <Trash size={15} /> Tüm Seçenekleri Sil{" "}
+          </button>
+          <button onClick={handleClearVariants}>
+            {" "}
+            <RefreshCwIcon size={15} /> Tüm Seçenekleri Temizle{" "}
+          </button>
+        </div>
+      </div>
+      <table className="variant-table">
+        <thead>
+          <tr className="border-b">
+            <th>Seçenek</th>
+            <th>
+              <div>
+                <span>Barkod</span>
+                <button onClick={handleGenerateBarcode}>Barkod Uret</button>
+              </div>
+            </th>
+            <th>Stok Kodu</th>
+            <th>
+              <div>
+                <span>Stok</span>
+                <button
+                  onClick={() =>
+                    setBulkModal({ open: true, field: "stock", value: "" })
+                  }
+                >
+                  Toplu Güncelle
+                </button>
+              </div>
+            </th>
+            <th>
+              <div>
+                <span>Fiyat</span>
+                <button
+                  onClick={() =>
+                    setBulkModal({ open: true, field: "price", value: "" })
+                  }
+                >
+                  Toplu Güncelle
+                </button>
+              </div>
+            </th>
+            <th>
+              <div>
+                {" "}
+                <span>N11 Fiyat</span>
+                <button
+                  onClick={() =>
+                    setBulkModal({ open: true, field: "n11_price", value: "" })
+                  }
+                >
+                  Toplu Güncelle
+                </button>
+              </div>
+            </th>
+            <th>
+              <div>
+                <span>Trendyol Liste Fiyat</span>
+                <button
+                  onClick={() =>
+                    setBulkModal({
+                      open: true,
+                      field: "trendyol_price",
+                      value: "",
+                    })
+                  }
+                >
+                  Toplu Güncelle
+                </button>
+              </div>
+            </th>
+            <th>
+              <div>
+                <span>Trendyol Satıs Fiyat</span>
+                <button
+                  onClick={() =>
+                    setBulkModal({
+                      open: true,
+                      field: "trendyol_sale_price",
+                      value: "",
+                    })
+                  }
+                >
+                  Toplu Güncelle
+                </button>
+              </div>
+            </th>
+            <th>Kacli Satiliyot</th>
+          </tr>
+        </thead>
+        <tbody>
+          {formData.map((item: any, index: number) => (
+            <tr key={index}>
+              <td className="text-left">{item.option}</td>
+              <td className="text-left">
+                <input
+                  type="text"
+                  name="barkod"
+                  id=""
+                  value={item.barkod}
+                  onChange={(e) =>
+                    handleChange(index, "barkod", e.target.value)
+                  }
+                />
+              </td>
+              <td className="text-left">{}</td>
+              <td className="text-left">
+                <input
+                  type="text"
+                  name="stock"
+                  id=""
+                  value={item.stock}
+                  onChange={(e) => handleChange(index, "stock", e.target.value)}
+                />
+              </td>
+              <td className="text-left">
+                <input
+                  type="text"
+                  name="price"
+                  id=""
+                  value={item.price}
+                  onChange={(e) => handleChange(index, "price", e.target.value)}
+                />
+              </td>
+              <td className="text-left">
+                <input
+                  type="text"
+                  name="n11_price"
+                  id=""
+                  value={item.n11_price}
+                  onChange={(e) =>
+                    handleChange(index, "n11_price", e.target.value)
+                  }
+                />
+              </td>
+              <td className="text-left">
+                <input
+                  type="text"
+                  name="trendyol_price"
+                  id=""
+                  value={item.trendyol_price}
+                  onChange={(e) =>
+                    handleChange(index, "trendyol_price", e.target.value)
+                  }
+                />
+              </td>
+              <td className="text-left">
+                <input
+                  type="text"
+                  name="trendyol_sale_price"
+                  id=""
+                  value={item.trendyol_sale_price}
+                  onChange={(e) =>
+                    handleChange(index, "trendyol_sale_price", e.target.value)
+                  }
+                />
+              </td>
+              <td className="text-left">
+                <input
+                  type="text"
+                  name="unit_count"
+                  id=""
+                  value={item.unit_count}
+                  onChange={(e) =>
+                    handleChange(index, "unitCount", e.target.value)
+                  }
+                />
+              </td>
+              <td className="text-right">
+                <button
+                  className="bg-red-800  p-1 px-2 rounded flex items-center gap-2"
+                  onClick={() => handleDeleteVariant(index)}
+                >
+                  <Trash size={15} />
+                  Sil
+                </button>
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+      <div className="mt-4 text-right">
+        <Button onClick={handleSave}>Kaydet</Button>
+      </div>
+      {bulkModal.open && (
+        <div className="fixed inset-0 bg-black bg-opacity-80 flex items-center justify-center z-50">
+          <div className="bg-card p-6 rounded shadow-md w-[300px]">
+            <h3 className="text-lg font-semibold mb-3 capitalize">
+              {bulkModal.field} Alanını Güncelle
+            </h3>
+            <input
+              type="text"
+              className="w-full border p-2 mb-4 outline-none"
+              value={bulkModal.value}
+              onChange={(e) =>
+                setBulkModal((prev) => ({ ...prev, value: e.target.value }))
+              }
+            />
+            <div className="flex justify-end gap-2">
+              <button
+                onClick={() =>
+                  setBulkModal({ open: false, field: "", value: "" })
+                }
+                className="px-3 py-1 border"
+              >
+                Vazgeç
+              </button>
+              <button
+                onClick={applyBulkUpdate}
+                className="px-3 py-1 bg-blue-600 text-white rounded"
+              >
+                Uygula
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+};
+
+export default index;

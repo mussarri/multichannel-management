@@ -2,11 +2,11 @@
 "use client";
 
 import { useState } from "react";
-import { Pencil, Trash2 } from "lucide-react";
+import { Pencil, PlusIcon, Trash2 } from "lucide-react";
 import { Input } from "@/components/ui/input";
-import { ProductForm } from "../product-add";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
+import { useMediaQuery } from "usehooks-ts";
 
 type Product = {
   id: string;
@@ -18,14 +18,14 @@ type Product = {
 
 export function ProductTable({ products }: { products: Product[] }) {
   const [search, setSearch] = useState("");
-
+  const mobile = useMediaQuery("(max-width: 840px)");
   const filtered = products.filter((p) =>
     p.name.toLowerCase().includes(search.toLowerCase())
   );
 
   return (
     <div className="space-y-4 box">
-      <div className="flex items-center justify-between border-b pb-4 px-4">
+      <div className="flex items-center justify-between border-b pb-4 gap-3">
         <Input
           placeholder="Ürün adıyla ara..."
           value={search}
@@ -34,12 +34,14 @@ export function ProductTable({ products }: { products: Product[] }) {
         />
 
         <Link href="/dashboard/products/new" className="">
-          <Button variant={"secondary"}>Yeni Ürün Oluştur</Button>
+          <Button variant={"secondary"}>
+            {mobile ? <PlusIcon size={16} /> : "Yeni Ürün Oluştur"}
+          </Button>
         </Link>
       </div>
-      <div className="px-4">
+      <div className="">
         <div className="overflow-x-auto  border rounded-lg">
-          <table className="min-w-full shadow-sm text-sm">
+          <table className="min-w-full shadow-sm text-sm product">
             <thead className="bg-inherit">
               <tr className="">
                 <th className="text-left p-2 border-b"></th>

@@ -70,9 +70,9 @@ const Info = () => {
   ];
 
   return (
-    <div className="pb-10 overflow-x-auto">
+    <div className="pb-10">
       <h2 className="text-xl font-semibold mb-4">Ürün Bilgileri</h2>
-      <div className="box max-w-[750px] w-full flex flex-col gap-5 relative">
+      <div className="box max-w-[750px] min-w-[750px] w-full flex flex-col gap-5 relative">
         <div className="justify-between  flex max-w-[100%] w-full h-[85px]">
           <h2 className="text-lg font-semibold mb-4">
             Ürün Bilgileri{id && <span> - ({id})</span>}
@@ -90,7 +90,7 @@ const Info = () => {
             </Link>
             <Link
               className="text-sm flex flex-col items-center"
-              href={"/dashboard/sync/" + id}
+              href={"/dashboard/variants/" + id}
             >
               <Settings size={22} />
               Seçenekler

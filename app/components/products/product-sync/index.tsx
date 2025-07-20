@@ -1,4 +1,5 @@
 import { Blocks } from "lucide-react";
+import Image from "next/image";
 import React from "react";
 
 const index = () => {
@@ -75,21 +76,26 @@ export default index;
 
 function Integration() {
   return (
-    <div className="integration rounded-lg bg-card flex w-full h-[100px] mt-3">
+    <div className="integration rounded-lg bg-card flex w-full h-[100px] mt-3 ">
       <div
-        className="logo border-r min-w-[120px] p-4"
+        className="logo border-r min-w-[120px]  relative p-7"
         style={{
+          minWidth: "100px",
           borderRadius: "10px 0px 0 10px",
         }}
-      ></div>
-      <div className="buttons flex flex-1 w-full justify-around items-center p-4 text-card-foreground">
-        <div className="flex flex-col items-center text-xs gap-1">
-          <Blocks size={22} /> <span>GittiGidiyor Urunune Bagla</span>
+      >
+        <div className="not relative w-full h-full">
+          <Image src={"/logo/gg.png"} fill alt="" className="w-full" />
         </div>
-        <div className="flex flex-col items-center text-xs gap-1">
+      </div>
+      <div className="buttons flex flex-1 w-full justify-around items-center p-4 text-card-foreground">
+        <button className="flex flex-col items-center text-xs gap-1">
+          <Blocks size={22} /> <span>GittiGidiyor Urunune Bagla</span>
+        </button>
+        <button className="flex flex-col items-center text-xs gap-1">
           <Blocks size={22} />{" "}
           <span className="text-xs">GittiGidiyor uzerinden satisa cikar</span>
-        </div>
+        </button>
       </div>
     </div>
   );

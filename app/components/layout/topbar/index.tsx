@@ -6,7 +6,7 @@ export function Topbar() {
   const { setTheme, theme } = useTheme();
 
   return (
-    <header className="flex items-center justify-between px-4 py-3 border-b bg-sidebar">
+    <header className="flex items-center justify-between px-8 py-3 border-b bg-sidebar">
       <div className="w-1/2 max-w-md">
         <input className="outline-none" type="text" placeholder="Search..." />
       </div>

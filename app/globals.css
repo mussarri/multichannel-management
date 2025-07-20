@@ -1,3 +1,4 @@
+@import url("https://fonts.googleapis.com/css2?family=Comfortaa:wght@300..700&display=swap");
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -96,7 +97,7 @@ label.text-sm {
 }
 
 .box {
-  @apply p-4 bg-card border rounded-lg text-card-foreground min-w-[536px] w-full;
+  @apply p-4 bg-card border rounded-lg text-card-foreground;
 }
 
 input,
@@ -164,4 +165,71 @@ div.fr-box a.fr-floating-btn {
 
 #fr-logo {
   display: none !important;
+}
+
+div select {
+  background: var(--input);
+}
+select option {
+  color: var(--text-foreground);
+  background-color: var(--secondary);
+  border-color: transparent;
+}
+
+a.logo {
+  font-family: "Comfortaa", sans-serif;
+  font-optical-sizing: auto;
+}
+
+.variant-table thead tr {
+  @apply text-[11px] font-semibold;
+}
+.variant-table thead th {
+  @apply min-w-[120px] font-semibold text-left;
+}
+.variant-table thead tr th > div > span {
+  @apply w-max font-semibold text-[11px];
+}
+.variant-table thead tr th > div {
+  @apply flex flex-col items-start w-full;
+}
+
+.variant-table thead tr button {
+  @apply text-primary rounded font-light text-[10px] cursor-pointer hover:brightness-125 hover:shadow-sm shadow-primary w-max;
+}
+
+.variant-table tbody tr {
+  @apply border-b;
+}
+.variant-table tbody tr td {
+  @apply text-sm py-2 px-1;
+}
+.variant-table tbody tr td input {
+  @apply h-[36px] text-xs outline-none rounded-sm;
+}
+.variant-table tbody tr td:first-child {
+  @apply capitalize;
+}
+
+table.product tbody tr td {
+  @apply w-max;
+}
+table.product tbody tr td a {
+  @apply w-max inline-block;
+}
+
+aside.mobile {
+  position: fixed;
+  width: 100%;
+  height: 60px;
+  bottom: 0;
+  z-index: 10000;
+  border-top: 1px solid var(--border);
+  flex-direction: row;
+  display: flex;
+  padding: 0;
+}
+
+.variant-table-buttons button {
+  @apply border rounded px-2 py-1 bg-background flex gap-2 items-center hover:shadow-sm shadow-card-foreground text-[13px] w-max;
 }
