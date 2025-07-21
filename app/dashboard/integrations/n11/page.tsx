@@ -12,6 +12,7 @@ import FroalaEditorComponent from "react-froala-wysiwyg";
 
 const page = () => {
   const [model, setModel] = React.useState("");
+  const [model2, setModel2] = React.useState("");
   const [form, setForm] = React.useState({
     active: false,
   });
@@ -19,10 +20,13 @@ const page = () => {
   const handleModelChange = (model: any) => {
     setModel(model);
   };
+  const handleModelChange2 = (model: any) => {
+    setModel2(model);
+  };
   return (
     <>
       <h2 className="text-xl font-semibold mb-2">N11 Ayarlari</h2>
-      <div className="box max-w-[750px] mt-5 flex flex-col gap-2">
+      <div className="box p-4 max-w-[750px] mt-5 flex flex-col gap-2">
         <TextInput
           label="Magaza Adi"
           name="storeName"
@@ -66,8 +70,8 @@ const page = () => {
           </label>
           <div
             className={
-              "w-full text-center bg-secondary py-2 text-xs uppercase rounded " +
-              (form.active ? "bg-green-600 text-white" : "")
+              "w-full text-center  py-2 text-xs uppercase rounded " +
+              (form.active ? "bg-green-600 text-white" : " bg-secondary")
             }
           >
             {form.active ? "Aktif" : " Pasif"}
@@ -75,7 +79,7 @@ const page = () => {
         </div>
       </div>
 
-      <div className="box  max-w-[750px] mt-5">
+      <div className="box p-4  max-w-[750px] mt-5">
         <div className="">
           <h5 className="uppercase text-[10px] pb-2 font-semibold text-card-foreground">
             Sabit Aciklama
@@ -100,8 +104,8 @@ const page = () => {
               placeholderText: "Edit Your Content Here!",
               charCounterCount: false,
             }}
-            model={model}
-            onModelChange={handleModelChange}
+            model={model2}
+            onModelChange={handleModelChange2}
           />
         </div>
       </div>

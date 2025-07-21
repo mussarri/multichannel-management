@@ -72,7 +72,11 @@ export function Sidebar() {
   if (mobile) return <Mobile menuItems={menuItems} isActive={isActive} />;
   else
     return (
-      <aside className="h-full w-64 bg-sidebar border-r px-2 py-4 overflow-y-auto space-y-2">
+      <aside
+        className={
+          "h-full w-64 bg-sidebar border-r px-2 py-4 overflow-y-auto space-y-2"
+        }
+      >
         <div className="pb-3">
           <Link
             href="/dashboard/overview"
@@ -147,7 +151,7 @@ function Mobile({ menuItems, isActive }: { menuItems: any; isActive: any }) {
           key={item.href}
           href={item.href}
           className={cn(
-            "w-full flex items-center gap-2 px-4 py-3 rounded text-sm hover:bg-hover",
+            "w-full flex items-center gap-2 px-4 py-3 rounded text-sm hover:bg-hover justify-center",
             isActive(item.href) && " active font-semibold"
           )}
         >

@@ -18,7 +18,7 @@ const page = () => {
   return (
     <form action={createUser}>
       <h2 className="text-xl font-semibold mb-2">Trendyol Ayarlari</h2>
-      <div className="box max-w-[750px] mt-5 flex flex-col gap-2">
+      <div className="box p-4 max-w-[750px] mt-5 flex flex-col gap-2">
         <TextInput
           label="Magaza Adi"
           name="storeName"

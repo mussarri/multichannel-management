@@ -7,6 +7,8 @@ import { Input } from "@/components/ui/input";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { useMediaQuery } from "usehooks-ts";
+import EditButton from "@/app/components/buttons/edit";
+import DeleteButton from "@/app/components/buttons/delete";
 
 type Product = {
   id: string;
@@ -25,7 +27,7 @@ export function ProductTable({ products }: { products: Product[] }) {
 
   return (
     <div className="space-y-4 box">
-      <div className="flex items-center justify-between border-b pb-4 gap-3">
+      <div className="flex items-center justify-between border-b p-4 gap-3">
         <Input
           placeholder="Ürün adıyla ara..."
           value={search}
@@ -39,7 +41,7 @@ export function ProductTable({ products }: { products: Product[] }) {
           </Button>
         </Link>
       </div>
-      <div className="">
+      <div className="p-4">
         <div className="overflow-x-auto  border rounded-lg">
           <table className="min-w-full shadow-sm text-sm product">
             <thead className="bg-inherit">
@@ -71,11 +73,19 @@ export function ProductTable({ products }: { products: Product[] }) {
                   <td className="p-2">{product.stock}</td>
                   <td className="p-2">{}</td>
                   <td className="p-2 text-right space-x-2">
-                    <button className="text-blue-600 hover:underline">
-                      <Pencil size={16} />
+                    <button>
+                      <Pencil
+                        size={16}
+                        className="hover:scale-110 duration-200 hover:cursor-pointer"
+                        color="var(--warning)"
+                      />
                     </button>
-                    <button className="text-red-600 hover:underline">
-                      <Trash2 size={16} />
+                    <button>
+                      <Trash2
+                        size={16}
+                        className="hover:scale-110 duration-200 hover:cursor-pointer"
+                        color="var(--error)"
+                      />
                     </button>
                   </td>
                 </tr>

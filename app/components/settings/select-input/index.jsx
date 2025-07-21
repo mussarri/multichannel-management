@@ -7,6 +7,7 @@ const index = ({
   required = false,
   onChange,
   vertical = false,
+  value,
 }) => {
   return (
     <div
@@ -22,12 +23,15 @@ const index = ({
       <select
         name={name}
         onChange={(e) => onChange(e.target.value)}
-        className="py-3 px-4 pe-9 block w-full border rounded-lg h-9 text-xs"
-        defaultValue={label}
+        className="py-2 px-4 pe-9 block w-full border rounded-lg h-9 text-xs"
+        required={required}
       >
+        <option value="" selected disabled hidden>
+          Select
+        </option>
         {options.length > 0 &&
-          options?.map((option) => (
-            <option value={option} key={option}>
+          options?.map((option, index) => (
+            <option value={option} key={index} selected={value === option}>
               {option}
             </option>
           ))}

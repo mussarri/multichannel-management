@@ -9,7 +9,7 @@ const index = () => {
         <div className="justify-between flex max-w-[700px] w-full ">
           <h2 className="text-xl font-semibold mb-4">Entegrasyon</h2>
         </div>
-        <div className="box w-full flex relative items-center">
+        <div className="box p-4 w-full flex relative items-center">
           <div className="flex flex-1 h-full items-center">
             <div className="min-w-[150px]">
               <div className="bg-slate-500 rounded w-[30px] h-[30px]"></div>

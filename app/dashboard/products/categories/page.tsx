@@ -70,11 +70,19 @@ const page = () => {
                 </td>
                 <td className="p-2 text-center">{category.products}</td>
                 <td className="p-2 text-right space-x-2">
-                  <button className="text-blue-600 hover:underline">
-                    <Pencil size={16} />
+                  <button>
+                    <Pencil
+                      size={16}
+                      className="hover:scale-110 duration-200 hover:cursor-pointer"
+                      color="var(--warning)"
+                    />
                   </button>
-                  <button className="text-red-600 hover:underline">
-                    <Trash2 size={16} />
+                  <button>
+                    <Trash2
+                      size={16}
+                      className="hover:scale-110 duration-200 hover:cursor-pointer"
+                      color="var(--error)"
+                    />
                   </button>
                 </td>
               </tr>

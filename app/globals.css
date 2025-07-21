@@ -37,6 +37,8 @@
   --sidebar-accent-foreground: oklch(0.21 0.006 285.885);
   --sidebar-border: oklch(0.92 0.004 286.32);
   --sidebar-ring: oklch(0.705 0.015 286.067);
+  --error: #ff3448;
+  --warning: #ffb933;
 }
 
 [data-theme="dark"] {
@@ -73,6 +75,8 @@
   --sidebar-accent-foreground: oklch(0.985 0 0);
   --sidebar-border: oklch(1 0 0 / 10%);
   --sidebar-ring: oklch(0.552 0.016 285.938);
+  --error: #cc0003;
+  --warning: #ff8702;
 }
 
 @layer base {
@@ -97,7 +101,7 @@ label.text-sm {
 }
 
 .box {
-  @apply p-4 bg-card border rounded-lg text-card-foreground;
+  @apply bg-card border rounded-lg text-card-foreground;
 }
 
 input,
@@ -232,4 +236,9 @@ aside.mobile {
 
 .variant-table-buttons button {
   @apply border rounded px-2 py-1 bg-background flex gap-2 items-center hover:shadow-sm shadow-card-foreground text-[13px] w-max;
+}
+
+table td,
+table th {
+  width: max-content;
 }

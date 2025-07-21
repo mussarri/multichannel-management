@@ -15,6 +15,7 @@ import CheckBox from "@/app/components/settings/checkbox";
 import VariantTable from "@/app/components/products/variant-table";
 import React, { useState } from "react";
 import { Trash2 } from "lucide-react";
+import ProductCard from "@/app/components/products/product-card";
 
 const index = () => {
   const [open, setOpen] = useState(false);
@@ -109,61 +110,9 @@ const index = () => {
         <div className="justify-between flex max-w-[700px] w-full ">
           <h2 className="text-xl font-semibold mb-4">Ürün Seçeneklerı</h2>
         </div>
-        <div className="box w-full flex relative items-center overflow-x-auto">
-          <div className="flex flex-1 h-full items-center">
-            <div className="min-w-[150px]">
-              <div className="bg-slate-500 rounded w-[30px] h-[30px]"></div>
-            </div>
-            <div className="flex gap-5 text-sm">
-              <div className="w-max">
-                <p className="text-foreground">Urun Adi</p>
-                <span className="text-xs text-secondary-foreground">
-                  Apple Macbook Pro M4 Pro 24GB RAM 512GB SSD
-                </span>
-              </div>
-              <div className="w-max">
-                <p className="text-foreground">Urun Kodu</p>
-                <span className="text-xs text-secondary-foreground">
-                  hl-29jdm1
-                </span>
-              </div>
-            </div>
-          </div>
-          <div className="flex gap-2">
-            <div className="flex flex-col items-center gap-1">
-              <div className="w-8 h-8 rounded-full bg-gray-500 overflow-hidden"></div>
-              <div className="px-1 rounded-sm border border-green-600 text-[10px] text-green-600">
-                Aktif
-              </div>
-            </div>
-            <div className="flex flex-col items-center gap-1">
-              <div className="w-8 h-8 rounded-full bg-gray-500 overflow-hidden"></div>
-              <div className="px-1 rounded-sm border border-green-600 text-[10px] text-green-600">
-                Aktif
-              </div>
-            </div>
-            <div className="flex flex-col items-center gap-1">
-              <div className="w-8 h-8 rounded-full bg-gray-500 overflow-hidden"></div>
-              <div className="px-1 rounded-sm border border-green-600 text-[10px] text-green-600">
-                Aktif
-              </div>
-            </div>
-            <div className="flex flex-col items-center gap-1">
-              <div className="w-8 h-8 rounded-full bg-gray-500 overflow-hidden"></div>
-              <div className="px-1 rounded-sm border border-green-600 text-[10px] text-green-600">
-                Aktif
-              </div>
-            </div>
-            <div className="flex flex-col items-center gap-1">
-              <div className="w-8 h-8 rounded-full bg-gray-500 overflow-hidden"></div>
-              <div className="px-1 rounded-sm border border-green-600 text-[10px] text-green-600">
-                Aktif
-              </div>
-            </div>
-          </div>
-        </div>
-        <div className="w-full my-10 overflow-x-auto border ">
-          <div className="justify-between flex w-full p-4 border-b bg-card  min-w-[750px]">
+        <ProductCard />
+        <div className="w-full my-10 overflow-x-auto border rounded-md">
+          <div className="justify-between flex w-full p-4 bg-card border min-w-[750px] ">
             <h2 className="text-lg font-semibold">Ürün Seçenek Gruplari</h2>
             <Dialog open={open} onOpenChange={setOpen}>
               <DialogTrigger asChild>
@@ -262,7 +211,7 @@ const index = () => {
                         <table className="text-xs font-light w-full my-2 ">
                           <thead>
                             <tr className="">
-                              <th className="text-left py-1">option</th>
+                              <th className="text-left py-1">Seçenek</th>
                               <th className="">Sil</th>
                             </tr>
                           </thead>
@@ -293,7 +242,7 @@ const index = () => {
             </div>
           </div>
 
-          <div className="p-4 text-right gap-4">
+          <div className="p-4 text-right bg-card gap-4">
             <Button onClick={() => setVariants(optionList)}>Oluştur</Button>
           </div>
         </div>

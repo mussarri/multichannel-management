@@ -1,7 +1,7 @@
 /* eslint-disable react-hooks/rules-of-hooks */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { Button } from "@/components/ui/button";
-import { BlocksIcon, RefreshCwIcon, Trash } from "lucide-react";
+import { BlocksIcon, RefreshCwIcon, Trash, Trash2 } from "lucide-react";
 import React, { useState } from "react";
 
 const index = ({ optionList }: { optionList: any[] }) => {
@@ -111,7 +111,7 @@ const index = ({ optionList }: { optionList: any[] }) => {
   };
 
   return (
-    <div className="w-full overflow-auto mt-5 py-2 box">
+    <div className="w-full overflow-auto mt-5 py-6 box p-4">
       <div className="flex items-center justify-between pb-5 w-full">
         <h2 className="text-xl font-semibold min-w-[250px]">
           {" "}
@@ -298,12 +298,12 @@ const index = ({ optionList }: { optionList: any[] }) => {
                 />
               </td>
               <td className="text-right">
-                <button
-                  className="bg-red-800  p-1 px-2 rounded flex items-center gap-2"
-                  onClick={() => handleDeleteVariant(index)}
-                >
-                  <Trash size={15} />
-                  Sil
+                <button onClick={() => handleDeleteVariant(index)}>
+                  <Trash2
+                    size={16}
+                    className="hover:scale-110 duration-200 hover:cursor-pointer"
+                    color="var(--error)"
+                  />
                 </button>
               </td>
             </tr>

@@ -45,6 +45,8 @@ export default {
         sidebar: "var(--sidebar)",
         input: "var(--input)",
         ring: "var(--ring)",
+        error: "var(--error)",
+        warning: "var(--warning)",
         chart: {
           "1": "var(--chart-1)",
           "2": "var(--chart-2)",

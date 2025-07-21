@@ -7,9 +7,9 @@ export default function IntegrationsPage() {
     <div className="">
       <h2 className="font-semibold text-xl mb-4">Entegrasyon Ayarlari</h2>
       <div
-        className="grid gap-8"
+        className="grid gap-2"
         style={{
-          gridTemplateColumns: "repeat(auto-fit, minmax(120px, 1fr))",
+          gridTemplateColumns: "repeat(auto-fit, minmax(120px, 2fr))",
         }}
       >
         <Link
@@ -29,7 +29,7 @@ export default function IntegrationsPage() {
         </Link>
         <Link
           href={"/dashboard/integrations/hepsiburada"}
-          className="w-full rounded-lg overflow-hidden border shadow-sm flex flex-col  m-0"
+          className="w-full rounded-lg overflow-hidden border shadow-sm flex flex-col max-w-[160px]"
           style={{ aspectRatio: 0.9 }}
         >
           <div
@@ -44,7 +44,7 @@ export default function IntegrationsPage() {
         </Link>
         <Link
           href={"/dashboard/integrations/gittigidiyor"}
-          className="w-full rounded-lg overflow-hidden border shadow-sm flex flex-col "
+          className="w-full rounded-lg overflow-hidden border shadow-sm flex flex-col max-w-[160px]"
           style={{ aspectRatio: 0.9 }}
         >
           <div className="w-full relative h-auto" style={{ aspectRatio: 1.2 }}>
@@ -56,7 +56,7 @@ export default function IntegrationsPage() {
         </Link>
         <Link
           href={"/dashboard/integrations/n11"}
-          className="w-full rounded-lg overflow-hidden border shadow-sm flex flex-col "
+          className="w-full rounded-lg overflow-hidden border shadow-sm flex flex-col max-w-[160px]"
           style={{ aspectRatio: 0.9 }}
         >
           <div
@@ -71,7 +71,7 @@ export default function IntegrationsPage() {
         </Link>
         <Link
           href={"/dashboard/integrations/amazon"}
-          className="w-full rounded-lg overflow-hidden border shadow-sm flex flex-col "
+          className="w-full rounded-lg overflow-hidden border shadow-sm flex flex-col max-w-[160px]"
           style={{ aspectRatio: 0.9 }}
         >
           <div
