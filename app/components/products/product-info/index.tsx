@@ -26,6 +26,13 @@ const Info = () => {
     name: "",
     value: "",
     placeholder: "",
+    category: "",
+    stock: "",
+    title: "",
+    sub_title: "",
+    dec_from_inventory: "",
+    stock_code: "",
+    t_stock_code: "",
     lstmodeplaseholder: "",
     brand: "",
   });
@@ -107,6 +114,7 @@ const Info = () => {
               required={true}
               onChange={() => {}}
               vertical={true}
+              value={form.brand}
             />
           </div>
           <MarkaForm />
@@ -118,6 +126,7 @@ const Info = () => {
               required={true}
               onChange={() => {}}
               vertical={true}
+              value={form.category}
             />
           </div>
         </div>

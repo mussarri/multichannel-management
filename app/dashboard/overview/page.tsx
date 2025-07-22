@@ -21,6 +21,7 @@ import {
   BarChart,
   Bar,
 } from "recharts";
+import { useState } from "react";
 
 const salesData = [
   { date: "07-01", sales: 4300 },
@@ -43,6 +44,11 @@ const orderData = [
 ];
 
 export default function DashboardPage() {
+  const [range, setRange] = useState<{ from: Date; to: Date }>();
+  const handleDateChange = (range: { from: Date; to: Date }) => {
+    // API çağrısı burada yapılır
+    setRange(range);
+  };
   return (
     <div className="grid gap-4 p-2 py-4">
       {/* Stat Cards */}

@@ -1,90 +1,80 @@
-import Image from "next/image";
+import { Calculator, GlobeIcon, ShoppingBag, Truck } from "lucide-react";
 import Link from "next/link";
 import React from "react";
 
-export default function IntegrationsPage() {
+const page = () => {
   return (
-    <div className="">
+    <div>
       <h2 className="font-semibold text-xl mb-4">Entegrasyon Ayarlari</h2>
       <div
-        className="grid gap-2"
+        className="flex gap-2"
         style={{
           gridTemplateColumns: "repeat(auto-fit, minmax(120px, 2fr))",
         }}
       >
         <Link
-          href={"/dashboard/integrations/trendyol"}
+          href={"/dashboard/integrations/channels"}
           className="w-full rounded-lg overflow-hidden border shadow-sm flex flex-col max-w-[160px]"
-          style={{ aspectRatio: 0.9 }}
+          style={{ aspectRatio: 0.8 }}
         >
           <div
-            className="w-full relative h-auto"
+            className="w-full relative h-auto p-10 bg-chart-1 opacity-80 hover:opacity-100"
             style={{ aspectRatio: 12 / 10 }}
           >
-            <Image src="/logo/trendyol.com.png" alt="" fill />
+            <ShoppingBag size={"inherit"} color="white" />
           </div>
           <div className="text-xs font-semibold w-full text-center p-2 flex items-center justify-center h-full">
-            Trendyol Ayarlari
+            Pazaryeri Ayarlari
           </div>
         </Link>
         <Link
-          href={"/dashboard/integrations/hepsiburada"}
+          href={"/dashboard/integrations/ecommerce"}
           className="w-full rounded-lg overflow-hidden border shadow-sm flex flex-col max-w-[160px]"
-          style={{ aspectRatio: 0.9 }}
+          style={{ aspectRatio: 0.8 }}
         >
           <div
-            className="w-full relative h-auto"
+            className="w-full relative h-auto p-10 bg-chart-2 opacity-80 hover:opacity-100"
             style={{ aspectRatio: 12 / 10 }}
           >
-            <Image src="/logo/hepsiburada.png" alt="" fill />
+            <GlobeIcon size={"inherit"} color="white" />
           </div>
           <div className="text-xs font-semibold w-full text-center p-2 flex items-center justify-center h-full">
-            Hepsiburada Ayarlari
+            E-Ticaret Ayarlari
           </div>
         </Link>
         <Link
-          href={"/dashboard/integrations/gittigidiyor"}
+          href={"/dashboard/integrations/shipping"}
           className="w-full rounded-lg overflow-hidden border shadow-sm flex flex-col max-w-[160px]"
-          style={{ aspectRatio: 0.9 }}
+          style={{ aspectRatio: 0.8 }}
         >
-          <div className="w-full relative h-auto" style={{ aspectRatio: 1.2 }}>
-            <Image src="/logo/gittigidiyor.png" alt="" fill />
+          <div
+            className="w-full relative h-auto p-10 bg-chart-3 opacity-80 hover:opacity-100"
+            style={{ aspectRatio: 12 / 10 }}
+          >
+            <Truck size={"inherit"} color="white" />
           </div>
           <div className="text-xs font-semibold w-full text-center p-2 flex items-center justify-center h-full">
-            Gittigidiyor Ayarlari
+            Kargo Ayarlari
           </div>
         </Link>
         <Link
-          href={"/dashboard/integrations/n11"}
+          href={"/dashboard/integrations/accounting"}
           className="w-full rounded-lg overflow-hidden border shadow-sm flex flex-col max-w-[160px]"
-          style={{ aspectRatio: 0.9 }}
+          style={{ aspectRatio: 0.8 }}
         >
           <div
-            className="w-full relative h-auto"
+            className="w-full relative h-auto p-10 bg-chart-4 opacity-80 hover:opacity-100"
             style={{ aspectRatio: 12 / 10 }}
           >
-            <Image src="/logo/n11.png" alt="" fill />
+            <Calculator size={"inherit"} color="white" />
           </div>
           <div className="text-xs font-semibold w-full text-center p-2 flex items-center justify-center h-full">
-            N11 Ayarlari
-          </div>
-        </Link>
-        <Link
-          href={"/dashboard/integrations/amazon"}
-          className="w-full rounded-lg overflow-hidden border shadow-sm flex flex-col max-w-[160px]"
-          style={{ aspectRatio: 0.9 }}
-        >
-          <div
-            className="w-full relative h-auto"
-            style={{ aspectRatio: 12 / 10 }}
-          >
-            <Image src="/logo/amazon.webp" alt="" fill />
-          </div>
-          <div className="text-xs font-semibold w-full text-center p-2 flex items-center justify-center h-full">
-            Amazon Ayarlari
+            Muhasebe Ayarlari
           </div>
         </Link>
       </div>
     </div>
   );
-}
+};
+
+export default page;

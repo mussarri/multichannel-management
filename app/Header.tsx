@@ -1,11 +1,13 @@
-"use client";
-
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import Link from "next/link";
-import { useSession, signOut } from "next-auth/react";
+import { authOptions } from "@/auth";
+import { getServerSession } from "next-auth";
 
-export default function Header() {
-  const { data: session } = useSession();
+export default async function Header() {
+  const session = await getServerSession(authOptions);
+  console.log(session);
 
+  const signOut = () => {};
   return (
     <header className="w-full bg-white shadow-md py-4 px-8">
       <nav className="flex justify-between items-center">

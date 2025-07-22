@@ -1,5 +1,4 @@
 import { ProductTable } from "@/app/components/products/product-table";
-import { Suspense } from "react";
 
 export default function ProductsPage() {
   const initialProducts = [
@@ -31,9 +30,7 @@ export default function ProductsPage() {
       <div className="flex items-center justify-between">
         <h1 className="text-xl font-semibold">Ürünler</h1>
       </div>
-      <Suspense fallback={<div>Yükleniyor...</div>}>
-        <ProductTable products={initialProducts} />
-      </Suspense>
+      <ProductTable products={initialProducts} />
     </div>
   );
 }

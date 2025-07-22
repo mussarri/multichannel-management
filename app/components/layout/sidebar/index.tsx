@@ -5,7 +5,15 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { useEffect, useState } from "react";
-import { Blocks, ChevronDown, ChevronRight } from "lucide-react";
+import {
+  Blocks,
+  Calculator,
+  ChevronDown,
+  ChevronRight,
+  Globe2Icon,
+  ShoppingBag,
+  Truck,
+} from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Home, Package, Users, Settings } from "lucide-react";
 import { useMediaQuery } from "usehooks-ts";
@@ -36,9 +44,31 @@ const menuItems = [
     ],
   },
   {
-    label: "Integrations",
+    label: "Entegrasyonlar",
     icon: <Blocks size={18} />,
     href: "/dashboard/integrations",
+    submenu: [
+      {
+        label: "Pazaryeri",
+        icon: <ShoppingBag size={15} />,
+        href: "/dashboard/integrations/channels",
+      },
+      {
+        label: "E-Ticaret",
+        icon: <Globe2Icon size={15} />,
+        href: "/dashboard/integrations/ecommerce",
+      },
+      {
+        label: "Muhasebe",
+        icon: <Calculator size={15} />,
+        href: "/dashboard/integrations/accounting",
+      },
+      {
+        label: "Kargo",
+        icon: <Truck size={15} />,
+        href: "/dashboard/integrations/shipping",
+      },
+    ],
   },
   {
     label: "Ayarlar",
@@ -74,13 +104,13 @@ export function Sidebar() {
     return (
       <aside
         className={
-          "h-full w-64 bg-sidebar border-r px-2 py-4 overflow-y-auto space-y-2"
+          "h-full w-[260px] bg-sidebar border-r px-2 py-4 overflow-y-auto space-y-2"
         }
       >
         <div className="pb-3">
           <Link
             href="/dashboard/overview"
-            className="text-lg font-bold px-2 mb-2 text-primary logo lowercase"
+            className="text-xl font-bold px-2 mb-2 text-primary logo lowercase"
           >
             SmartHub
           </Link>
@@ -93,7 +123,7 @@ export function Sidebar() {
                 key={item.label}
                 href={item.href}
                 className={
-                  "w-full flex items-center justify-between py-3 px-4 text-sm rounded hover:bg-hover " +
+                  "w-full flex items-center justify-between py-3 px-4 rounded hover:bg-hover text-md " +
                   (pathname.startsWith(item.href) && " active font-semibold")
                 }
               >
@@ -115,10 +145,11 @@ export function Sidebar() {
                       key={sub.href}
                       href={sub.href}
                       className={cn(
-                        "text-sm gap-2 px-3 py-2 rounded hover:bg-hover",
-                        isActive(sub.href) && " active font-semibold"
+                        "text-sm gap-2 px-3 py-2 rounded hover:bg-hover flex items-center",
+                        isActive(sub.href) && "active font-semibold"
                       )}
                     >
+                      {sub.icon}
                       {sub.label}
                     </Link>
                   ))}

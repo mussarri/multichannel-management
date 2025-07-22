@@ -105,9 +105,7 @@ label.text-sm {
 }
 
 input,
-select,
-textarea,
-option {
+textarea {
   @apply bg-input shadow-sm border p-2 rounded-lg w-full text-xs outline-none placeholder:text-xs h-[38px];
 }
 path {
@@ -174,6 +172,12 @@ div.fr-box a.fr-floating-btn {
 div select {
   background: var(--input);
 }
+
+select {
+  background-color: var(--card) !important;
+  color: var(--card-foreground)  !important;
+}
+
 select option {
   color: var(--text-foreground);
   background-color: var(--secondary);

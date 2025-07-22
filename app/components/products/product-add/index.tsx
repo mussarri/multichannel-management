@@ -28,6 +28,14 @@ const New = () => {
     placeholder: "",
     lstmodeplaseholder: "",
     brand: "",
+    category: "",
+    stock: "",
+    title: "",
+    sub_title: "",
+    dec_from_inventory: "",
+    stock_code: "",
+    t_stock_code: "",
+    active: false,
   });
 
   const { id } = useParams();
@@ -39,42 +47,48 @@ const New = () => {
   const settings = [
     {
       label: "Barkod",
-      name: "mode",
-      value: "adsasd",
+      name: "barkod",
+      value: "",
       placeholder: "placeholder",
     },
     {
       label: "Desi",
-      name: "mode",
-      value: "adsasd",
+      name: "desi",
+      value: "",
       placeholder: "placeholder",
     },
     {
       label: "Stok",
-      name: "mode",
-      value: "adsasd",
+      name: "stock",
+      value: "",
       placeholder: "placeholder",
     },
     {
       label: "Stok Kodu",
-      name: "mode",
-      value: "adsasd",
+      name: "stock_code",
+      value: "",
       placeholder: "placeholder",
     },
     {
       label: "T. Stok Kodu",
-      name: "mode",
-      value: "adsasd",
+      name: "t_stock_code",
+      value: "",
       placeholder: "placeholder",
     },
   ];
+
+  const toggleActive = () => {
+    setForm((prev) => {
+      return { ...prev, active: !prev.active };
+    });
+  };
 
   return (
     <div className="pb-10 overflow-x-auto">
       <div className="justify-between flex max-w-[700px] w-full ">
         <h2 className="text-xl font-semibold mb-4">Ürün Ekle</h2>
       </div>
-      <div className="box max-w-[750px] w-full flex flex-col gap-5 relative">
+      <div className="box p-4 max-w-[750px] w-full flex flex-col gap-5 relative">
         <div className="flex gap-4 items-end ">
           <div className=" flex-1">
             <SelectInput
@@ -84,6 +98,7 @@ const New = () => {
               required={true}
               onChange={() => {}}
               vertical={true}
+              value={form.brand}
             />
           </div>
           <MarkaForm />
@@ -95,6 +110,7 @@ const New = () => {
               required={true}
               onChange={() => {}}
               vertical={true}
+              value={form.category}
             />
           </div>
         </div>
@@ -103,7 +119,7 @@ const New = () => {
             <TextInput
               label={"Ürün Basligi"}
               name={"title"}
-              value=""
+              value={form.title}
               error={false}
               required={true}
               placeholder="Ürün başlığı"
@@ -116,10 +132,17 @@ const New = () => {
             <label className="text-sm font-semibold" htmlFor="">
               Ürün Satış Durumu
             </label>
-            <select name="" id="" className="p-2 rounded-lg h-[40px] w-full">
-              <option value="">Acık</option>
-              <option value="">Kapalı</option>
-            </select>
+            <SelectInput
+              name={"is_active"}
+              options={["Aktif", "Pasif"]}
+              required={true}
+              onChange={() => {
+                toggleActive();
+              }}
+              vertical={true}
+              value={form.active}
+              label={""}
+            />
           </div>
         </div>
         <div className="flex flex-wrap gap-1">
@@ -128,7 +151,7 @@ const New = () => {
               key={didem}
               label={item.label}
               name={"title"}
-              value=""
+              value={item.value}
               error={false}
               required={true}
               placeholder="Ürün başlığı"
@@ -149,7 +172,7 @@ const New = () => {
               error={false}
               type={"text"}
               placeholder="1"
-              value=""
+              value={form.sub_title}
             />
           </div>
           <div className="flex-1">
@@ -162,7 +185,7 @@ const New = () => {
               error={false}
               type={"text"}
               placeholder="1"
-              value=""
+              value={form.dec_from_inventory}
             />
           </div>
         </div>
@@ -186,7 +209,7 @@ const New = () => {
         </div>
       </div>
       <div className="max-w-[750px] w-full text-right mt-4 ">
-        <Button>Kaydet</Button>
+        <Button type="submit">Kaydet</Button>
       </div>
     </div>
   );

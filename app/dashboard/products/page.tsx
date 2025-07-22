@@ -2,6 +2,23 @@ import { ProductTable } from "@/app/components/products/product-table";
 import { Suspense } from "react";
 
 export default function ProductsPage() {
+  return (
+    <div className="space-y-4 overflow-y-auto">
+      <div className="flex items-center justify-between">
+        <h1 className="text-xl font-semibold">Ürünler</h1>
+      </div>
+      <Suspense fallback={<div>Yükleniyor...</div>}>
+        <RenderProducts />
+      </Suspense>
+    </div>
+  );
+}
+
+async function RenderProducts() {
+  const response = await fetch("https://api.escuelajs.co/api/v1/products");
+  const data = await response.json();
+  console.log(data);
+
   const initialProducts = [
     {
       id: "1",
@@ -25,15 +42,5 @@ export default function ProductsPage() {
       stock: 78,
     },
   ];
-
-  return (
-    <div className="space-y-4 overflow-y-auto">
-      <div className="flex items-center justify-between">
-        <h1 className="text-xl font-semibold">Ürünler</h1>
-      </div>
-      <Suspense fallback={<div>Yükleniyor...</div>}>
-        <ProductTable products={initialProducts} />
-      </Suspense>
-    </div>
-  );
+  return <ProductTable products={initialProducts} />;
 }

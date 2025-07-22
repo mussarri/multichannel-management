@@ -7,8 +7,6 @@ import { Input } from "@/components/ui/input";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { useMediaQuery } from "usehooks-ts";
-import EditButton from "@/app/components/buttons/edit";
-import DeleteButton from "@/app/components/buttons/delete";
 
 type Product = {
   id: string;
