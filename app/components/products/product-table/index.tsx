@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 "use client";
 
@@ -7,24 +8,23 @@ import { Input } from "@/components/ui/input";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { useMediaQuery } from "usehooks-ts";
+import { Product } from "@prisma/client";
+import Image from "next/image";
 
-type Product = {
-  id: string;
-  name: string;
-  sku: string;
-  price: number;
-  stock: number;
-};
-
-export function ProductTable({ products }: { products: Product[] }) {
+export function ProductTable({ products }: { products: any[] }) {
   const [search, setSearch] = useState("");
   const mobile = useMediaQuery("(max-width: 840px)");
-  const filtered = products.filter((p) =>
-    p.name.toLowerCase().includes(search.toLowerCase())
+  const filtered = products?.filter((p) =>
+    p.title.toLowerCase().includes(search.toLowerCase())
   );
 
   return (
-    <div className="space-y-4 box">
+    <div
+      className="space-y-4 box w-full"
+      style={{
+        width: "100%",
+      }}
+    >
       <div className="flex items-center justify-between border-b p-4 gap-3">
         <Input
           placeholder="Ürün adıyla ara..."
@@ -54,42 +54,52 @@ export function ProductTable({ products }: { products: Product[] }) {
               </tr>
             </thead>
             <tbody>
-              {filtered.map((product) => (
-                <tr key={product.id} className="border-b hover:bg-muted/40">
-                  <td className="p-2">
-                    <Link href={`/dashboard/products/${product.id}`}>
-                      <div className="w-[50px] h-[50px] bg-slate-600 rounded-md" />
-                    </Link>
-                  </td>
-                  <td className="p-2">
-                    <Link href={`/dashboard/products/${product.id}`}>
-                      {product.name}
-                    </Link>
-                  </td>
-                  <td className="p-2">{product.sku}</td>
-                  <td className="p-2">{product.price.toLocaleString()} ₺</td>
-                  <td className="p-2">{product.stock}</td>
-                  <td className="p-2">{}</td>
-                  <td className="p-2 text-right space-x-2">
-                    <button>
-                      <Pencil
-                        size={16}
-                        className="hover:scale-110 duration-200 hover:cursor-pointer"
-                        color="var(--warning)"
-                      />
-                    </button>
-                    <button>
-                      <Trash2
-                        size={16}
-                        className="hover:scale-110 duration-200 hover:cursor-pointer"
-                        color="var(--error)"
-                      />
-                    </button>
-                  </td>
-                </tr>
-              ))}
+              {filtered &&
+                filtered.map((product) => (
+                  <tr key={product.id} className="border-b hover:bg-muted/40">
+                    <td className="p-2">
+                      <Link href={`/dashboard/products/${product.id}`}>
+                        <div className="w-[50px] h-[50px] rounded-md relative overflow-hidden">
+                          <Image
+                            src={product.images[0]?.url}
+                            alt=""
+                            fill
+                            objectFit="contain"
+                          />
+                        </div>
+                      </Link>
+                    </td>
+                    <td className="p-2">
+                      <Link href={`/dashboard/products/${product.id}`}>
+                        {product.title}
+                      </Link>
+                    </td>
+                    <td className="p-2">{product.stock_code}</td>
+                    <td className="p-2">
+                      {product?.price?.toLocaleString()} ₺
+                    </td>
+                    <td className="p-2">{product.stock}</td>
+                    <td className="p-2">{}</td>
+                    <td className="p-2 text-right space-x-2">
+                      <Link href={`/dashboard/products/${product.id}`}>
+                        <Pencil
+                          size={16}
+                          className="hover:scale-110 duration-200 hover:cursor-pointer"
+                          color="var(--warning)"
+                        />
+                      </Link>
+                      <button>
+                        <Trash2
+                          size={16}
+                          className="hover:scale-110 duration-200 hover:cursor-pointer"
+                          color="var(--error)"
+                        />
+                      </button>
+                    </td>
+                  </tr>
+                ))}
 
-              {filtered.length === 0 && (
+              {filtered && filtered.length === 0 && (
                 <tr>
                   <td
                     colSpan={5}

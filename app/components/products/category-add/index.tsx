@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 import React from "react";
 import SelectInput from "@/app/components/settings/select-input";
@@ -5,22 +6,33 @@ import TextInput from "@/app/components/settings/text-input";
 import { Button } from "@/components/ui/button";
 import { RefreshCcwIcon } from "lucide-react";
 
-const index = () => {
+const Form = ({ categories }: { categories: any[] }) => {
+  const [form, setForm] = React.useState({
+    parent: "",
+    category: "",
+    n11_category: "",
+    brand: "",
+    product_quantity: "",
+  });
+  const [categoryInput, setCategoryInput] = React.useState("");
+
   return (
-    <div className="pb-10 overflow-x-auto">
-      <div className="justify-between flex max-w-[700px] w-full ">
-        <h2 className="text-xl font-semibold mb-4">Kategori Ekle</h2>
-      </div>
+    <form action="">
       <div className="mt-3">
-        <div className="box flex flex-col md:flex-row gap-3">
+        <div className="box p-4 flex flex-col md:flex-row gap-3">
           <div className="flex-1">
             <SelectInput
               label="Ust Kategori"
-              name={"up_category"}
-              options={[]}
+              name={"parent"}
+              options={categories}
               vertical={false}
               required={true}
-              onChange={() => {}}
+              onChange={(e: string) => {
+                setForm((prev) => {
+                  return { ...prev, parent: e };
+                });
+              }}
+              value={form.parent}
             />
           </div>
           <div className="flex-1">
@@ -29,9 +41,11 @@ const index = () => {
               name={"category"}
               vertical={false}
               required={true}
-              value=""
+              value={categoryInput}
               placeholder=""
-              onChange={() => {}}
+              onChange={(value: string) => {
+                setCategoryInput(value);
+              }}
               error={false}
               type="text"
             />
@@ -48,11 +62,11 @@ const index = () => {
         <N11 />
         <N11 />
       </div>
-    </div>
+    </form>
   );
 };
 
-export default index;
+export default Form;
 
 function N11() {
   return (
@@ -65,6 +79,7 @@ function N11() {
           vertical={true}
           required={true}
           onChange={() => {}}
+          value={""}
         />
       </div>
       <div className="p-3 flex-1 flex flex-col gap-1">
@@ -84,6 +99,7 @@ function N11() {
           vertical={true}
           required={true}
           onChange={() => {}}
+          value={""}
         />
         <SelectInput
           label="Ürün Miktarı"
@@ -92,6 +108,7 @@ function N11() {
           vertical={true}
           required={true}
           onChange={() => {}}
+          value={""}
         />
       </div>
     </div>

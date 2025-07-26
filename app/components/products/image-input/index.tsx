@@ -2,8 +2,7 @@
 import React, { useRef, useState } from "react";
 import PropTypes from "prop-types";
 import "./drop-file-input.css";
-import Image from "next/image";
-import { Image as ImageIcon, Trash } from "lucide-react";
+import { Image as ImageIcon } from "lucide-react";
 
 const DropFileInput = (props: { onFileChange: (files: any[]) => void }) => {
   const wrapperRef = useRef<HTMLDivElement>(null);
@@ -41,12 +40,12 @@ const DropFileInput = (props: { onFileChange: (files: any[]) => void }) => {
     }
   };
 
-  const fileRemove = (file: any) => {
-    const updatedList = [...fileList];
-    updatedList.splice(fileList.indexOf(file), 1);
-    setFileList(updatedList);
-    props.onFileChange(updatedList);
-  };
+  // const fileRemove = (file: any) => {
+  //   const updatedList = [...fileList];
+  //   updatedList.splice(fileList.indexOf(file), 1);
+  //   setFileList(updatedList);
+  //   props.onFileChange(updatedList);
+  // };
 
   return (
     <>
@@ -65,33 +64,6 @@ const DropFileInput = (props: { onFileChange: (files: any[]) => void }) => {
         </div>
         <input type="file" value="" onChange={onFileDrop} />
       </div>
-      <p className="drop-file-preview__title text-xs">Ready to upload</p>
-      {fileList.length > 0 ? (
-        <div className="grid grid-cols-5 gap-3 w-full">
-          {fileList.map((item, index) => (
-            <div key={index}>
-              <div
-                className="relative bg-card rounded border"
-                style={{
-                  aspectRatio: 1,
-                }}
-              >
-                <Image src={item.url} alt="" fill objectFit="contain" />
-                {/* <div className="drop-file-preview__item__info">
-                <p>{item?.name}</p>
-                <p>{item?.size}B</p>
-              </div> */}
-              </div>
-              <span
-                className="text-xs flex items-center justify-center gap-2 py-1 mx-auto cursor-pointer hover:text-red-800"
-                onClick={() => fileRemove(item)}
-              >
-                <Trash size={11} /> Remove File
-              </span>
-            </div>
-          ))}
-        </div>
-      ) : null}
     </>
   );
 };

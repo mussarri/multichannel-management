@@ -39,6 +39,7 @@
   --sidebar-ring: oklch(0.705 0.015 286.067);
   --error: #ff3448;
   --warning: #ffb933;
+  --opacity-input: 1;
 }
 
 [data-theme="dark"] {
@@ -77,6 +78,7 @@
   --sidebar-ring: oklch(0.552 0.016 285.938);
   --error: #cc0003;
   --warning: #ff8702;
+  --opacity-input: 0.4;
 }
 
 @layer base {
@@ -86,6 +88,9 @@
 
   body {
     box-sizing: border-box;
+    width: 100vw;
+    overflow-x: hidden;
+    position: relative;
     @apply bg-background text-foreground;
   }
 }
@@ -93,6 +98,8 @@
 html {
   font-family: ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji",
     "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+  overflow-x: hidden;
+  width: 100vw;
 }
 
 label.text-sm {
@@ -108,6 +115,12 @@ input,
 textarea {
   @apply bg-input shadow-sm border p-2 rounded-lg w-full text-xs outline-none placeholder:text-xs h-[38px];
 }
+
+input::placeholder,
+textarea::placeholder {
+  opacity: var(--opacity-input);
+}
+
 path {
   fill: inherit;
 }
@@ -175,7 +188,7 @@ div select {
 
 select {
   background-color: var(--card) !important;
-  color: var(--card-foreground)  !important;
+  color: var(--card-foreground) !important;
 }
 
 select option {
@@ -196,7 +209,7 @@ a.logo {
   @apply min-w-[120px] font-semibold text-left;
 }
 .variant-table thead tr th > div > span {
-  @apply w-max font-semibold text-[11px];
+  @apply w-max  font-semibold text-[11px];
 }
 .variant-table thead tr th > div {
   @apply flex flex-col items-start w-full;
@@ -210,10 +223,10 @@ a.logo {
   @apply border-b;
 }
 .variant-table tbody tr td {
-  @apply text-sm py-2 px-1;
+  @apply text-[sm] py-2 px-1;
 }
 .variant-table tbody tr td input {
-  @apply h-[36px] text-xs outline-none rounded-sm;
+  @apply h-[36px] text-xs outline-none rounded-sm max-w-[80px];
 }
 .variant-table tbody tr td:first-child {
   @apply capitalize;
@@ -245,4 +258,168 @@ aside.mobile {
 table td,
 table th {
   width: max-content;
+}
+
+.market li {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.market-logos img {
+  height: 100%;
+  object-fit: contain;
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
+  filter: grayscale(100%) brightness(60%);
+  opacity: 70%;
+}
+
+.market-logos img:hover {
+  scale: 115%;
+}
+
+.e-commerce-box {
+  @apply overflow-hidden rounded border w-[70px] h-[70px] relative bg-white;
+  aspect-ratio: 1;
+  box-shadow: rgba(99, 99, 99, 0.2) 0px 2px 8px 0px;
+}
+.e-commerce-box > img {
+  width: 70%;
+  height: 100%;
+  object-fit: contain;
+  margin: auto;
+}
+
+.fade-box {
+  -webkit-mask-image: linear-gradient(
+    to bottom,
+    transparent,
+    black 20%,
+    black 80%,
+    transparent
+  );
+  mask-image: linear-gradient(
+    to bottom,
+    transparent,
+    black 20%,
+    black 80%,
+    transparent
+  );
+
+  -webkit-mask-size: 100% 100%;
+  mask-size: 100% 100%;
+  mask-repeat: no-repeat;
+}
+
+.fade-box > div {
+  /* Maske ile yukarı ve aşağı fade */
+  -webkit-mask-image: linear-gradient(
+    to right,
+    transparent,
+    black 20%,
+    black 80%,
+    transparent
+  );
+  mask-image: linear-gradient(
+    to right,
+    transparent,
+    black 20%,
+    black 80%,
+    transparent
+  );
+
+  -webkit-mask-size: 100% 100%;
+  mask-size: 100% 100%;
+  mask-repeat: no-repeat;
+  width: 300px;
+  height: 270px;
+}
+
+.image-wrapper {
+  box-shadow: rgba(0, 0, 0, 0.1) 0px 4px 12px;
+  display: flex;
+  align-items: center;
+}
+
+.image-wrapper > img {
+  height: 70%;
+}
+
+@media screen and (min-width: 768px) {
+  .entegrations > div:nth-of-type(odd) {
+    float: left;
+    flex-direction: row;
+  }
+  .entegrations > div:nth-of-type(even) {
+    float: right;
+    flex-direction: row-reverse;
+  }
+}
+
+@media screen and (max-width: 768px) {
+  .entegrations > div.flex {
+    float: unset;
+    flex-direction: column;
+    align-items: start;
+    gap: 0;
+    border-radius: 10px;
+    background: white;
+    padding: 30px 20px;
+  }
+}
+
+.entegration-item {
+  padding: 0;
+}
+
+.entegration-otel {
+  color: white;
+}
+
+table.product-variants,
+table.product-variants tbody,
+table.product-variants thead,
+table.product-variants tr {
+  width: 100%;
+}
+table.product-variants th,
+table.product-variants td {
+  padding: 10px 10px;
+}
+
+
+.tooltip-container {
+  position: relative;
+  display: inline-block;
+}
+
+.hover-target {
+  background-color: #ddd;
+  border: none;
+  border-radius: 50%;
+  padding: 6px;
+  cursor: pointer;
+}
+
+.tooltip-content {
+  visibility: hidden;
+  opacity: 0;
+  width: 200px;
+  background-color: #333;
+  color: #fff;
+  text-align: left;
+  padding: 8px;
+  border-radius: 6px;
+  position: absolute;
+  top: 120%; /* Butonun altına */
+  left: 50%;
+  transform: translateX(-50%);
+  transition: opacity 0.2s ease-in-out;
+  z-index: 10;
+}
+
+.tooltip-container:hover .tooltip-content {
+  visibility: visible;
+  opacity: 1;
 }

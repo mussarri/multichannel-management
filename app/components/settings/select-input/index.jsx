@@ -26,7 +26,7 @@ const index = ({
         className="py-2 px-4 pe-9 block w-full border rounded-lg h-9 text-xs"
         required={required}
       >
-        <option value="" selected disabled hidden>
+        <option value="" hidden disabled selected>
           Select
         </option>
         {options.length > 0 &&

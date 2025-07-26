@@ -1,6 +1,8 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { Button } from "@/components/ui/button";
+import prisma from "@/lib/prisma";
 import { Check, CircleX, Pencil, Trash2 } from "lucide-react";
+import { tree } from "next/dist/build/templates/app-page";
 import Link from "next/link";
 import React, { Suspense } from "react";
 
@@ -22,9 +24,11 @@ export default function Page() {
 }
 
 async function RenderCategories() {
-  const response = await fetch("https://api.escuelajs.co/api/v1/categories");
-  const data = await response.json();
-  const categories = data.categories;
+  const data = await prisma.category.findMany({
+    include: {
+      products: true,
+    },
+  });
   const check = (value: boolean) => {
     return value ? (
       <Check color="green" size={16} />
@@ -32,26 +36,6 @@ async function RenderCategories() {
       <CircleX color="red" size={16} />
     );
   };
-  const filtered = [
-    {
-      id: 1,
-      name: "Elektronik",
-      markets: ["n11", "gittigidiyor", "trendyol"],
-      products: 10,
-    },
-    {
-      id: 2,
-      name: "Giyim",
-      markets: ["n11", "gittigidiyor", "trendyol"],
-      products: 1,
-    },
-    {
-      id: 3,
-      name: "Mobilya",
-      markets: ["n11", "gittigidiyor"],
-      products: 5,
-    },
-  ];
 
   return (
     <div className="overflow-x-auto   rounded-lg">
@@ -67,22 +51,16 @@ async function RenderCategories() {
           </tr>
         </thead>
         <tbody>
-          {filtered.map((category) => (
+          {data.map((category) => (
             <tr
               key={category.id}
               className="border-4 rounded border-background bg-card hover:bg-muted/40"
             >
               <td className="p-2">{category.name}</td>
-              <td className="p-2">
-                {check(category.markets?.includes("n11"))}
-              </td>
-              <td className="p-2">
-                {check(category.markets?.includes("gittigidiyor"))}
-              </td>
-              <td className="p-2">
-                {check(category.markets?.includes("trendyol"))}
-              </td>
-              <td className="p-2 text-center">{category.products}</td>
+              <td className="p-2">{check(true)}</td>
+              <td className="p-2">{check(true)}</td>
+              <td className="p-2">{check(true)}</td>
+              <td className="p-2 text-center">{category.products.length}</td>
               <td className="p-2 text-right space-x-2">
                 <button>
                   <Pencil
@@ -102,7 +80,7 @@ async function RenderCategories() {
             </tr>
           ))}
 
-          {filtered.length === 0 && (
+          {data.length === 0 && (
             <tr>
               <td colSpan={5} className="text-center p-4 text-muted-foreground">
                 Aramanıza uygun ürün bulunamadı.

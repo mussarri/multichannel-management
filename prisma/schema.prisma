@@ -14,67 +14,123 @@ datasource db {
 }
 
 model User {
-  id           String        @id @default(uuid())
-  name         String
-  email        String        @unique
-  password     String // hash
-  role         Role          @default(USER) // ADMIN | USER
-  createdAt    DateTime      @default(now())
-  updatedAt    DateTime      @updatedAt
-  orders       Order[]
-  integrations Integration[]
+  id        String   @id @default(uuid())
+  name      String
+  email     String   @unique
+  password  String // hash
+  role      Role     @default(USER) // ADMIN | USER
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Brand {
+  id          Int        @id @default(autoincrement())
+  name        String
+  slug        String     @unique
+  categoryIds Int[]
+  categories  Category[]
+  products    Product[]
+}
+
+model Category {
+  id         Int         @id @default(autoincrement())
+  name       String
+  slug       String      @unique
+  parentId   Int?
+  parent     Category?   @relation("Subcategories", fields: [parentId], references: [id])
+  children   Category[]  @relation("Subcategories")
+  attributes Attribute[]
+  products   Product[]
+  brands     Brand[]
+}
+
+model Attribute {
+  id         Int              @id @default(autoincrement())
+  name       String // örn: "Renk", "Beden", "Numara"
+  slug       String
+  categoryId Int
+  category   Category         @relation(fields: [categoryId], references: [id])
+  values     AttributeValue[]
 }
 
 model Product {
-  id        String      @id @default(uuid())
-  name      String
-  sku       String      @unique
-  price     Float
-  stock     Int
-  createdAt DateTime    @default(now())
-  updatedAt DateTime    @updatedAt
-  OrderItem OrderItem[]
+  id              String           @id @default(cuid())
+  brandId         Int
+  categoryId      Int
+  sku             String?          @unique
+  title           String?
+  sub_title       String?
+  description     String?
+  stock           Int              @default(0)
+  is_active       Boolean          @default(true)
+  barkod          String
+  price           Float
+  desi            String           @default("1")
+  brand           Brand            @relation(fields: [brandId], references: [id])
+  category        Category         @relation(fields: [categoryId], references: [id])
+  variants        ProductVariant[]
+  AttributeValues AttributeValue[]
+  images          ProductImage[]
 }
 
-model Order {
-  id          String      @id @default(uuid())
-  userId      String
-  user        User        @relation(fields: [userId], references: [id])
-  status      OrderStatus @default(PENDING) // PENDING, SHIPPED, DELIVERED, CANCELLED
-  totalAmount Float
-  items       OrderItem[]
-  createdAt   DateTime    @default(now())
+model AttributeValue {
+  id              Int              @id @default(autoincrement())
+  productId       String
+  attributeId     Int
+  value           String // örn: "Mavi", "L", "128GB" 
+  product         Product          @relation(fields: [productId], references: [id])
+  attribute       Attribute        @relation(fields: [attributeId], references: [id])
+  productVariants ProductVariant[]
+
+  @@unique([productId, attributeId, value])
 }
 
-model OrderItem {
-  id        String @id @default(uuid())
-  orderId   String
+model ProductVariant {
+  id           String                 @id @default(cuid())
+  sku          String                 @unique
+  productId    String
+  title        String // (örn: "Mavi - L" veya "Varsayılan")
+  variant_code String?
+  combination  Json?
+  price        Float
+  stock        Int                    @default(0)
+  barkod       String?
+  desi         String?
+  is_active    Boolean                @default(true)
+  is_default   Boolean                @default(false)
+  product      Product                @relation(fields: [productId], references: [id])
+  sources      ProductVariantSource[]
+  attributes   AttributeValue[]
+  images       VariantImage[]
+}
+
+model ProductVariantSource {
+  id         String         @id @default(cuid())
+  variantId  String
+  source     String // örn: "trendyol"
+  externalId String?
+  price      Float?
+  stock      Int?
+  is_active  Boolean        @default(true)
+  variant    ProductVariant @relation(fields: [variantId], references: [id])
+}
+
+model ProductImage {
+  id        String  @id @default(cuid())
   productId String
-  quantity  Int
-  price     Float
-
-  order   Order   @relation(fields: [orderId], references: [id])
-  product Product @relation(fields: [productId], references: [id])
+  url       String
+  alt       String?
+  order     Int     @default(0)
+  product   Product @relation(fields: [productId], references: [id])
 }
 
-model Customer {
-  id        String   @id @default(uuid())
-  name      String
-  email     String
-  phone     String
-  address   String
-  createdAt DateTime @default(now())
-}
-
-model Integration {
-  id        String   @id @default(uuid())
-  userId    String
-  user      User     @relation(fields: [userId], references: [id])
-  type      String // 'trendyol' | 'hepsiburada' | 'woocommerce'
-  apiKey    String
-  apiSecret String
-  isActive  Boolean  @default(true)
-  createdAt DateTime @default(now())
+model VariantImage {
+  id        String         @id @default(cuid())
+  variantId String
+  url       String
+  alt       String?
+  order     Int            @default(0)
+  variant   ProductVariant @relation(fields: [variantId], references: [id])
 }
 
 enum OrderStatus {

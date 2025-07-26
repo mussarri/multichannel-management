@@ -1,164 +1,383 @@
-import { PrismaClient } from '@prisma/client';
-import bcrypt from 'bcryptjs';
+/* eslint-disable @typescript-eslint/no-unused-vars */
+import { PrismaClient } from "@prisma/client";
+import { connect } from "http2";
 
 const prisma = new PrismaClient();
 
 async function main() {
-  // Create 5 users with hashed passwords
-  const users = await Promise.all([
-    prisma.user.create({
+  // 1. Kategori oluştur
+
+  const kitap = await prisma.category.create({
+    data: {
+      name: "Kitap",
+      slug: "kitap",
+    },
+  });
+
+  const giyim = await prisma.category.upsert({
+    where: { slug: "giyim" },
+    update: {},
+    create: {
+      name: "Giyim",
+      slug: "giyim",
+      children: {
+        create: [
+          {
+            name: "Erkek Tişört",
+            slug: "erkek-tisort",
+            attributes: {
+              create: [
+                {
+                  name: "Renk",
+                  slug: "renk",
+                },
+                {
+                  name: "Beden",
+                  slug: "beden",
+                },
+              ],
+            },
+          },
+          {
+            name: "Kadın Elbise",
+            slug: "kadin-elbise",
+            attributes: {
+              create: [
+                {
+                  name: "Renk",
+                  slug: "renk",
+                },
+                {
+                  name: "Beden",
+                  slug: "beden",
+                },
+              ],
+            },
+          },
+        ],
+      },
+    },
+  });
+
+  const kitapCategory = await prisma.category.upsert({
+    where: { slug: "kitap" },
+    update: {},
+    create: {
+      name: "Kitap",
+      slug: "kitap",
+    },
+  });
+
+  const nike = await prisma.brand.create({
+    data: {
+      name: "Nike",
+      slug: "nike",
+    },
+  });
+
+  const renkAttr = await prisma.attribute.create({
+    data: {
+      name: "Renk",
+      slug: "renk",
+      categoryId: giyim.id,
+    },
+  });
+
+  const bedenAttr = await prisma.attribute.create({
+    data: {
+      name: "Beden",
+      slug: "beden",
+      categoryId: giyim.id,
+    },
+  });
+
+  // 3. Ürün oluştur
+  const product = await prisma.product.create({
+    data: {
+      title: "Basic Tişört",
+      description: "Pamuklu kumaştan üretilmiş basic tişört.",
+      brand: {
+        connect: { id: nike.id },
+      },
+      price: 199.99,
+      stock: 100,
+      barkod: "1234567890",
+      desi: "0.5",
+      category: {
+        connect: { id: giyim.id },
+      },
+    },
+  });
+
+  const [kirmizi, mavi, m, l] = await Promise.all([
+    prisma.attributeValue.create({
       data: {
-        email: 'alice@example.com',
-        name: 'Alice',
-        password: await bcrypt.hash('password123', 10),
+        value: "Kırmızı",
+        attributeId: renkAttr.id,
+        productId: product.id,
       },
     }),
-    prisma.user.create({
+    prisma.attributeValue.create({
       data: {
-        email: 'bob@example.com',
-        name: 'Bob',
-        password: await bcrypt.hash('password123', 10),
+        value: "Mavi",
+        attributeId: renkAttr.id,
+        productId: product.id,
       },
     }),
-    prisma.user.create({
+    prisma.attributeValue.create({
       data: {
-        email: 'charlie@example.com',
-        name: 'Charlie',
-        password: await bcrypt.hash('password123', 10),
+        value: "M",
+        attributeId: bedenAttr.id,
+        productId: product.id,
       },
     }),
-    prisma.user.create({
+    prisma.attributeValue.create({
       data: {
-        email: 'diana@example.com',
-        name: 'Diana',
-        password: await bcrypt.hash('password123', 10),
-      },
-    }),
-    prisma.user.create({
-      data: {
-        email: 'edward@example.com',
-        name: 'Edward',
-        password: await bcrypt.hash('password123', 10),
+        value: "L",
+        attributeId: bedenAttr.id,
+        productId: product.id,
       },
     }),
   ]);
 
-  const userIdMapping = {
-    alice: users[0].id,
-    bob: users[1].id,
-    charlie: users[2].id,
-    diana: users[3].id,
-    edward: users[4].id,
-  };
-
-  // Create 15 posts distributed among users
-  await prisma.post.createMany({
+  await prisma.productVariant.createMany({
     data: [
-      // Alice's posts
-      { 
-        title: 'Getting Started with TypeScript and Prisma', 
-        content: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Fusce id erat a lorem tincidunt ultricies. Vivamus porta bibendum nulla vel accumsan.', 
-        published: true, 
-        authorId: userIdMapping.alice 
+      {
+        title: "Basic Tişört Kirmizi",
+        productId: product.id,
+        price: 199.99,
+        stock: 25,
+        barkod: "VARIANT-KIRMIZI-M",
+        sku: "sku-12mskujm",
+        is_default: false,
+        variant_code: "KIRMIZI-M",
+        combination: {
+          renk: "Kırmızı",
+          beden: "M",
+        },
       },
-      { 
-        title: 'How ORMs Simplify Complex Queries', 
-        content: 'Duis sagittis urna ut sapien tristique convallis. Aenean vel ligula felis. Phasellus bibendum sem at elit dictum volutpat.', 
-        published: false, 
-        authorId: userIdMapping.alice 
-      },
-
-      // Bob's posts
-      { 
-        title: 'Mastering Prisma: Efficient Database Migrations', 
-        content: 'Ut ullamcorper nec erat id auctor. Nullam nec ligula in ex feugiat tincidunt. Cras accumsan vehicula tortor ut eleifend.', 
-        published: true, 
-        authorId: userIdMapping.bob 
-      },
-      { 
-        title: 'Best Practices for Type Safety in ORMs', 
-        content: 'Aliquam erat volutpat. Suspendisse potenti. Maecenas fringilla elit vel eros laoreet, et tempor sapien vulputate.', 
-        published: true, 
-        authorId: userIdMapping.bob 
-      },
-      { 
-        title: 'TypeScript Utility Types for Database Models', 
-        content: 'Donec ac magna facilisis, vestibulum ligula at, elementum nisl. Morbi volutpat eget velit eu egestas.', 
-        published: false, 
-        authorId: userIdMapping.bob 
-      },
-
-      // Charlie's posts (no posts for Charlie)
-
-      // Diana's posts
-      { 
-        title: 'Exploring Database Indexes and Their Performance Impact', 
-        content: 'Vivamus ac velit tincidunt, sollicitudin erat quis, fringilla enim. Aenean posuere est a risus placerat suscipit.', 
-        published: true, 
-        authorId: userIdMapping.diana 
-      },
-      { 
-        title: 'Choosing the Right Database for Your TypeScript Project', 
-        content: 'Sed vel suscipit lorem. Duis et arcu consequat, sagittis justo quis, pellentesque risus. Curabitur sed consequat est.', 
-        published: false, 
-        authorId: userIdMapping.diana 
-      },
-      { 
-        title: 'Designing Scalable Schemas with Prisma', 
-        content: 'Phasellus ut erat nec elit ultricies egestas. Vestibulum rhoncus urna eget magna varius pharetra.', 
-        published: true, 
-        authorId: userIdMapping.diana 
-      },
-      { 
-        title: 'Handling Relations Between Models in ORMs', 
-        content: 'Integer luctus ac augue at tristique. Curabitur varius nisl vitae mi fringilla, vel tincidunt nunc dictum.', 
-        published: false, 
-        authorId: userIdMapping.diana 
-      },
-
-      // Edward's posts
-      { 
-        title: 'Why TypeORM Still Has Its Place in 2025', 
-        content: 'Morbi non arcu nec velit cursus feugiat sit amet sit amet mi. Etiam porttitor ligula id sem molestie, in tempor arcu bibendum.', 
-        published: true, 
-        authorId: userIdMapping.edward 
-      },
-      { 
-        title: 'NoSQL vs SQL: The Definitive Guide for Developers', 
-        content: 'Suspendisse a ligula sit amet risus ullamcorper tincidunt. Curabitur tincidunt, sapien id fringilla auctor, risus libero gravida odio, nec volutpat libero orci nec lorem.', 
-        published: true, 
-        authorId: userIdMapping.edward 
-      },
-      { 
-        title: 'Optimizing Queries with Prisma\'s Select and Include', 
-        content: 'Proin vel diam vel nisi facilisis malesuada. Sed vitae diam nec magna mollis commodo a vitae nunc.', 
-        published: false, 
-        authorId: userIdMapping.edward 
-      },
-      { 
-        title: 'PostgreSQL Optimizations Every Developer Should Know', 
-        content: 'Nullam mollis quam sit amet lacus interdum, at suscipit libero pellentesque. Suspendisse in mi vitae magna finibus pretium.', 
-        published: true, 
-        authorId: userIdMapping.edward 
-      },
-      { 
-        title: 'Scaling Applications with Partitioned Tables in PostgreSQL', 
-        content: 'Cras vitae tortor in mauris tristique elementum non id ipsum. Nunc vitae pulvinar purus.', 
-        published: true, 
-        authorId: userIdMapping.edward 
+      {
+        title: "Basic Tişört Mavi",
+        productId: product.id,
+        price: 199.99,
+        stock: 25,
+        barkod: "VARIANT-MAVI-L",
+        sku: "sku-12msko3l",
+        is_default: false,
+        variant_code: "MAVI-L",
+        combination: {
+          renk: "Mavi",
+          beden: "L",
+        },
       },
     ],
   });
 
-  console.log('Seeding completed.');
+  const variants = await prisma.productVariant.findMany({
+    where: { productId: product.id },
+  });
+
+  for (const variant of variants) {
+    const comb = variant.combination;
+
+    const relatedValues = await prisma.attributeValue.findMany({
+      where: {
+        productId: product.id,
+        value: {
+          in: Object.values(comb),
+        },
+      },
+    });
+
+    await prisma.productVariant.update({
+      where: { id: variant.id },
+      data: {
+        attributes: {
+          connect: relatedValues.map((val) => ({ id: val.id })),
+        },
+      },
+    });
+  }
+
+  // 2. Ürün oluştur
+  // const product22 = await prisma.product.create({
+  //   data: {
+  //     title: "Oversize Tişört",
+  //     brand: "XYZ Marka",
+  //     categoryId: giyim.id,
+  //     description: "Geniş kesim rahat tişört",
+  //     barkod: "1234567890123",
+  //     desi: "1.5",
+  //     price: 130.0,
+  //     stock: 100,
+  //     is_active: true,
+  //     variants: {
+  //       create: [
+  //         {
+  //           variant_code: "RED-M",
+  //           stock: 30,
+  //           price: 120.0,
+  //           barkod: "1234567890124",
+  //           sku: "SKU-REDOVERTEE-001",
+  //           title: "Oversize Tişört Kirmizi",
+  //           desi: "1.5",
+  //           is_active: true,
+  //           combination: [
+  //             { attribute: "renk", values: "Kirmizi" },
+  //             { attribute: "beden", values: "M" },
+  //           ],
+  //           sources: {
+  //             create: [
+  //               {
+  //                 source: "trendyol",
+  //                 externalId: "trendyol-1001",
+  //                 price: 119.0,
+  //                 stock: 25,
+  //                 is_active: true,
+  //               },
+  //               {
+  //                 source: "n11",
+  //                 externalId: "n11-5001",
+  //                 price: 118.5,
+  //                 stock: 20,
+  //                 is_active: true,
+  //               },
+  //             ],
+  //           },
+  //           images: {
+  //             create: [
+  //               {
+  //                 url: "https://i.imgur.com/QkIa5tT.jpeg",
+  //                 alt: "Kırmızı Tişört M Beden - Ön",
+  //                 order: 0,
+  //               },
+  //             ],
+  //           },
+  //           attributes: {
+  //             create: [
+  //               {
+  //                 value: "mavi",
+  //                 attribute: {
+  //                   create: {
+  //                     name: "renk",
+  //                   },
+  //                 },
+  //               },
+  //               {
+  //                 value: "kirmizi",
+  //               },
+  //               {
+  //                 value: "beyaz",
+  //               },
+  //             ],
+  //           },
+  //         },
+  //         {
+  //           variant_code: "BLUE-L",
+  //           stock: 40,
+  //           price: 130.0,
+  //           title: "Oversize Tişört Mavi",
+  //           sku: "SKU-BLUEOVERTEE-001",
+  //           barkod: "1234567890125",
+  //           desi: "1.5",
+  //           is_active: true,
+  //           combination: [
+  //             { attribute: "renk", values: "Mavi" },
+  //             { attribute: "beden", values: "L" },
+  //           ],
+  //           sources: {
+  //             create: [
+  //               {
+  //                 source: "trendyol",
+  //                 externalId: "trendyol-1002",
+  //                 price: 129.0,
+  //                 stock: 35,
+  //                 is_active: true,
+  //               },
+  //             ],
+  //           },
+  //           images: {
+  //             create: [
+  //               {
+  //                 url: "https://fakestoreapi.com/img/61pHAEJ4NML._AC_UX679_.jpg",
+  //                 alt: "Mavi Tişört L Beden - Ön",
+  //                 order: 0,
+  //               },
+  //             ],
+  //           },
+  //         },
+  //       ],
+  //     },
+  //     images: {
+  //       create: [
+  //         {
+  //           url: "https://fakestoreapi.com/img/61pHAEJ4NML._AC_UX679_.jpg",
+  //           alt: "Oversize Tişört Genel Görsel 1",
+  //           order: 0,
+  //         },
+  //       ],
+  //     },
+  //   },
+  // });
+
+  const ttk = await prisma.brand.create({
+    data: {
+      name: "Alfa Yayinlari",
+      slug: "alfa-yayinlari",
+    },
+  });
+
+  const product2 = await prisma.product.create({
+    data: {
+      title: "Nutuk",
+      sub_title: "Mustafa Kemal Atatürk",
+      description:
+        "Atatürk’ün 1919-1927 yılları arasındaki olayları anlattığı eseri.",
+      category: {
+        connect: { id: kitapCategory.id },
+      },
+      brand: {
+        connect: { id: ttk.id },
+      },
+      barkod: "9789751604037",
+      desi: "1.2",
+      stock: 11,
+      price: 100.0,
+      is_active: true,
+      variants: {
+        create: [
+          {
+            title: "Standart",
+            price: 99.9,
+            stock: 120,
+            sku: "NUTUK-V11",
+            barkod: "9789751604037",
+            is_default: true,
+            sources: {
+              create: [
+                {
+                  source: "trendyol",
+                  externalId: "trendyol-1001",
+                  price: 119.0,
+                  stock: 25,
+                  is_active: true,
+                },
+              ],
+            },
+          },
+        ],
+      },
+    },
+  });
+
+  console.log("Seed işlemi tamamlandı!");
 }
 
 main()
-  .then(async () => {
-    await prisma.$disconnect();
-  })
-  .catch(async (e) => {
+  .catch((e) => {
     console.error(e);
-    await prisma.$disconnect();
     process.exit(1);
+  })
+  .finally(async () => {
+    await prisma.$disconnect();
   });

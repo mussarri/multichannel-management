@@ -2,6 +2,7 @@ import { Sidebar } from "@/app/components/layout/sidebar";
 import { Topbar } from "@/app/components/layout/topbar";
 
 import Breadcrumb from "@/app/components/bradcrumb";
+import { ToastContainer } from "react-toastify";
 
 export default function DashboardLayout({
   children,
@@ -16,8 +17,8 @@ export default function DashboardLayout({
         <Topbar />
         <main className={"flex-1 overflow-y-auto overflow-x-hidden p-4 "}>
           <Breadcrumb />
-
           {children}
+          <ToastContainer />
         </main>
       </div>
     </div>

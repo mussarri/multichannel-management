@@ -12,7 +12,7 @@ export function Topbar() {
   return (
     <header
       className={
-        "flex items-center justify-between py-3 border-b bg-sidebar gap-4" +
+        "flex z-40 items-center justify-between py-3 border-b bg-sidebar gap-4" +
         (mobile ? " px-2" : " px-8")
       }
     >

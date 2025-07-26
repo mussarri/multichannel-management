@@ -2,33 +2,61 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { Button } from "@/components/ui/button";
 import { BlocksIcon, RefreshCwIcon, Trash, Trash2 } from "lucide-react";
+import { redirect } from "next/navigation";
 import React, { useState } from "react";
 
-const index = ({ optionList }: { optionList: any[] }) => {
-  const list = optionList.filter((item) => item.name !== "");
+const index = ({
+  attributes,
+  product,
+}: {
+  attributes: any[];
+  product: any;
+}) => {
+  function generateCombinations(variants, index = 0, current = {}) {
+    if (index === variants.length) {
+      return [
+        {
+          ...current,
+          variant: Object.values(current).join("-"),
+        },
+      ];
+    }
 
-  function cartesianProduct(arrays: any[]) {
-    return arrays.reduce(
-      (acc, curr) => acc.flatMap((a: any) => curr.map((b: any) => [...a, b])),
-      [[]]
-    );
+    const [key, values] = variants[index];
+    const results = [];
+
+    values.forEach((value) => {
+      results.push(
+        ...generateCombinations(variants, index + 1, {
+          ...current,
+          [key]: value,
+        })
+      );
+    });
+
+    return results;
   }
 
-  const combinations = cartesianProduct(list.map((opt) => opt.values)).map(
-    (combo: any[]) => combo.join("-")
-  );
+  const combinations = generateCombinations(attributes);
 
   const [formData, setFormData] = useState(() =>
     combinations.map((option: any) => ({
-      option,
+      variant_code: option.variant,
+      combinations: {
+        ...option,
+        variant: undefined,
+      },
       barkod: "",
-      stockCode: "",
-      stock: "",
-      price: "",
-      n11Price: "",
-      trendyolPrice: "",
-      trendyolSalePrice: "",
-      unitCount: "",
+      sku: product.sku + "-" + option.variant,
+      stock: 0,
+      desi: product.desi,
+      title: product.title + " " + option.variant,
+      description: product.description + " " + option.variant,
+      price: product.price,
+      n11_price: product.price,
+      trendyol_price: product.price,
+      trendyol_sale_price: product.price,
+      unit_count: 1,
     }))
   );
 
@@ -95,19 +123,38 @@ const index = ({ optionList }: { optionList: any[] }) => {
       prev.map((item) => ({
         ...item,
         barkod: "",
-        stockCode: "",
+        sku: "",
+        title: "",
+        description: "",
         stock: "",
         price: "",
-        n11Price: "",
-        trendyolPrice: "",
-        trendyolSalePrice: "",
+        n11_price: "",
+        trendyol_price: "",
+        trendyol_sale_price: "",
         unitCount: "",
       }))
     );
   };
 
   const handleDeleteAllVariants = () => {
-    setFormData([]);
+    setFormData([
+      {
+        variant_code: "default",
+        combinations: {},
+        barkod: "",
+        sku: product.sku,
+        stock: 0,
+        desi: product.desi,
+        title: product.title,
+        description: product.description,
+        price: product.price,
+        n11_price: product.price,
+        trendyol_price: product.price,
+        trendyol_sale_price: product.price,
+        unit_count: 1,
+      },
+    ]);
+    redirect("/dashboard/products/" + product.id);
   };
 
   return (
@@ -136,7 +183,7 @@ const index = ({ optionList }: { optionList: any[] }) => {
           </button>
         </div>
       </div>
-      <table className="variant-table">
+      <table className="variant-table w-max">
         <thead>
           <tr className="border-b">
             <th>Seçenek</th>
@@ -222,7 +269,7 @@ const index = ({ optionList }: { optionList: any[] }) => {
         <tbody>
           {formData.map((item: any, index: number) => (
             <tr key={index}>
-              <td className="text-left">{item.option}</td>
+              <td className="text-left">{item.variant_code}</td>
               <td className="text-left">
                 <input
                   type="text"
@@ -234,7 +281,7 @@ const index = ({ optionList }: { optionList: any[] }) => {
                   }
                 />
               </td>
-              <td className="text-left">{}</td>
+              <td className="text-left text-[13px]">{item.sku}</td>
               <td className="text-left">
                 <input
                   type="text"

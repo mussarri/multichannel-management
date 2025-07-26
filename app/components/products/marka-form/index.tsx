@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useActionState, useEffect, useState } from "react";
 import {
   Dialog,
   DialogContent,
@@ -10,16 +10,26 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { createBrand } from "@/app/action";
+import { toast } from "react-toastify";
+import { useParams } from "next/navigation";
 
 export function MarkaForm() {
   const [open, setOpen] = useState(false);
-  const [marka, setMarka] = useState("");
+  const [state, formAction, isPending] = useActionState(createBrand, null);
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    setMarka("");
-    setOpen(false);
-  };
+  useEffect(() => {
+    if (state?.error) {
+      toast.error("Ürün güncellenirken bir hata oluştu.");
+      setOpen(false);
+    }
+    if (state?.success) {
+      toast.success("Ürün başarıyla güncellendi.");
+      setOpen(false);
+    }
+  }, [state]);
+
+  const { id } = useParams();
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
@@ -32,16 +42,16 @@ export function MarkaForm() {
           <DialogTitle>Yeni Marka Ekle</DialogTitle>
         </DialogHeader>
 
-        <form onSubmit={handleSubmit} className="space-y-4 mt-2">
-          <Input
-            placeholder="Marka adı"
-            value={marka}
-            onChange={(e) => setMarka(e.target.value as string)}
-            required
-          />
+        {state?.error && <div>{state?.meessage}</div>}
+
+        <form action={formAction} className="space-y-4 mt-2">
+          <Input placeholder="Marka adı" name="name" required />
+          <input type="hidden" name="id" value={id} />
 
           <div className="flex justify-end">
-            <Button type="submit">Kaydet</Button>
+            <Button type="submit" disabled={isPending}>
+              Kaydet
+            </Button>
           </div>
         </form>
       </DialogContent>

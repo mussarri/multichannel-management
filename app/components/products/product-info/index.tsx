@@ -1,9 +1,10 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 "use client";
 
 import { MarkaForm } from "@/app/components/products/marka-form";
 import { Input } from "@/components/ui/input";
-import React, { useState } from "react";
+import React, { useActionState, useEffect, useState } from "react";
 import SelectInput from "@/app/components/settings/select-input";
 import TextInput from "@/app/components/settings/text-input";
 
@@ -17,24 +18,64 @@ import { Button } from "@/components/ui/button";
 import ImageInput from "@/app/components/products/image-input";
 import { useParams } from "next/navigation";
 import Link from "next/link";
-import { Blocks, OptionIcon, Settings } from "lucide-react";
+import { Blocks, Settings, Trash } from "lucide-react";
+import { Product, Category } from "@prisma/client";
+import Image from "next/image";
+import { updateProductAction } from "@/app/action";
+import { toast } from "react-toastify";
 
-const Info = () => {
+const Info = ({
+  product,
+  categories,
+  brands,
+}: {
+  product: any;
+  categories: Category[];
+  brands: any[];
+}) => {
   const [model, setModel] = useState<object>();
+  const [message, formAction, isPending] = useActionState(
+    updateProductAction,
+    null
+  );
+
+  useEffect(() => {
+    if (message?.error) {
+      toast.error("Ürün güncellenirken bir hata oluştu.");
+    }
+    if (message?.success) {
+      toast.success("Ürün başarıyla güncellendi.");
+    }
+  }, [message]);
+
+  const errorRef = React.useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (message?.error && errorRef.current) {
+      errorRef.current.scrollIntoView({
+        behavior: "smooth", // Yumuşak kaydırma animasyonu
+        block: "center", // Elementi görünümün ortasına hizala (başlangıç/son da olabilir)
+      });
+    }
+  }, [message?.error, message?.message]);
+
+  console.log(product);
+
   const [form, setForm] = useState({
-    label: "",
-    name: "",
-    value: "",
-    placeholder: "",
-    category: "",
-    stock: "",
-    title: "",
-    sub_title: "",
-    dec_from_inventory: "",
-    stock_code: "",
+    title: product.title,
+    sub_title: product.sub_title,
+    category: product.category.name,
+    stock: product.stock,
     t_stock_code: "",
-    lstmodeplaseholder: "",
-    brand: "",
+    stock_code: product.stock_code,
+    dec_from_inventory: "",
+    price: product.price,
+    brand: product.brand.name,
+    is_active: product.is_active,
+    barkod: product.barkod,
+    desi: product.desi,
+    description: product.description,
+    images: product.images.map((item: any) => item.url),
   });
 
   const { id } = useParams();
@@ -45,74 +86,99 @@ const Info = () => {
 
   const settings = [
     {
+      label: "T. Stok Kodu",
+      name: "t_stock_code",
+      value: form.t_stock_code,
+      placeholder: "placeholder",
+    },
+    {
       label: "Barkod",
-      name: "mode",
-      value: "adsasd",
+      name: "barkod",
+      value: form.barkod,
       placeholder: "placeholder",
     },
     {
       label: "Desi",
-      name: "mode",
-      value: "adsasd",
+      name: "desi",
+      value: form.desi,
       placeholder: "placeholder",
     },
     {
       label: "Stok",
-      name: "mode",
-      value: "adsasd",
-      placeholder: "placeholder",
-    },
-    {
-      label: "Stok Kodu",
-      name: "mode",
-      value: "adsasd",
-      placeholder: "placeholder",
-    },
-    {
-      label: "T. Stok Kodu",
-      name: "mode",
-      value: "adsasd",
+      name: "stock",
+      value: form.stock,
       placeholder: "placeholder",
     },
   ];
 
   return (
-    <div className="pb-10">
+    <form action={formAction} className="pb-10" encType="multipart/form-data">
       <h2 className="text-xl font-semibold mb-4">Ürün Bilgileri</h2>
       <div className="box p-4 max-w-[750px] min-w-[750px] w-full flex flex-col gap-5 relative">
         <div className="justify-between  flex max-w-[100%] w-full h-[85px]">
           <h2 className="text-lg font-semibold mb-4">
-            Ürün Bilgileri{id && <span> - ({id})</span>}
+            Ürün Bilgileri{id && <span> - ({product.title})</span>}
             <p className="text-xs font-light">
               Urun bilgilerini formlar ile duzenleyebilirsiniz.
             </p>
           </h2>
           <div className="flex gap-5">
-            <Link
-              className="text-sm flex flex-col items-center"
-              href={"/dashboard/sync/" + id}
-            >
-              <Blocks size={22} />
-              Entegrasyon
-            </Link>
-            <Link
-              className="text-sm flex flex-col items-center"
-              href={"/dashboard/variants/" + id}
-            >
-              <Settings size={22} />
-              Seçenekler
-            </Link>
+            <div className="relative inline-block group">
+              <Link
+                className="text-sm flex flex-col items-center"
+                href={"/dashboard/sync/" + id}
+              >
+                <Blocks size={22} />
+                Entegrasyon
+              </Link>
+              <div className="absolute left-1/2 -translate-x-1/2 top-[50%] mt-2 w-48 bg-gray-800 text-white text-sm p-2 rounded hidden group-hover:block z-50">
+                Ürünü pazarylerinde satışa çıkarmak için tıklayınız.
+              </div>
+            </div>
+            <div className="relative inline-block group">
+              <Link
+                className="text-sm flex flex-col items-center"
+                href={"/dashboard/variants/" + id}
+              >
+                <Settings size={22} />
+                Seçenekler
+              </Link>
+              <div className="absolute left-1/2 -translate-x-1/2 top-[50%] mt-2 w-48 bg-gray-800 text-white text-sm p-2 rounded hidden group-hover:block z-50">
+                Ürünün varyantlarını ayarlamak için tıklayınız.
+              </div>
+            </div>
           </div>
         </div>
         <div className="absolute w-full h-[1px] bg-border left-0 top-[85px]"></div>
+        <div className="flex flex-col gap-1 items-start">
+          <label className="text-sm font-semibold" htmlFor="">
+            Ürün Satış Durumu
+          </label>
+          <div
+            className={
+              " p-2 text-sm text-center  rounded cursor-pointer w-full max-w-[400px] transition-all duration-200 " +
+              (form.is_active
+                ? "bg-green-500 text-white"
+                : " bg-secondary text-secondary-foreground")
+            }
+            onClick={() => {
+              setForm({ ...form, is_active: !form.is_active });
+            }}
+          >
+            {form.is_active ? "Aktif" : "Pasif"}
+          </div>
+        </div>
         <div className="flex gap-4 items-end">
+          <input type="hidden" name="id" value={id} />
           <div className=" flex-1">
             <SelectInput
               label={"Ürün Markasi"}
               name={"brand"}
-              options={[]}
+              options={brands.map((b) => b.name) || []}
               required={true}
-              onChange={() => {}}
+              onChange={(value: string) => {
+                setForm({ ...form, brand: value });
+              }}
               vertical={true}
               value={form.brand}
             />
@@ -122,9 +188,11 @@ const Info = () => {
             <SelectInput
               label={"Ürün Kategorisi"}
               name={"category"}
-              options={[]}
+              options={categories.map((c) => c.name)}
               required={true}
-              onChange={() => {}}
+              onChange={(v: string) => {
+                setForm({ ...form, category: v });
+              }}
               vertical={true}
               value={form.category}
             />
@@ -135,7 +203,7 @@ const Info = () => {
             <TextInput
               label={"Ürün Basligi"}
               name={"title"}
-              value=""
+              value={form.title}
               error={false}
               required={true}
               placeholder="Ürün başlığı"
@@ -144,27 +212,34 @@ const Info = () => {
               vertical={true}
             />
           </div>
-          <div className="flex flex-col gap-1 items-start">
-            <label className="text-sm font-semibold" htmlFor="">
-              Ürün Satış Durumu
-            </label>
-            <select name="" id="" className="p-2 rounded-lg h-[40px] w-full">
-              <option value="">Acık</option>
-              <option value="">Kapalı</option>
-            </select>
-          </div>
         </div>
         <div className="flex flex-wrap gap-1">
+          <TextInput
+            label={"Stok Kodu"}
+            name={"stock_code"}
+            value={form.stock_code?.toLocaleString()}
+            error={false}
+            required={true}
+            placeholder={"stock_code"}
+            onChange={(v: string) => {
+              setForm({ ...form, stock_code: v });
+            }}
+            type="text"
+            vertical={true}
+            readOnly={true}
+          />
           {settings.map((item, didem) => (
             <TextInput
               key={didem}
               label={item.label}
-              name={"title"}
-              value=""
+              name={item.name}
+              value={form[item.name]?.toLocaleString()}
               error={false}
               required={true}
-              placeholder="Ürün başlığı"
-              onChange={() => {}}
+              placeholder={item.name}
+              onChange={(v: string) => {
+                setForm({ ...form, [item.name]: v });
+              }}
               type="text"
               vertical={true}
             />
@@ -181,7 +256,7 @@ const Info = () => {
               error={false}
               type={"text"}
               placeholder="1"
-              value=""
+              value={form.sub_title}
             />
           </div>
           <div className="flex-1">
@@ -189,16 +264,21 @@ const Info = () => {
               label={"Ürün satınca stoktan ne kardar düşecek"}
               name={"dec_from_inventory"}
               required={true}
-              onChange={() => {}}
+              onChange={(value: string) => {
+                setForm({ ...form, dec_from_inventory: value });
+              }}
               vertical={true}
               error={false}
               type={"text"}
               placeholder="1"
-              value=""
+              value={form.dec_from_inventory}
             />
           </div>
         </div>
         <div>
+          <label htmlFor="" className="text-sm uppercase font-semibold mb-1">
+            Ürün Aciklama
+          </label>
           <FroalaEditorComponent
             tag="textarea"
             config={{
@@ -212,15 +292,84 @@ const Info = () => {
         <div>
           <ImageInput
             onFileChange={(files) => {
-              console.log(files);
+              setForm({ ...form, images: [...form.images, files] });
             }}
           />
+          <div className="grid grid-cols-6 gap-3">
+            {form.images &&
+              form.images.map((item, index) =>
+                typeof item === "string" ? (
+                  <div key={index}>
+                    <div
+                      className="relative bg-card rounded border"
+                      style={{
+                        aspectRatio: 1,
+                      }}
+                    >
+                      <Image src={item} alt="" fill objectFit="contain" />
+                      {/* <div className="drop-file-preview__item__info">
+                <p>{item?.name}</p>
+                <p>{item?.size}B</p>
+              </div> */}
+                    </div>
+                    <span
+                      className="text-xs flex items-center justify-center gap-2 py-1 mx-auto cursor-pointer hover:text-red-800"
+                      onClick={() =>
+                        setForm({
+                          ...form,
+                          images: form.images.filter(
+                            (item) => typeof item !== "string" || item !== item
+                          ),
+                        })
+                      }
+                    >
+                      <Trash size={11} /> Remove File
+                    </span>
+                  </div>
+                ) : (
+                  item.map((item2, index2) => (
+                    <div key={index}>
+                      <div
+                        className="relative bg-card rounded border"
+                        style={{
+                          aspectRatio: 1,
+                        }}
+                      >
+                        <Image
+                          src={item2.url}
+                          alt=""
+                          fill
+                          objectFit="contain"
+                        />
+                      </div>
+                      <span
+                        className="text-xs flex items-center justify-center gap-2 py-1 mx-auto cursor-pointer hover:text-red-800"
+                        onClick={() =>
+                          setForm({
+                            ...form,
+                            images: form.images.map((item3) =>
+                              typeof item3 === "string"
+                                ? item3
+                                : item3.filter((item) => item.url !== item2.url)
+                            ),
+                          })
+                        }
+                      >
+                        <Trash size={11} /> Remove File
+                      </span>
+                    </div>
+                  ))
+                )
+              )}
+          </div>
         </div>
       </div>
       <div className="max-w-[750px] w-full text-right mt-4 ">
-        <Button>Kaydet</Button>
+        <Button type="submit" disabled={isPending}>
+          Kaydet
+        </Button>
       </div>
-    </div>
+    </form>
   );
 };
 

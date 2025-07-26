@@ -1,4 +1,7 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
+import { fetchProductsAction } from "@/app/action";
 import { ProductTable } from "@/app/components/products/product-table";
+import prisma from "@/lib/prisma";
 import { Suspense } from "react";
 
 export default function ProductsPage() {
@@ -15,32 +18,28 @@ export default function ProductsPage() {
 }
 
 async function RenderProducts() {
-  const response = await fetch("https://api.escuelajs.co/api/v1/products");
-  const data = await response.json();
-  console.log(data);
+  const response = await fetchProductsAction();
+  const data = response.data;
+  if (response?.error) {
+    return <div>{response?.message}.</div>;
+  }
 
   const initialProducts = [
     {
-      id: "1",
-      name: "Apple Iphone 13 256 GB",
-      sku: "PHN-123",
-      price: 7999,
-      stock: 42,
-    },
-    {
-      id: "2",
-      name: "Apple Macbook Pro M4 Pro 24GB RAM 512GB SSD",
-      sku: "LPT-456",
-      price: 15999,
-      stock: 12,
-    },
-    {
-      id: "3",
-      name: "Logitech G502 HERO Gaming Mouse ",
-      sku: "KEY-789",
-      price: 399,
-      stock: 78,
+      id: "",
+      categoryId: "Apple Iphone 13 256 GB",
+      title: "",
+      sub_title: "",
+      description: "",
+      stock: "",
+      stock_code: "PHN-123",
+      brand: "42",
+      is_active: true,
+      barkod: "",
+      price: "7999",
+      desi: "",
     },
   ];
-  return <ProductTable products={initialProducts} />;
+
+  return <ProductTable products={data} />;
 }

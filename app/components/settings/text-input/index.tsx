@@ -10,6 +10,7 @@ const index = ({
   type = "text",
   error = false,
   vertical = false,
+  readOnly = false,
 }: {
   label: string;
   placeholder: string;
@@ -20,6 +21,7 @@ const index = ({
   type: string;
   error: boolean;
   vertical: boolean;
+  readOnly?: boolean;
 }) => {
   const InputElement = () => {
     switch (type) {
@@ -47,6 +49,7 @@ const index = ({
               "border p-2 rounded-lg w-full outline-none text-sm" +
               (value ? "border-green-700" : error ? "border-red-500" : "")
             }
+            readOnly={readOnly}
           />
         );
     }
