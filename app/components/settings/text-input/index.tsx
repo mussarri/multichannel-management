@@ -46,8 +46,8 @@ const index = ({
             }}
             required={required}
             className={
-              "border p-2 rounded-lg w-full outline-none text-sm" +
-              (value ? "border-green-700" : error ? "border-red-500" : "")
+              "border p-2 rounded-lg w-full outline-none text-sm " +
+              (error ? "border-red-500" : "")
             }
             readOnly={readOnly}
           />
@@ -69,6 +69,7 @@ const index = ({
       </label>
       {vertical || ":"}
       {InputElement()}
+      {error && <p className="text-red-500 text-xs">{error}</p>}
     </div>
   );
 };

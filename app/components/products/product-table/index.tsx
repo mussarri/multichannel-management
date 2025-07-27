@@ -1,22 +1,40 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-/* eslint-disable @typescript-eslint/no-unused-vars */
 "use client";
 
-import { useState } from "react";
+import { useActionState, useEffect, useState } from "react";
 import { Pencil, PlusIcon, Trash2 } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { useMediaQuery } from "usehooks-ts";
-import { Product } from "@prisma/client";
 import Image from "next/image";
+import { deleteProduct } from "@/app/action";
+import { toast } from "react-toastify";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { DialogTrigger } from "@radix-ui/react-dialog";
 
 export function ProductTable({ products }: { products: any[] }) {
   const [search, setSearch] = useState("");
+  const [open, setOpen] = useState(false);
   const mobile = useMediaQuery("(max-width: 840px)");
   const filtered = products?.filter((p) =>
     p.title.toLowerCase().includes(search.toLowerCase())
   );
+  const [message, formAction, isPending] = useActionState(deleteProduct, null);
+
+  useEffect(() => {
+    if (message?.error) {
+      toast.error(message?.message);
+    }
+    if (message?.success) {
+      toast.success(message?.message);
+    }
+  }, [message?.error, message?.message, message?.success]);
 
   return (
     <div
@@ -81,20 +99,61 @@ export function ProductTable({ products }: { products: any[] }) {
                     <td className="p-2">{product.stock}</td>
                     <td className="p-2">{}</td>
                     <td className="p-2 text-right space-x-2">
-                      <Link href={`/dashboard/products/${product.id}`}>
-                        <Pencil
-                          size={16}
-                          className="hover:scale-110 duration-200 hover:cursor-pointer"
-                          color="var(--warning)"
-                        />
-                      </Link>
-                      <button>
-                        <Trash2
-                          size={16}
-                          className="hover:scale-110 duration-200 hover:cursor-pointer"
-                          color="var(--error)"
-                        />
-                      </button>
+                      <div className="flex gap-2 justify-end">
+                        {" "}
+                        <Link href={`/dashboard/products/${product.id}`}>
+                          <Pencil
+                            size={16}
+                            className="hover:scale-110 duration-200 hover:cursor-pointer"
+                            color="var(--warning)"
+                          />
+                        </Link>
+                        <Dialog open={open} onOpenChange={setOpen}>
+                          <DialogTrigger asChild>
+                            <button type="button">
+                              <Trash2
+                                size={16}
+                                className="hover:scale-110 duration-200 hover:cursor-pointer"
+                                color="var(--error)"
+                              />
+                            </button>
+                          </DialogTrigger>
+
+                          <DialogContent>
+                            <DialogHeader>
+                              <DialogTitle>
+                                {product.title + " silinsin mi?"}
+                              </DialogTitle>
+                            </DialogHeader>
+
+                            <form
+                              action={formAction}
+                              className="flex justify-end items-center gap-2"
+                            >
+                              <input
+                                type="text"
+                                name="id"
+                                value={product.id}
+                                hidden
+                              />
+                              <button
+                                className="rounded border px-3 p-1 text-sm"
+                                type="button"
+                                onClick={() => setOpen(false)}
+                              >
+                                Iptal
+                              </button>
+                              <button
+                                className="rounded border px-3 p-1 text-sm bg-error text-white"
+                                type="submit"
+                                disabled={isPending}
+                              >
+                                Evet
+                              </button>
+                            </form>
+                          </DialogContent>
+                        </Dialog>
+                      </div>
                     </td>
                   </tr>
                 ))}

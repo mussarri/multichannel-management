@@ -37,7 +37,7 @@ model Category {
   name       String
   slug       String      @unique
   parentId   Int?
-  parent     Category?   @relation("Subcategories", fields: [parentId], references: [id])
+  parent     Category?   @relation("Subcategories", fields: [parentId], references: [id], onDelete: SetNull)
   children   Category[]  @relation("Subcategories")
   attributes Attribute[]
   products   Product[]
@@ -63,11 +63,11 @@ model Product {
   description     String?
   stock           Int              @default(0)
   is_active       Boolean          @default(true)
-  barkod          String
-  price           Float
+  barkod          String?
+  price           Float?
   desi            String           @default("1")
-  brand           Brand            @relation(fields: [brandId], references: [id])
-  category        Category         @relation(fields: [categoryId], references: [id])
+  brand           Brand            @relation(fields: [brandId], references: [id], onDelete: NoAction)
+  category        Category         @relation(fields: [categoryId], references: [id], onDelete: NoAction)
   variants        ProductVariant[]
   AttributeValues AttributeValue[]
   images          ProductImage[]
@@ -78,41 +78,66 @@ model AttributeValue {
   productId       String
   attributeId     Int
   value           String // örn: "Mavi", "L", "128GB" 
-  product         Product          @relation(fields: [productId], references: [id])
-  attribute       Attribute        @relation(fields: [attributeId], references: [id])
+  product         Product          @relation(fields: [productId], references: [id], onDelete: Cascade)
+  attribute       Attribute        @relation(fields: [attributeId], references: [id], onDelete: Cascade)
   productVariants ProductVariant[]
 
   @@unique([productId, attributeId, value])
 }
 
 model ProductVariant {
-  id           String                 @id @default(cuid())
-  sku          String                 @unique
-  productId    String
-  title        String // (örn: "Mavi - L" veya "Varsayılan")
-  variant_code String?
-  combination  Json?
-  price        Float
-  stock        Int                    @default(0)
-  barkod       String?
-  desi         String?
-  is_active    Boolean                @default(true)
-  is_default   Boolean                @default(false)
-  product      Product                @relation(fields: [productId], references: [id])
-  sources      ProductVariantSource[]
-  attributes   AttributeValue[]
-  images       VariantImage[]
+  id            String           @id @default(cuid())
+  sku           String           @unique
+  productId     String
+  title         String // (örn: "Mavi - L" veya "Varsayılan")
+  variant_code  String?
+  combination   Json?
+  price         Float
+  stock         Int              @default(0)
+  barkod        String?
+  desi          String?
+  is_active     Boolean          @default(false)
+  is_default    Boolean          @default(false)
+  product       Product          @relation(fields: [productId], references: [id], onDelete: Cascade)
+  attributes    AttributeValue[]
+  images        VariantImage[]
+  variantPrices VariantPrice[]
+
+  @@unique([productId, sku])
 }
 
-model ProductVariantSource {
-  id         String         @id @default(cuid())
-  variantId  String
-  source     String // örn: "trendyol"
-  externalId String?
-  price      Float?
-  stock      Int?
-  is_active  Boolean        @default(true)
-  variant    ProductVariant @relation(fields: [variantId], references: [id])
+model VariantPrice {
+  id            String         @id @default(cuid())
+  variantId     String
+  marketplaceId Int
+  vatRate       Int            @default(18)
+  currency      String         @default("TRY")
+  salePrice     Float
+  listPrice     Float?
+  discountPrice Float?
+  costPrice     Float?
+  //piyasa fiyati
+  variant       ProductVariant @relation(fields: [variantId], references: [id], onDelete: Cascade)
+  marketplace   Marketplace    @relation(fields: [marketplaceId], references: [id], onDelete: Cascade)
+  startDate     DateTime?
+  endDate       DateTime?
+  createdAt     DateTime       @default(now())
+}
+
+model Marketplace {
+  id            Int            @id @default(autoincrement())
+  name          String         @unique // e.g. "Trendyol"
+  code          String         @unique // e.g. "TRENDYOL"
+  logoUrl       String? // UI için
+  description   String? // Admin panelde gösterilecek alt açıklama
+  apiUrl        String? // Entegrasyon için
+  apiKey        String? // Gizli anahtar (şifrelenebilir)
+  currency      String         @default("TRY") // Pazaryerinin yerel para birimi
+  active        Boolean        @default(true) // Aktif mi?
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+  extraInfo     Json?
+  variantPrices VariantPrice[]
 }
 
 model ProductImage {
@@ -121,7 +146,7 @@ model ProductImage {
   url       String
   alt       String?
   order     Int     @default(0)
-  product   Product @relation(fields: [productId], references: [id])
+  product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
 }
 
 model VariantImage {
@@ -130,7 +155,7 @@ model VariantImage {
   url       String
   alt       String?
   order     Int            @default(0)
-  variant   ProductVariant @relation(fields: [variantId], references: [id])
+  variant   ProductVariant @relation(fields: [variantId], references: [id], onDelete: Cascade)
 }
 
 enum OrderStatus {

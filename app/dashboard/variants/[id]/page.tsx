@@ -18,7 +18,7 @@ export default New;
 async function RenderVariant({ params }: { params: any }) {
   const product = await prisma.product.findFirst({
     where: {
-      id: params.id,
+      id: await params.id,
     },
     include: {
       images: true,

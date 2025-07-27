@@ -90,9 +90,10 @@ const ProductCard = ({ data }: { data: any }) => {
           </div>
         </div>
       </div>
-      <div className="p-3 mt-5 bg-card box overflow-scroll max-h-[500px]">
-        <h2 className="text-md pb-3 font-bold text-foreground">Varyantlar</h2>
-        {data.variants && data.variants.length > 1 && (
+
+      {data.variants && data.variants.length > 1 && (
+        <div className="p-3 mt-5 bg-card box overflow-scroll max-h-[500px]">
+          <h2 className="text-md pb-3 font-bold text-foreground">Varyantlar</h2>
           <table className="product-variants min-w-max">
             <thead>
               <tr className="text-sm w-full">
@@ -185,8 +186,8 @@ const ProductCard = ({ data }: { data: any }) => {
               ))}
             </tbody>
           </table>
-        )}
-      </div>
+        </div>
+      )}
     </>
   );
 };

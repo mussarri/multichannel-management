@@ -14,6 +14,13 @@ async function main() {
     },
   });
 
+  const trendyol = await prisma.marketplace.create({
+    data: {
+      name: "Trendyol",
+      code: "TRENDYOL",
+    },
+  });
+
   const giyim = await prisma.category.upsert({
     where: { slug: "giyim" },
     update: {},
@@ -148,9 +155,10 @@ async function main() {
         price: 199.99,
         stock: 25,
         barkod: "VARIANT-KIRMIZI-M",
-        sku: "sku-12mskujm",
+        sku: "sku-12msk-KIRMIZI-M",
         is_default: false,
         variant_code: "KIRMIZI-M",
+
         combination: {
           renk: "Kırmızı",
           beden: "M",
@@ -162,7 +170,7 @@ async function main() {
         price: 199.99,
         stock: 25,
         barkod: "VARIANT-MAVI-L",
-        sku: "sku-12msko3l",
+        sku: "sku-12msk-MAVI-L",
         is_default: false,
         variant_code: "MAVI-L",
         combination: {
@@ -194,6 +202,21 @@ async function main() {
       data: {
         attributes: {
           connect: relatedValues.map((val) => ({ id: val.id })),
+        },
+        variantPrices: {
+          create: {
+            marketplaceId: trendyol.id,
+            salePrice: 199.99,
+          },
+        },
+        images: {
+          create: [
+            {
+              url: "https://fakestoreapi.com/img/71",
+              alt: "Basic Tişört Genel Görsel 1",
+              order: 0,
+            },
+          ],
         },
       },
     });
@@ -353,14 +376,11 @@ async function main() {
             sku: "NUTUK-V11",
             barkod: "9789751604037",
             is_default: true,
-            sources: {
+            variantPrices: {
               create: [
                 {
-                  source: "trendyol",
-                  externalId: "trendyol-1001",
-                  price: 119.0,
-                  stock: 25,
-                  is_active: true,
+                  marketplaceId: trendyol.id,
+                  salePrice: 100,
                 },
               ],
             },

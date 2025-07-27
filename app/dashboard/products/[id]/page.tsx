@@ -4,8 +4,9 @@ import ProductForm from "@/app/components/products/product-info";
 import prisma from "@/lib/prisma";
 import { redirect } from "next/navigation";
 
-const ProductEdit = ({ params }) => {
-  const id = params.id;
+const ProductEdit = async ({ params }) => {
+  const { id } = await params;
+
   if (!id) {
     return redirect("/dashboard/products");
   }

@@ -62,7 +62,13 @@ const DropFileInput = (props: { onFileChange: (files: any[]) => void }) => {
             Ürün Görsellerini Buraya Sürükle ve Bırakın ya da Tıklayın
           </p>
         </div>
-        <input type="file" value="" onChange={onFileDrop} />
+        <input
+          type="file"
+          name="images"
+          multiple
+          accept="image/*"
+          onChange={onFileDrop}
+        />
       </div>
     </>
   );
