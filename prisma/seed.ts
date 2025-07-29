@@ -102,6 +102,8 @@ async function main() {
   const product = await prisma.product.create({
     data: {
       title: "Basic Tişört",
+      name: "Basic Tişört",
+      slug: "basic-tshirt",
       description: "Pamuklu kumaştan üretilmiş basic tişört.",
       brand: {
         connect: { id: nike.id },
@@ -208,15 +210,6 @@ async function main() {
             marketplaceId: trendyol.id,
             salePrice: 199.99,
           },
-        },
-        images: {
-          create: [
-            {
-              url: "https://fakestoreapi.com/img/71",
-              alt: "Basic Tişört Genel Görsel 1",
-              order: 0,
-            },
-          ],
         },
       },
     });
@@ -353,6 +346,8 @@ async function main() {
   const product2 = await prisma.product.create({
     data: {
       title: "Nutuk",
+      name: "Nutuk",
+      slug: "nutuk",
       sub_title: "Mustafa Kemal Atatürk",
       description:
         "Atatürk’ün 1919-1927 yılları arasındaki olayları anlattığı eseri.",

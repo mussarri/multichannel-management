@@ -7,7 +7,6 @@ import React from "react";
 export default function Breadcrumb() {
   const pathname = usePathname();
   let array = pathname.split("/").slice(1);
-  console.log(array);
   array = array.slice(
     0,
     array.findIndex((item) => item.toLowerCase() === "products") + 1

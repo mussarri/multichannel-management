@@ -116,9 +116,18 @@ textarea {
   @apply bg-input shadow-sm border p-2 rounded-lg w-full text-xs outline-none placeholder:text-xs h-[38px];
 }
 
+.filter input {
+  @apply rounded-none outline-none;
+}
+
 input::placeholder,
 textarea::placeholder {
   opacity: var(--opacity-input);
+}
+
+input[type="checkbox"] {
+  width: 13px;
+  height: 13px;
 }
 
 path {
@@ -141,8 +150,9 @@ label,
 table *:not(a) {
   @apply text-secondary-foreground;
 }
-label{
-  @apply min-w-[200px] text-[11px] uppercase font-semibold
+
+label {
+  @apply text-[11px] uppercase font-semibold;
 }
 
 table a {
@@ -205,51 +215,58 @@ a.logo {
   font-optical-sizing: auto;
 }
 
-table.variant-table-create{
+table.variant-table-create {
   @apply w-full;
 }
 
-.variant-table-create thead th:last-child{
+.variant-table-create thead th:last-child {
   @apply text-right pr-2;
-} 
+}
 
-.variant-table thead tr, .variant-table-create thead tr {
+.variant-table thead tr,
+.variant-table-create thead tr {
   @apply text-[11px] font-semibold;
 }
-.variant-table thead th, .variant-table-create thead th {
+.variant-table thead th,
+.variant-table-create thead th {
   @apply min-w-[120px] font-semibold text-left;
 }
-.variant-table thead tr th > div > span, .variant-table-create thead tr th > div > span {
+.variant-table thead tr th > div > span,
+.variant-table-create thead tr th > div > span {
   @apply w-max  font-semibold text-[11px];
 }
-.variant-table thead tr th > div, .variant-table-create thead tr th > div {
+.variant-table thead tr th > div,
+.variant-table-create thead tr th > div {
   @apply flex flex-col items-start w-full;
 }
 
-.variant-table thead tr button, .variant-table-create thead tr button {
+.variant-table thead tr button,
+.variant-table-create thead tr button {
   @apply text-primary rounded font-light text-[10px] cursor-pointer hover:brightness-125 hover:shadow-sm shadow-primary w-max;
 }
 
-.variant-table tbody tr, .variant-table-create tbody tr {
+.variant-table tbody tr,
+.variant-table-create tbody tr {
   @apply border-b;
 }
-.variant-table tbody tr td , .variant-table-create tbody tr td {
+.variant-table tbody tr td,
+.variant-table-create tbody tr td {
   @apply text-[sm] py-2 px-1;
 }
-.variant-table tbody tr td input , .variant-table-create tbody tr td input {
+.variant-table tbody tr td input,
+.variant-table-create tbody tr td input {
   @apply h-[36px] text-xs outline-none rounded-sm max-w-[80px];
 }
-.variant-table tbody tr td input  {
+.variant-table tbody tr td input {
   @apply max-w-[80px];
 }
 .variant-table-create tbody tr td input {
   @apply max-w-[200px];
 }
-.variant-table tbody tr td:first-child , .variant-table-create tbody tr td:first-child {
+.variant-table tbody tr td:first-child,
+.variant-table-create tbody tr td:first-child {
   @apply capitalize;
 }
-
- 
 
 table.product tbody tr td {
   @apply w-max;
@@ -442,9 +459,33 @@ table.product-variants td {
   opacity: 1;
 }
 
- 
-
 .rs-steps {
   --rs-steps-state-finish: green;
   --rs-steps-state-process: green;
+}
+
+.marketplace-settings img {
+  object-fit: contain;
+  height: 100%;
+  width: auto;
+}
+
+.marketplace-settings .image-container {
+  @apply flex justify-center items-center;
+  aspect-ratio: 1.2;
+}
+
+input[type="number"] {
+  -moz-appearance: textfield;
+  -webkit-appearance: textfield;
+  appearance: textfield;
+}
+
+body {
+  background-image: url("../public/logo/bg-logo.png");
+  background-repeat: no-repeat;
+  background-position: center center;
+}
+body>div{
+  opacity: .95;
 }

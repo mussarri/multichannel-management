@@ -41,7 +41,7 @@ const RenderProductEdit = async ({ id }: { id: string }) => {
   if (!product) {
     return redirect("/dashboard/products");
   }
-  
+
   const categories = await prisma.category.findMany();
   const brands = await prisma.brand.findMany();
 

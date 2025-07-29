@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable @typescript-eslint/no-unused-vars */
+"use client";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -8,13 +9,12 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import React, { FormEvent, useEffect, useState } from "react";
+import React, { FormEvent, useActionState, useEffect, useState } from "react";
 import TextInput from "@/app/components/settings/text-input";
-import CheckBox from "@/app/components/settings/checkbox";
-import VariantTable from "@/app/components/products/variant-table-create";
 import { CirclePlusIcon, Trash2 } from "lucide-react";
+import { deleteVariants } from "@/app/action";
 
-const Page = ({
+function Page({
   formData,
   setForm,
   errors,
@@ -24,18 +24,35 @@ const Page = ({
   setForm: (value: any) => void;
   errors: any;
   setErrors: (value: any) => void;
-}) => {
-  const [open, setOpen] = useState(false);
-
+}) {
   const [option, setoption] = useState("");
   const [attInputs, setAttributesInput] = useState({});
-  const [optionList, setOptionList] = useState<any[]>([]);
-  const [attributes, setAttributes] = useState<any>([]);
-  const [variants, setVariants] = useState<any[]>();
+
+  const [open, setOpen] = useState(false);
+  const input =
+    formData.variants.length > 1 &&
+    formData.variants?.map((item) => item.combination);
+
+  const grouped =
+    input &&
+    Object.fromEntries(
+      Object.keys(input[0]).map((key) => [
+        key,
+        [...new Set(input.map((item) => item[key]))],
+      ])
+    );
+
+  const [attributes, setAttributes] = useState<any[]>(
+    grouped ? Array.from(Object.entries(grouped)) : []
+  );
+
+  const [variants, setVariants] = useState<any[]>(attributes);
+
+  const [message, formAction, isPending] = useActionState(deleteVariants, null);
 
   const handleSubmit = (e: any) => {
     e.preventDefault();
-    setAttributes((prev) => [...prev, [option, []]]);
+    setAttributesInput({});
     setoption("");
     setOpen(false);
   };
@@ -55,7 +72,7 @@ const Page = ({
   };
 
   return (
-    <div key={2} className="w-full max-w-[1000px] flex flex-col relative">
+    <div key={2} className="w-full max-w-[750px] flex flex-col relative">
       <div className="box w-full overflow-x-auto rounded-md ">
         <div className="p-4 flex gap-2 items-center justify-start pb-2 border-b">
           <p>Ürünün Varyantları Var mı ?</p>
@@ -195,8 +212,8 @@ const Page = ({
                         placeholder={item[0]}
                         value={attInputs[item[0]] || ""}
                         onChange={(e) => {
-                          setAttributesInput((prev) => {
-                            return { ...prev, [item[0]]: e.target.value };
+                          setAttributesInput({
+                            [e.target.name]: e.target.value,
                           });
                         }}
                         onKeyDown={(e) => {
@@ -260,20 +277,23 @@ const Page = ({
           </div>
         )}
 
-        {attributes?.length > 0 &&
+        {/* {attributes?.length > 0 &&
           attributes?.every((i: any) => i[1].length > 0) && (
             <div className="p-4 text-right bg-card gap-4">
-              <button type="button" onClick={() => setVariants(attributes)}>
-                Varyantlari Oluştur
+              <button
+                type="button"
+                onClick={() => {
+                  setAttributes([]);
+                  setVariants([]);
+                }}
+              >
+                Varyantlari Sil
               </button>
             </div>
-          )}
+          )} */}
       </div>
-      {variants && variants.length > 0 && (
-        <VariantTable attributes={variants} />
-      )}
     </div>
   );
-};
+}
 
 export default Page;

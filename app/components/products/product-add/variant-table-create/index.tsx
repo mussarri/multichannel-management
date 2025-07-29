@@ -5,7 +5,15 @@ import { Button } from "@/components/ui/button";
 import { BlocksIcon, RefreshCwIcon, Trash, Trash2 } from "lucide-react";
 import React, { useState } from "react";
 
-const index = ({ attributes }: { attributes: any[] }) => {
+const index = ({
+  form,
+  setForm,
+  variants,
+}: {
+  form: any;
+  setForm: (value: any) => void;
+  variants: any[];
+}) => {
   function generateCombinations(variants, index = 0, current = {}) {
     if (index === variants.length) {
       return [
@@ -31,7 +39,7 @@ const index = ({ attributes }: { attributes: any[] }) => {
     return results;
   }
 
-  const combinations = generateCombinations(attributes);
+  const combinations = generateCombinations(variants);
 
   const [formData, setFormData] = useState(() =>
     combinations.map((option: any) => ({
@@ -42,14 +50,21 @@ const index = ({ attributes }: { attributes: any[] }) => {
       },
       barkod: "",
       sku: "",
-      stock: 0,
-      desi: "",
-      title: "",
-      price: "",
-      n11_price: "",
-      trendyol_price: "",
-      trendyol_sale_price: "",
-      unit_count: 1,
+      desi: form.desi,
+      title: form.title,
+      product_name: form.name,
+      price: form.price,
+      sub_title: form.subtitle,
+      description: form.decsription,
+      // is_active: false,
+      // is_default: false,
+      // model: "",
+      // images: [],
+      // salePrice: form.salePrice,
+      // listPrice: form.listPrice,
+      // costPrice: form.costPrice,
+      // stock: 0,
+      // vatRate: 18,
     }))
   );
 
@@ -89,6 +104,8 @@ const index = ({ attributes }: { attributes: any[] }) => {
       return;
     }
 
+    setForm((prev: any) => ({ ...prev, variants: formData }));
+
     console.log("Kayıt verisi:", formData);
   };
 
@@ -98,11 +115,30 @@ const index = ({ attributes }: { attributes: any[] }) => {
     );
   };
 
+  function generateSKU(itemName, variantPart) {
+    const namePart = itemName
+      .replace(/[^a-zA-Z0-9]/g, "") // remove non-alphanum
+      .toUpperCase()
+      .slice(0, 6); // keep it short (optional)
+
+    const uniquePart = Math.random().toString(36).substring(2, 5).toUpperCase();
+
+    return `${namePart}-${variantPart}-${uniquePart}`;
+  }
+
   const handleGenerateBarcode = () => {
     setFormData((prev: any[]) =>
       prev.map(function (item) {
         const newBarcode = generateBarcode();
         return { ...item, barkod: newBarcode };
+      })
+    );
+  };
+  const handleGenerateSku = () => {
+    setFormData((prev: any[]) =>
+      prev.map(function (item) {
+        const newBarcode = generateSKU(item.product_name, item.variant_code);
+        return { ...item, sku: newBarcode };
       })
     );
   };
@@ -132,11 +168,11 @@ const index = ({ attributes }: { attributes: any[] }) => {
           Seçenek Grupları{" "}
         </h2>
         <div className="flex gap-2 text-sm variant-table-buttons">
-          <button onClick={() => {}}>
+          <button type="button" onClick={() => {}}>
             {" "}
             <Trash size={15} /> Tüm Seçenekleri Sil{" "}
           </button>
-          <button onClick={handleClearVariants}>
+          <button type="button" onClick={handleClearVariants}>
             {" "}
             <RefreshCwIcon size={15} /> Tüm Seçenekleri Temizle{" "}
           </button>
@@ -149,13 +185,17 @@ const index = ({ attributes }: { attributes: any[] }) => {
             <th>
               <div>
                 <span>Barkod</span>
-                <button onClick={handleGenerateBarcode}>Barkod Uret</button>
+                <button type="button" onClick={handleGenerateBarcode}>
+                  Barkod Uret
+                </button>
               </div>
             </th>
             <th>
               <div>
                 <span>Stok Kodu</span>
-                <button onClick={handleGenerateBarcode}>SKU Uret</button>
+                <button type="button" onClick={handleGenerateSku}>
+                  SKU Uret
+                </button>
               </div>
             </th>
             <th className="text-right">Sil</th>
@@ -176,7 +216,15 @@ const index = ({ attributes }: { attributes: any[] }) => {
                   }
                 />
               </td>
-              <td className="text-left text-[13px]">{item.sku}</td>
+              <td className="text-left text-[13px]">
+                <input
+                  type="text"
+                  name="sku"
+                  id=""
+                  value={item.sku}
+                  onChange={(e) => handleChange(index, "sku", e.target.value)}
+                />
+              </td>
 
               <td className="text-right">
                 <button onClick={() => handleDeleteVariant(index)}>
@@ -216,6 +264,7 @@ const index = ({ attributes }: { attributes: any[] }) => {
             />
             <div className="flex justify-end gap-2">
               <button
+                type="button"
                 onClick={() =>
                   setBulkModal({ open: false, field: "", value: "" })
                 }
@@ -224,6 +273,7 @@ const index = ({ attributes }: { attributes: any[] }) => {
                 Vazgeç
               </button>
               <button
+                type="button"
                 onClick={applyBulkUpdate}
                 className="px-3 py-1 bg-blue-600 text-white rounded"
               >

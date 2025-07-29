@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 import { ImageIcon } from "lucide-react";
@@ -7,9 +8,11 @@ import { useState, DragEvent, ChangeEvent } from "react";
 export default function MultiImageUploader({
   setForm,
   setErrors,
+  preview = true,
 }: {
   setForm: (value: any) => void;
   setErrors: (value: any) => void;
+  preview: boolean;
 }) {
   const [previews, setPreviews] = useState<string[]>([]);
   const [dragActive, setDragActive] = useState(false);
@@ -94,7 +97,7 @@ export default function MultiImageUploader({
         </label>
       </div>
 
-      {previews.length > 0 && (
+      {preview && previews.length > 0 && (
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-4 mt-6">
           {previews.map((src, index) => (
             <div

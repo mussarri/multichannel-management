@@ -10,8 +10,11 @@ import { slugify } from "@/lib/utils";
 import { Product } from "@prisma/client";
 import { revalidatePath } from "next/cache";
 
-import { writeFile } from "fs/promises";
+import { mkdir, writeFile } from "fs/promises";
 import path, { parse } from "path";
+import { randomUUID } from "crypto";
+import { log } from "console";
+import { redirect } from "next/navigation";
 
 export default async function createUser(formData: FormData) {
   console.log(formData);
@@ -53,7 +56,10 @@ export async function fetchTrendyolProductsAction(params) {
 }
 
 export async function createProduct(prevState: any, formData: FormData) {
+  console.log(formData);
+
   const title = formData.get("title").toString();
+  const name = formData.get("name").toString();
   const sub_title = formData.get("sub_title").toString();
   const categoryId = parseInt(formData.get("categoryId").toString());
   const brandId = parseInt(formData.get("brandId").toString());
@@ -61,7 +67,7 @@ export async function createProduct(prevState: any, formData: FormData) {
   const is_active = formData.get("is_active").toString() === "true";
   const is_default = formData.get("is_default").toString() === "true";
   const desi = formData.get("desi").toString();
-  const model = formData.get("model").toString();
+  const sku = formData.get("sku").toString();
   const barkod = formData.get("barkod").toString();
   const variants = JSON.parse(formData.get("variants").toString());
   const salePrice = parseFloat(formData.get("salePrice").toString());
@@ -76,6 +82,10 @@ export async function createProduct(prevState: any, formData: FormData) {
     is_active: false,
     desi: desi,
     barkod: barkod,
+    price: salePrice,
+    name: name,
+    sku: sku,
+    slug: slugify(name),
   };
 
   try {
@@ -86,17 +96,37 @@ export async function createProduct(prevState: any, formData: FormData) {
         brand: { connect: { id: brandId } },
       },
     });
-    if (variants.length > 0 && !is_default) {
+    const images = formData.getAll("images") as File[];
+    const uploadDir = path.join(process.cwd(), "public", "uploads");
+    for (const image of images) {
+      const bytes = await image.arrayBuffer();
+      const buffer = Buffer.from(bytes);
+      const fileName = `${product.id}-${image.name}`;
+      await mkdir(uploadDir, { recursive: true });
+      const filePath = path.join(process.cwd(), "public/uploads", fileName);
+
+      await writeFile(filePath, buffer);
+      await prisma.product.update({
+        where: { id: product.id },
+        data: { images: { create: { url: fileName } } },
+      });
+      console.log("Yüklendi:", fileName);
+    }
+
+    if (variants.length > 0 || !is_default) {
       console.log(variants);
     } else {
       await prisma.productVariant.create({
         data: {
-          sku: product.id.slice(6, 10).toString() + "-def",
+          sku: sku,
+          barkod: barkod,
           productId: product.id,
           title: product.title,
           price: salePrice,
+          description: description,
           stock: stock,
           is_default: true,
+          is_active: false,
           variantPrices: {
             create: [
               {
@@ -232,7 +262,14 @@ export async function fetchProductsAction() {
       include: {
         images: true,
         category: true,
-        variants: true,
+        brand: true,
+        variants: {
+          include: {
+            variantPrices: true,
+            attributes: true,
+            images: true,
+          },
+        },
       },
     });
     return { success: true, data: products };
@@ -256,6 +293,32 @@ export async function updateProductAction(prevState: any, formData: FormData) {
   const categoryId = parseInt(formData.get("category") as string);
   const desi = parseFloat(formData.get("desi") as string);
   const files = formData.getAll("images") as File[];
+  const title = formData.get("title").toString();
+  const name = formData.get("name").toString();
+  const sub_title = formData.get("sub_title").toString();
+  const description = formData.get("description").toString();
+  const is_active = formData.get("is_active").toString() === "true";
+  const is_default = formData.get("is_default").toString() === "true";
+  const model = formData.get("model").toString();
+  const barkod = formData.get("barkod").toString();
+  const variants = JSON.parse(formData.get("variants").toString());
+  const salePrice = parseFloat(formData.get("salePrice").toString());
+  const listPrice = parseFloat(formData.get("listPrice").toString());
+  const costPrice = parseFloat(formData.get("costPrice").toString());
+
+  const newProduct = {
+    title: title,
+    sub_title: sub_title,
+    description: model,
+    is_active: false,
+    desi: desi,
+    barkod: barkod,
+    price: salePrice,
+    name: name,
+    slug: slugify(name),
+  };
+
+  console.log(newProduct);
 
   for (const file of files) {
     if (file.size === 0) continue;
@@ -263,11 +326,11 @@ export async function updateProductAction(prevState: any, formData: FormData) {
     const arrayBuffer = await file.arrayBuffer();
     const buffer = Buffer.from(arrayBuffer);
     //generate filename for uploaded images
-    const fileName = Date.now() + "-" + file.name;
-    const filePath = path.join(process.cwd(), "public/uploads", fileName);
-    console.log(fileName);
+    //const fileName = Date.now() + "-" + file.name;
+    //const filePath = path.join(process.cwd(), "public/uploads", fileName);
+    //console.log(fileName);
 
-    await writeFile(filePath, buffer);
+    //await writeFile(filePath, buffer);
 
     // await prisma.productImage.create({
     //   data: {
@@ -278,27 +341,30 @@ export async function updateProductAction(prevState: any, formData: FormData) {
   }
 
   try {
-    const result = await prisma.product.update({
-      where: { id },
-      data: {
-        title: formData.get("title") as string,
-        sub_title: formData.get("sub_title") as string,
-        barkod: formData.get("barkod") as string,
-        stock: isNaN(stock) ? 0 : stock,
-        desi: isNaN(desi) ? "0.0" : desi.toString(),
-        is_active: formData.get("isActice") === "true",
-        brand: {
-          connect: {
-            id: brandId,
-          },
-        },
-        category: {
-          connect: {
-            id: categoryId,
-          },
-        },
-      },
-    });
+    // const result = await prisma.product.update({
+    //   where: { id },
+    //   data: {
+    //     title: title,
+    //     sub_title: sub_title,
+    //     description: model,
+    //     is_active: false,
+    //     desi: desi.toString(),
+    //     barkod: barkod,
+    //     price: salePrice,
+    //     name: name,
+    //     slug: slugify(name),
+    //     brand: {
+    //       connect: {
+    //         id: brandId,
+    //       },
+    //     },
+    //     category: {
+    //       connect: {
+    //         id: categoryId,
+    //       },
+    //     },
+    //   },
+    // });
     revalidatePath("/dashboard/products/" + id);
     return {
       success: true,
@@ -338,6 +404,49 @@ export async function createAttributeAction(
     return {
       success: false,
       message: "Özellik eklenirken bir hata oluştu.",
+      error: error.message,
+    };
+  }
+}
+
+export async function deleteVariants(prevState: any, formData: FormData) {
+  const id = formData.get("id").toString();
+
+  try {
+    const variants = await prisma.productVariant.deleteMany({
+      where: {
+        is_default: false,
+        productId: {
+          notIn: [id],
+        },
+      },
+    });
+    return { success: true, data: "ok" };
+  } catch (error) {
+    return {
+      success: false,
+      message: "Ürünler alınamadı.",
+      error: error.message,
+    };
+  }
+}
+export async function updateVariant(prevState: any, formData: FormData) {
+  const id = formData.get("id").toString();
+
+  try {
+    const variants = await prisma.productVariant.deleteMany({
+      where: {
+        is_default: false,
+        productId: {
+          notIn: [id],
+        },
+      },
+    });
+    return { success: true, data: "ok" };
+  } catch (error) {
+    return {
+      success: false,
+      message: "Ürünler alınamadı.",
       error: error.message,
     };
   }

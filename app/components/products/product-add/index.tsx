@@ -17,11 +17,12 @@ import { Button } from "@/components/ui/button";
 import { Category } from "@prisma/client";
 import { createProduct } from "@/app/action";
 import { toast } from "react-toastify";
-import VariantSettings from "@/app/components/products/variant-settings";
+import VariantSettings from "@/app/components/products/product-add/variant-settings";
 import { Steps } from "rsuite";
 import "rsuite/Steps/styles/index.css";
 import ProductAddForm1 from "./price";
 import { ArrowLeft, ArrowRight, MoveRightIcon } from "lucide-react";
+import { redirect } from "next/navigation";
 
 const New = ({
   categories,
@@ -37,9 +38,10 @@ const New = ({
       toast.error(message?.message);
     }
     if (message?.success) {
-      toast.error(message?.message);
+      toast.success(message?.message);
+      redirect("/products/" + message.id);
     }
-  }, [message?.error, message?.message, message?.success]);
+  }, [message?.error, message?.message, message?.success, message?.id]);
 
   const [errors, setErrors] = useState<any>({});
 
@@ -47,6 +49,7 @@ const New = ({
 
   const [formValues, setFormValues] = useState<any>({
     title: "",
+    name: "",
     sub_title: "",
     categoryId: "",
     brandId: "",
@@ -54,13 +57,14 @@ const New = ({
     is_active: false,
     is_default: true,
     desi: "",
-    model: "",
     barkod: "",
+    sku: "",
     variants: [],
     images: [],
     salePrice: 0,
     listPrice: 0,
-    vatRate: 0,
+    costPrice: 0,
+    vatRate: 18,
     stock: 0,
 
     // stock: "",
@@ -71,11 +75,17 @@ const New = ({
 
   const handleModelChange = (event: InputEvent) => {
     setFormValues((prev: any) => {
-      return { ...prev, model: event };
+      return { ...prev, description: event };
     });
   };
 
   const settings = [
+    {
+      label: "Desi",
+      name: "desi",
+      value: formValues.desi,
+      placeholder: "placeholder",
+    },
     {
       label: "Barkod",
       name: "barkod",
@@ -83,9 +93,9 @@ const New = ({
       placeholder: "placeholder",
     },
     {
-      label: "Desi",
-      name: "desi",
-      value: formValues.desi,
+      label: "SKU",
+      name: "sku",
+      value: formValues.sku,
       placeholder: "placeholder",
     },
   ];
@@ -97,15 +107,13 @@ const New = ({
     setFormValues({ ...formValues, [name]: value });
   };
 
-  console.log(formValues);
-
   const [index, setIndex] = useState(0);
   const forms = [
     <div
       key={0}
-      className="box p-4 max-w-[1000px] w-full flex flex-col gap-5 relative"
+      className="box p-4 max-w-[750px] w-full flex flex-col gap-5 relative"
     >
-      <div className="flex flex-col gap-1 items-start">
+      {/* <div className="flex flex-col gap-1 items-start">
         <label className="text-sm font-semibold" htmlFor="">
           Ürün Satış Durumu
         </label>
@@ -125,7 +133,8 @@ const New = ({
         >
           {formValues.is_active ? "Aktif" : "Pasif"}
         </div>
-      </div>
+      </div> */}
+
       <div className="flex gap-4 items-end ">
         <div className=" flex-1">
           <SelectInput
@@ -142,28 +151,46 @@ const New = ({
           />
         </div>
         <MarkaForm />
-        <div className="flex-1">
-          <SelectInput
-            label={"Ürün Kategorisi"}
-            name={"categoryId"}
-            options={categories}
-            required={true}
-            onChange={(value: any) => {
-              setErrors((prev) => {
-                return { ...prev, categoryId: "" };
-              });
-              setFormValues((prev) => {
-                return { ...prev, categoryId: value };
-              });
-            }}
-            vertical={true}
-            value={formValues.categoryId}
-            error={errors.categoryId}
-          />
-        </div>
       </div>
-      <div className="flex gap-4 items-end ">
-        <div className="flex-1">
+      <div className="flex-1">
+        <SelectInput
+          label={"Ürün Kategorisi"}
+          name={"categoryId"}
+          options={categories}
+          required={true}
+          onChange={(value: any) => {
+            setErrors((prev) => {
+              return { ...prev, categoryId: "" };
+            });
+            setFormValues((prev) => {
+              return { ...prev, categoryId: value };
+            });
+          }}
+          vertical={true}
+          value={formValues.categoryId}
+          error={errors.categoryId}
+        />
+      </div>
+      <div className="flex gap-4">
+        <TextInput
+          label={"Ürün Adi"}
+          name={"name"}
+          value={formValues.name}
+          error={errors.name}
+          required={true}
+          placeholder="Ürün adi.."
+          onChange={(value: string) => {
+            setErrors((prev) => {
+              return { ...prev, name: "" };
+            });
+            setFormValues({ ...formValues, name: value });
+          }}
+          type="text"
+          vertical={true}
+        />
+
+        <div className="w-full flex-1">
+          {" "}
           <TextInput
             label={"Ürün Basligi"}
             name={"title"}
@@ -182,7 +209,7 @@ const New = ({
           />
         </div>
       </div>
-      <div className="flex flex-wrap gap-1">
+      <div className="flex flex-wrap gap-4">
         {settings.map((item, didem) => (
           <TextInput
             key={didem}
@@ -221,46 +248,41 @@ const New = ({
         </div>
       </div>
       <div>
+        <label htmlFor="" className="pb-1">
+          Aciklama
+        </label>
         <FroalaEditorComponent
           tag="textarea"
           config={{
             placeholderText: "Edit Your Content Here!",
             charCounterCount: false,
           }}
-          model={formValues.model}
+          model={formValues.decsription}
           onModelChange={handleModelChange}
         />
       </div>
     </div>,
-    <VariantSettings
+    <div
       key={1}
-      formData={formValues}
-      setForm={setFormValues}
-      errors={errors}
-      setErrors={setErrors}
-    />,
+      className="box p-4 max-w-[750px] w-full flex flex-col gap-5 relative"
+    >
+      <ImageInput
+        preview={true}
+        setForm={setFormValues}
+        setErrors={setErrors}
+      />
+    </div>,
     <div
       key={2}
-      className="box p-4 max-w-[1000px] w-full flex flex-col gap-5 relative"
-    >
-      <ImageInput setForm={setFormValues} setErrors={setErrors} />
-    </div>,
-
-    <div
-      key={3}
-      className="box p-4 max-w-[1000px] w-full flex flex-col gap-5 relative"
+      className="box p-4 max-w-[750px] w-full flex flex-col gap-5 relative"
     >
       <ProductAddForm1
-        formValues={formValues}
+        form={formValues}
         setForm={setFormValues}
         errors={errors}
         setErrors={setErrors}
       />
     </div>,
-    <div
-      key={4}
-      className="box p-4 max-w-[1000px] w-full flex flex-col gap-5 relative"
-    ></div>,
   ];
 
   function validateStep1() {
@@ -274,7 +296,7 @@ const New = ({
     return errors;
   }
 
-  function validateStep2() {
+  function validateStep5() {
     const errors: Record<string, string> = {};
     if (!formValues.is_default && formValues.variants.length == 0) {
       errors.variants = "Variantlari ayarlayiniz.";
@@ -282,14 +304,14 @@ const New = ({
     return errors;
   }
 
-  function validateStep3() {
+  function validateStep2() {
     const errors: Record<string, string> = {};
     if (formValues.images.length == 0) {
       errors.images = "Görsel yükleyiniz.";
     }
     return errors;
   }
-  function validateStep4() {
+  function validateStep3() {
     const errors: Record<string, string> = {};
     if (!formValues.salePrice) {
       errors.salePrice = "Satış fiyatı zorunludur";
@@ -312,8 +334,6 @@ const New = ({
       errors = validateStep2();
     } else if (index === 2) {
       errors = validateStep3();
-    } else if (index === 3) {
-      errors = validateStep4();
     }
 
     if (Object.keys(errors).length > 0) {
@@ -324,9 +344,6 @@ const New = ({
     setIndex((prev) => prev + 1);
   };
 
-  console.log(formValues);
-  console.log(errors);
-
   return (
     <form
       onSubmit={(e) => {
@@ -334,6 +351,8 @@ const New = ({
         const formData = new FormData();
         formData.append("title", formValues.title);
         formData.append("sub_title", formValues.sub_title);
+        formData.append("sku", formValues.sku);
+        formData.append("name", formValues.name);
         formData.append("categoryId", formValues.categoryId);
         formData.append("brandId", formValues.brandId);
         formData.append("description", formValues.description);
@@ -343,8 +362,9 @@ const New = ({
         formData.append("model", formValues.model);
         formData.append("barkod", formValues.barkod);
         formData.append("variants", JSON.stringify(formValues.variants));
-        formData.append("salePrice", formValues.salePrice);
         formData.append("listPrice", formValues.listPrice);
+        formData.append("salePrice", formValues.salePrice);
+        formData.append("costPrice", formValues.costPrice);
         formData.append("vatRate", formValues.vatRate);
         formData.append("stock", formValues.stock);
 
@@ -359,13 +379,11 @@ const New = ({
         <h2 className="text-xl font-semibold mb-4">Ürün Ekle</h2>
       </div>
 
-      <div className="max-w-[1000px] mb-5 text-sm">
+      <div className="max-w-[750px] mb-5 text-sm">
         <Steps current={index} small>
           <Steps.Item title="Ürün Bilgileri" />
-          <Steps.Item title="Varyant Bilgileri" />
           <Steps.Item title="Görseller" />
           <Steps.Item title="Fiyat Bilgileri" />
-          <Steps.Item title="Detaylar" />
         </Steps>
       </div>
 
@@ -373,7 +391,7 @@ const New = ({
       {errors.images && (
         <p className="text-sm mt-1 text-error">{errors.images}</p>
       )}
-      <div className="max-w-[1000px] w-full flex justify-between items-center text-right mt-4 ">
+      <div className="max-w-[750px] w-full flex justify-between items-center text-right mt-4 ">
         {index > 0 ? (
           <a
             href="#"
@@ -388,7 +406,7 @@ const New = ({
         ) : (
           <div></div>
         )}
-        {index < forms.length - 2 && (
+        {index < forms.length - 1 && (
           <a
             href="#"
             className="inline-flex items-center border border-indigo-300 px-3 py-1.5 rounded-md text-indigo-500 hover:bg-indigo-50 text-[13px] gap-2 font-bold"
@@ -398,7 +416,7 @@ const New = ({
             <ArrowRight size={15} />
           </a>
         )}
-        {index == forms.length - 2 && (
+        {index == forms.length - 1 && (
           <Button type="submit" disabled={isPending}>
             Tamamla
           </Button>

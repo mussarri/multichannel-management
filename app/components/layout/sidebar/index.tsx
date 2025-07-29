@@ -31,6 +31,7 @@ const menuItems = [
     submenu: [
       { label: "Ürün Listesi", href: "/dashboard/products" },
       { label: "Kategoriler", href: "/dashboard/products/categories" },
+      { label: "Markalar", href: "/dashboard/products/brands" },
       { label: "Varyantlar", href: "/dashboard/products/variants" },
     ],
   },
