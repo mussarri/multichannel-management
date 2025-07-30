@@ -1,405 +1,136 @@
-/* eslint-disable prefer-const */
-/* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable @typescript-eslint/no-unused-vars */
-"use client";
+/* eslint-disable @typescript-eslint/no-explicit-any */
 
-import { MarkaForm } from "@/app/components/products/marka-form";
-import { Input } from "@/components/ui/input";
-import ImageUploader from "@/app/components/products/image-uploader";
-import React, { useActionState, useEffect, useState } from "react";
-import SelectInput from "@/app/components/settings/select-input";
-import TextInput from "@/app/components/settings/text-input";
-
-import "froala-editor/css/froala_style.min.css";
-import "froala-editor/css/froala_editor.pkgd.min.css";
-
-const FroalaEditorComponent = dynamic(() => import("react-froala-wysiwyg"), {
-  ssr: false,
-});
-import "rsuite/Steps/styles/index.css";
-
-import { Button } from "@/components/ui/button";
-import { useParams } from "next/navigation";
+import React, { Suspense } from "react";
 import Link from "next/link";
-import { ArrowLeft, ArrowRight, Blocks, Settings, Trash } from "lucide-react";
-import { Product, Category } from "@prisma/client";
-import { updateProductAction } from "@/app/action";
-import { toast } from "react-toastify";
-import dynamic from "next/dynamic";
-import { Steps } from "rsuite";
-import VariantSettings from "@/app/components/products/product-info/variant-settings-edit";
-import VariantTableEdit from "@/app/components/products/product-info/variant-table-edit";
+import { Pencil, PlusCircleIcon, Trash2 } from "lucide-react";
 import "rsuite/Steps/styles/index.css";
-import ProductAddForm1 from "../product-add/price";
-import ImageEdit from "@/app/components/products/product-info/images-edit";
+import ProductCard from "../product-card";
 
-const Info = ({
-  product,
-  categories,
-  brands,
-}: {
-  product: any;
-  categories: Category[];
-  brands: any[];
-}) => {
-  const [model, setModel] = useState<object>();
-  const [message, formAction, isPending] = useActionState(
-    updateProductAction,
-    null
-  );
-  const [errors, setErrors] = useState<any>({});
+import ProductStatus from "@/app/components/products/product-info/product-status";
+import ProductPreview from "@/app/components/products/product-info/product-preview";
+import ProductImages from "@/app/components/products/product-info/product-images";
+import ProductDescription from "@/app/components/products/product-info/product-description";
 
-  useEffect(() => {
-    if (message?.error) {
-      toast.error("Ürün güncellenirken bir hata oluştu.");
-    }
-    if (message?.success) {
-      toast.success("Ürün başarıyla güncellendi.");
-    }
-  }, [message]);
-
-  useEffect(() => {
-    import("froala-editor/js/plugins.pkgd.min.js");
-  }, []);
-
-  useEffect(() => {
-    if (message?.error) {
-      toast.error(message?.message);
-    }
-    if (message?.success) {
-      toast.success(message?.message);
-    }
-  }, [message?.error, message?.message, message?.success]);
-
-  const setImages = () => {
-    let array = [];
-    product.images?.map((item, index) => {
-      array.push(item);
-    });
-    product.variants?.map((element) => {
-      element.images?.map((item, index) => {
-        array.push(item);
-      });
-    });
-
-    return array;
-  };
-
-  const [form, setForm] = useState({
-    title: product.title,
-    name: product.name,
-    sub_title: product.sub_title,
-    description: product.description,
-    sku: product.sku,
-    categoryId: product.category.id,
-    brandId: product.brand.id,
-    is_active: product.is_active,
-    is_default: product.is_default || product.variants.length == 1,
-    desi: product.desi,
-    model: product.model,
-    barkod: product.barkod,
-    variants: product.variants,
-    salePrice: product.salePrice,
-    listPrice: product.listPrice,
-    costPrice: product.constProce,
-    stock: product.stock,
-    vatRate: product.vatRate,
-    images: setImages(),
-  });
-
-  const handleModelChange = (event: InputEvent) => {
-    setModel(event);
-  };
-
-  const [index, setIndex] = useState(0);
-
-  const settings = [
-    {
-      label: "Desi",
-      name: "desi",
-      value: form.desi,
-      placeholder: "placeholder",
-    },
-    {
-      label: "Barkod",
-      name: "barkod",
-      value: form.barkod,
-      placeholder: "placeholder",
-    },
-    {
-      label: "SKU",
-      name: "sku",
-      value: form.sku,
-      placeholder: "placeholder",
-    },
-  ];
-
-  const onChange = (value, name) => {
-    setErrors((prev) => {
-      return { ...prev, [name]: "" };
-    });
-    setForm({ ...form, [name]: value });
-  };
-
-  const handleNext = () => {
-    setIndex(index + 1);
-  };
-
-  const forms = [
-    <div
-      key={0}
-      className="box p-4 max-w-[750px] w-full flex flex-col gap-5 relative"
-    >
-      {/* <div className="flex flex-col gap-1 items-start">
-        <label className="text-sm font-semibold" htmlFor="">
-          Ürün Satış Durumu
-        </label>
-        <div
-          className={
-            " p-2 text-sm text-center  rounded cursor-pointer w-full max-w-[400px] transition-all duration-200 " +
-            (form.is_active
-              ? "bg-green-500 text-white"
-              : " bg-secondary text-secondary-foreground")
-          }
-          onClick={() => {
-            setForm({
-              ...form,
-              is_active: !form.is_active,
-            });
-          }}
-        >
-          {form.is_active ? "Aktif" : "Pasif"}
-        </div>
-      </div> */}
-
-      <div className="flex gap-4 items-end ">
-        <div className=" flex-1">
-          <SelectInput
-            label={"Ürün Markasi"}
-            name={"brandId"}
-            options={brands.map((item) => item)}
-            required={true}
-            onChange={(value: any) => {
-              onChange(value, "brandId");
-            }}
-            vertical={true}
-            value={form.brandId}
-            error={errors.brandId}
-          />
-        </div>
-        <MarkaForm />
-      </div>
-      <div className="flex-1">
-        <SelectInput
-          label={"Ürün Kategorisi"}
-          name={"categoryId"}
-          options={categories}
-          required={true}
-          onChange={(value: any) => {
-            setErrors((prev) => {
-              return { ...prev, categoryId: "" };
-            });
-            setForm((prev) => {
-              return { ...prev, categoryId: value };
-            });
-          }}
-          vertical={true}
-          value={form.categoryId}
-          error={errors.categoryId}
-        />
-      </div>
-      <div className="flex gap-4">
-        <TextInput
-          label={"Ürün Adi"}
-          name={"name"}
-          value={form.name}
-          error={errors.name}
-          required={true}
-          placeholder="Ürün adi.."
-          onChange={(value: string) => {
-            setErrors((prev) => {
-              return { ...prev, name: "" };
-            });
-            setForm({ ...form, name: value });
-          }}
-          type="text"
-          vertical={true}
-        />
-
-        <div className="w-full flex-1">
-          {" "}
-          <TextInput
-            label={"Ürün Basligi"}
-            name={"title"}
-            value={form.title}
-            error={errors.title}
-            required={true}
-            placeholder="Ürün başlığı"
-            onChange={(value: string) => {
-              setErrors((prev) => {
-                return { ...prev, title: "" };
-              });
-              setForm({ ...form, title: value });
-            }}
-            type="text"
-            vertical={true}
-          />
-        </div>
-      </div>
-      <div className="flex flex-wrap gap-4">
-        {settings.map((item, didem) => (
-          <TextInput
-            key={didem}
-            label={item.label}
-            name={item.name}
-            value={form[item.name]}
-            error={errors[item.name]}
-            required={true}
-            placeholder={item.name}
-            onChange={(value: string) => {
-              setForm({ ...form, [item.name]: value });
-            }}
-            type="text"
-            vertical={true}
-          />
-        ))}
-      </div>
-      <div className="flex gap-4 items-end my-4 ">
-        <div className=" flex-1">
-          <TextInput
-            label={"Ürün Alt Başlığı(Maksımum 60 karakter)"}
-            name={"sub_title"}
-            required={true}
-            onChange={(value: string) => {
-              setErrors((prev) => {
-                return { ...prev, sub_title: "" };
-              });
-              setForm({ ...form, sub_title: value });
-            }}
-            vertical={true}
-            error={errors.sub_title}
-            type={"text"}
-            placeholder="1"
-            value={form.sub_title}
-          />
-        </div>
-      </div>
-      <div>
-        <label htmlFor="" className="pb-1">
-          Aciklama
-        </label>
-        <FroalaEditorComponent
-          tag="textarea"
-          config={{
-            placeholderText: "Edit Your Content Here!",
-            charCounterCount: false,
-          }}
-          model={form.description}
-          onModelChange={handleModelChange}
-        />
-      </div>
-    </div>,
-    <ImageEdit key={2} form={form} setForm={setForm} setErrors={setErrors} />,
-
-    <div
-      key={3}
-      className="box p-4 max-w-[750px] w-full flex flex-col gap-5 relative"
-    >
-      <ProductAddForm1
-        form={form}
-        setForm={setForm}
-        errors={errors}
-        setErrors={setErrors}
-      />
-    </div>,
-
-    <VariantSettings
-      key={1}
-      formData={form}
-      setForm={setForm}
-      errors={errors}
-      setErrors={setErrors}
-    />,
-
-    <VariantTableEdit key={4} variants={form.variants} />,
-  ];
+const Info = ({ product }: { product: any }) => {
+  const data = product;
 
   return (
-    <form
-      onSubmit={(e) => {
-        e.preventDefault();
-        const formData = new FormData();
-        formData.append("title", form.title);
-        formData.append("sub_title", form.sub_title);
-        formData.append("sku", form.sku);
-        formData.append("name", form.name);
-        formData.append("categoryId", form.categoryId);
-        formData.append("brandId", form.brandId);
-        formData.append("description", form.description);
-        formData.append("is_active", form.is_active);
-        formData.append("is_default", form.is_default);
-        formData.append("desi", form.desi);
-        formData.append("model", form.model);
-        formData.append("barkod", form.barkod);
-        formData.append("variants", JSON.stringify(form.variants));
-        formData.append("listPrice", form.listPrice);
-        formData.append("salePrice", form.salePrice);
-        formData.append("costPrice", form.costPrice);
-        formData.append("vatRate", form.vatRate);
-        formData.append("stock", form.stock);
+    <div>
+      <h2 className="text-xl font-semibold mb-4">Ürün Bilgileri</h2>
+      <div className="max-w-[800px]">
+        <ProductStatus id={product.id} isActive={product.is_active} />
+        <ProductCard data={product} />
+        <ProductImages data={product} />
+        <ProductDescription description={product.description} id={product.id} />
+        {data.variants.length < 2 && (
+          <div className="bg-card border rounded-lg mt-4">
+            <h2 className="text-sm flex items-center justify-between p-4 pb-3 font-bold text-foreground border-b">
+              Varyantlar
+              <Link
+                className="text-[12px] font-[500]"
+                href={`/dashboard/products/edit/${data.id}`}
+              >
+                {" "}
+                (Düzenle)
+              </Link>
+            </h2>
+            <div className="p-4">
+              <button type="button" className="text-sm flex items-center gap-2">
+                {" "}
+                <PlusCircleIcon size={17} />
+                <Link href="#" className=" font-[600] text-[13px]">
+                  Boyut , Renk gibi seçenekler ekleyin
+                </Link>
+              </button>
+            </div>
+          </div>
+        )}
 
-        for (let i = 0; i < form.images.length; i++) {
-          formData.append("images", form.images[i]);
-        }
-        formAction(formData);
-      }}
-      method="POST"
-      className="pb-10"
-      encType="multipart/form-data"
-    >
-      <h2 className="text-xl font-semibold mb-4">Ürün Düzenle</h2>
+        {data.variants && data.variants.length > 0 && (
+          <div className="bg-card border rounded-lg mt-4 overflow-y-scroll">
+            <h2 className="text-sm flex items-center justify-between p-4 pb-3 font-bold text-foreground border-b">
+              Varyantlar
+              <Link
+                className="text-[12px] font-[500]"
+                href={`/dashboard/variants/${data.id}`}
+              >
+                {" "}
+                (Düzenle)
+              </Link>
+            </h2>
+            <table className="product-variants min-w-max">
+              <thead>
+                <tr className="text-sm w-full">
+                  <td className="text-left">Title</td>
+                  <td className="text-left">SKU</td>
+                  <td className="text-left">Varyant Bilgisi</td>
+                  <td className="text-left">Varyant Kodu</td>
+                  <td className="text-right">Price</td>
+                  <td className="text-right">Desi</td>
+                  <td className="text-right">Stok</td>
+                  <td className="text-center">İşlemler</td>
+                </tr>
+              </thead>
+              <tbody>
+                {data.variants &&
+                  data.variants.map((item, index) => {
+                    return (
+                      <tr
+                        key={index}
+                        className="text-sm w-full font-extralight"
+                      >
+                        <th className="text-left py-2 font-light">
+                          {item.title}
+                        </th>
 
-      <div className="max-w-[750px] mb-5 text-sm">
-        <Steps current={index} small>
-          <Steps.Item title="Ürün Bilgileri" />
-          <Steps.Item title="Görseller" />
-          <Steps.Item title="Ürun Fiyat" />
-        </Steps>
+                        <th className="text-left py-2 font-light">
+                          {item.sku}
+                        </th>
+                        <th className="text-left font-light">
+                          {JSON.stringify(item.combination)
+                            .replaceAll('"', "")
+                            .replaceAll("{", "")
+                            .replaceAll("}", "")
+                            .replaceAll(",", ", ")}
+                        </th>
+                        <th className="text-left font-light">
+                          {item.variant_code}
+                        </th>
+                        <th className="text-right font-light">{item.price}</th>
+                        <th className="text-right font-light">{item.desi}</th>
+                        <th className="text-right font-light">{item.stock}</th>
+
+                        <th className="">
+                          <div className="flex gap-2">
+                            {" "}
+                            <Link href={`/dashboard/products/${item.id}`}>
+                              <Pencil
+                                size={16}
+                                className="hover:scale-110 duration-200 hover:cursor-pointer"
+                                color="var(--warning)"
+                              />
+                            </Link>
+                            <button>
+                              <Trash2
+                                size={16}
+                                className="hover:scale-110 duration-200 hover:cursor-pointer"
+                                color="var(--error)"
+                              />
+                            </button>
+                          </div>
+                        </th>
+                      </tr>
+                    );
+                  })}
+              </tbody>
+            </table>
+          </div>
+        )}
       </div>
 
-      {forms[index]}
-      <div className="max-w-[750px] w-full flex justify-between items-center text-right mt-4 ">
-        {index > 0 ? (
-          <a
-            href="#"
-            className="inline-flex items-center border border-indigo-300 px-3 py-1.5 rounded-md text-indigo-500 hover:bg-indigo-50 text-[13px] gap-2 font-bold"
-            onClick={() => {
-              setIndex(index - 1);
-            }}
-          >
-            Geri
-            <ArrowLeft size={15} />
-          </a>
-        ) : (
-          <div></div>
-        )}
-        {index < forms.length - 1 && (
-          <a
-            href="#"
-            className="inline-flex items-center border border-indigo-300 px-3 py-1.5 rounded-md text-indigo-500 hover:bg-indigo-50 text-[13px] gap-2 font-bold"
-            onClick={handleNext}
-          >
-            Devam
-            <ArrowRight size={15} />
-          </a>
-        )}
-        {index == forms.length - 1 && (
-          <Button type="submit" disabled={isPending}>
-            Ürünü Güncelle
-          </Button>
-        )}
-      </div>
-    </form>
+      <ProductPreview data={product} />
+    </div>
   );
 };
 

@@ -69,7 +69,7 @@ function FeatureCard({
 export default function Highlights() {
   return (
     <section
-      className="w-full py-[50px] md:py-[130px]"
+      className="w-full py-[50px] md:py-[130px] "
       style={{ background: "linear-gradient(189deg, white 0%, #f9f9f8 100%);" }}
     >
       <div
@@ -117,8 +117,13 @@ export default function Highlights() {
               Satışa Uyumlu, Geleceğe Hazır{" "}
               <span className="text-primary">Entegrasyon Çözümü</span>
             </h1>
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 mt-3">
-              {features.map((feature, index) => (
+            <div className="grid gap-6 mt-3 grid-cols-2 features">
+              {features.slice(0, 2).map((feature, index) => (
+                <FeatureCard key={index} {...feature} />
+              ))}
+            </div>
+            <div className="grid gap-6 mt-3 grid-cols-3 features">
+              {features.slice(2, 5).map((feature, index) => (
                 <FeatureCard key={index} {...feature} />
               ))}
             </div>

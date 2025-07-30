@@ -7,18 +7,46 @@ import {
   getTrendyolProducts,
 } from "@/lib/services/trendyolApiService";
 import { slugify } from "@/lib/utils";
-import { Product } from "@prisma/client";
 import { revalidatePath } from "next/cache";
 
 import { mkdir, writeFile } from "fs/promises";
 import path, { parse } from "path";
-import { randomUUID } from "crypto";
-import { log } from "console";
-import { redirect } from "next/navigation";
+import fs from "fs/promises";
+import { log } from "util";
+const uploadDir = path.join(process.cwd(), "public", "uploads");
 
 export default async function createUser(formData: FormData) {
   console.log(formData);
 }
+
+const deleteImages = async (deletedIds: string[], productId: string) => {
+  const deletedImages = await prisma.productImage.findMany({
+    where: {
+      productId: productId,
+      id: {
+        in: deletedIds,
+      },
+    },
+  });
+
+  const deletedImagePaths = deletedImages.map((image) => image.url);
+
+  for (const imagePath of deletedImagePaths) {
+    const filePath = path.join(process.cwd(), "public", imagePath); // örn: public/uploads/image1.jpg
+    await prisma.productImage.deleteMany({
+      where: { id: { in: deletedIds } },
+    });
+
+    try {
+      await fs.unlink(filePath);
+      console.log("Silindi:", filePath);
+    } catch (err) {
+      console.error("Dosya silinemedi:", filePath, err);
+    }
+
+    // opsiyonel: veritabanından da sil
+  }
+};
 
 export async function createTrendyolProductAction(formData) {
   const newProduct = {
@@ -56,8 +84,6 @@ export async function fetchTrendyolProductsAction(params) {
 }
 
 export async function createProduct(prevState: any, formData: FormData) {
-  console.log(formData);
-
   const title = formData.get("title").toString();
   const name = formData.get("name").toString();
   const sub_title = formData.get("sub_title").toString();
@@ -82,7 +108,9 @@ export async function createProduct(prevState: any, formData: FormData) {
     is_active: false,
     desi: desi,
     barkod: barkod,
-    price: salePrice,
+    salePrice: salePrice,
+    listPrice: listPrice,
+    costPrice: costPrice,
     name: name,
     sku: sku,
     slug: slugify(name),
@@ -98,6 +126,7 @@ export async function createProduct(prevState: any, formData: FormData) {
     });
     const images = formData.getAll("images") as File[];
     const uploadDir = path.join(process.cwd(), "public", "uploads");
+
     for (const image of images) {
       const bytes = await image.arrayBuffer();
       const buffer = Buffer.from(bytes);
@@ -111,34 +140,6 @@ export async function createProduct(prevState: any, formData: FormData) {
         data: { images: { create: { url: fileName } } },
       });
       console.log("Yüklendi:", fileName);
-    }
-
-    if (variants.length > 0 || !is_default) {
-      console.log(variants);
-    } else {
-      await prisma.productVariant.create({
-        data: {
-          sku: sku,
-          barkod: barkod,
-          productId: product.id,
-          title: product.title,
-          price: salePrice,
-          description: description,
-          stock: stock,
-          is_default: true,
-          is_active: false,
-          variantPrices: {
-            create: [
-              {
-                marketplaceId: 1,
-                salePrice: salePrice,
-                listPrice: listPrice,
-                costPrice: costPrice,
-              },
-            ],
-          },
-        },
-      });
     }
 
     revalidatePath("/dashboard/products");
@@ -179,7 +180,6 @@ export async function deleteProduct(prevState: any, formData: FormData) {
           include: {
             variantPrices: true,
             attributes: true,
-            images: true,
           },
         },
       },
@@ -267,7 +267,6 @@ export async function fetchProductsAction() {
           include: {
             variantPrices: true,
             attributes: true,
-            images: true,
           },
         },
       },
@@ -283,89 +282,108 @@ export async function fetchProductsAction() {
   }
 }
 
+export async function updateProductStatus(id: string, currentState: boolean) {
+  try {
+    const result = await prisma.product.update({
+      where: { id },
+      data: {
+        is_active: !currentState,
+      },
+    });
+    revalidatePath("/dashboard/products/" + id);
+    return {
+      success: true,
+      message: "Ürün başarıyla güncellendi.",
+      data: result.is_active,
+    };
+  } catch (error) {
+    console.error("Server Action: Ürün güncellenirken hata oluştu:", error);
+    return {
+      success: false,
+      message: "Ürün güncellenirken bir hata oluştu.",
+      error: error.message,
+    };
+  }
+}
+
 export async function updateProductAction(prevState: any, formData: FormData) {
   const id = formData.get("id") as string;
 
   if (!id) throw new Error("Ürün ID belirtilmedi.");
 
+  const is_default = formData.get("is_default").toString() === "true";
+  const variants = JSON.parse(formData.get("variants").toString());
+
   const stock = parseInt(formData.get("stock") as string);
-  const brandId = parseInt(formData.get("brand") as string);
-  const categoryId = parseInt(formData.get("category") as string);
-  const desi = parseFloat(formData.get("desi") as string);
-  const files = formData.getAll("images") as File[];
+  const brandId = parseInt(formData.get("brandId") as string);
+  const categoryId = parseInt(formData.get("categoryId") as string);
+  const newImages = formData.getAll("images") as File[];
+
   const title = formData.get("title").toString();
   const name = formData.get("name").toString();
   const sub_title = formData.get("sub_title").toString();
   const description = formData.get("description").toString();
   const is_active = formData.get("is_active").toString() === "true";
-  const is_default = formData.get("is_default").toString() === "true";
-  const model = formData.get("model").toString();
   const barkod = formData.get("barkod").toString();
-  const variants = JSON.parse(formData.get("variants").toString());
+  const desi = parseFloat(formData.get("desi") as string);
   const salePrice = parseFloat(formData.get("salePrice").toString());
   const listPrice = parseFloat(formData.get("listPrice").toString());
   const costPrice = parseFloat(formData.get("costPrice").toString());
-
-  const newProduct = {
-    title: title,
-    sub_title: sub_title,
-    description: model,
-    is_active: false,
-    desi: desi,
-    barkod: barkod,
-    price: salePrice,
-    name: name,
-    slug: slugify(name),
-  };
-
-  console.log(newProduct);
-
-  for (const file of files) {
-    if (file.size === 0) continue;
-
-    const arrayBuffer = await file.arrayBuffer();
-    const buffer = Buffer.from(arrayBuffer);
-    //generate filename for uploaded images
-    //const fileName = Date.now() + "-" + file.name;
-    //const filePath = path.join(process.cwd(), "public/uploads", fileName);
-    //console.log(fileName);
-
-    //await writeFile(filePath, buffer);
-
-    // await prisma.productImage.create({
-    //   data: {
-    //     productId: id,
-    //     url: `/uploads/${fileName}`,
-    //   },
-    // });
-  }
+  const deletedIds = JSON.parse(formData.get("deletedIds").toString());
 
   try {
-    // const result = await prisma.product.update({
-    //   where: { id },
-    //   data: {
-    //     title: title,
-    //     sub_title: sub_title,
-    //     description: model,
-    //     is_active: false,
-    //     desi: desi.toString(),
-    //     barkod: barkod,
-    //     price: salePrice,
-    //     name: name,
-    //     slug: slugify(name),
-    //     brand: {
-    //       connect: {
-    //         id: brandId,
-    //       },
-    //     },
-    //     category: {
-    //       connect: {
-    //         id: categoryId,
-    //       },
-    //     },
-    //   },
-    // });
-    revalidatePath("/dashboard/products/" + id);
+    const result = await prisma.product.update({
+      where: { id },
+      data: {
+        name: name,
+        title: title,
+        sub_title: sub_title,
+        barkod: barkod,
+        desi: desi.toString(),
+        description: description,
+        salePrice: salePrice,
+        listPrice: listPrice,
+        costPrice: costPrice,
+        stock: stock,
+        is_active: is_active,
+        slug: slugify(name),
+        brand: {
+          connect: {
+            id: brandId,
+          },
+        },
+        category: {
+          connect: {
+            id: categoryId,
+          },
+        },
+      },
+    });
+    if (deletedIds.length > 0) {
+      await deleteImages(deletedIds, id);
+    }
+
+    for (const image of newImages) {
+      console.log(image);
+
+      if (image.size === 0) continue;
+      const bytes = await image.arrayBuffer();
+      const buffer = Buffer.from(bytes);
+      const fileName = `${id}-${image.name}`;
+      await mkdir(uploadDir, { recursive: true });
+      const filePath = path.join(process.cwd(), "public/uploads", fileName);
+
+      await writeFile(filePath, buffer);
+
+      const news = await prisma.productImage.create({
+        data: {
+          productId: id,
+          url: fileName,
+        },
+      });
+      console.log(news);
+    }
+
     return {
       success: true,
       message: "Ürün başarıyla güncellendi.",

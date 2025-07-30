@@ -106,7 +106,8 @@ export default function Highlights() {
     <section
       className="w-full py-[50px] md:py-[90px] relative z-0"
       style={{
-        background: "linear-gradient(180deg, #222233 0%, #0b0f14 100%)",
+        background: "#fbfbfb",
+        //background: "linear-gradient(180deg, #222233 0%, #0b0f14 100%)",
         // "linear-gradient(180deg,rgb(249, 250, 251) 0%, rgba(70, 95, 255, 0.23) 68%, #0b0f14 100%)",
       }}
     >
@@ -172,7 +173,7 @@ export default function Highlights() {
       </div>
 
       <div className="max-w-6xl px-4 md:px-8 lg:px-0 mx-auto py-10" style={{}}>
-        <div className="flex flex-col-reverse md:flex-row justify-between gap-5 bg-[#2f344a] rounded-lg relative">
+        <div className="flex flex-col-reverse md:flex-row justify-between gap-5  rounded-lg relative">
           <div
             className="absolute bottom-0 opacity-20"
             style={{
@@ -207,7 +208,12 @@ export default function Highlights() {
               operasyonel verimliliği artırmak için onlarca entegrasyon hazır
             </p>
             <div className="entegrations z-[1] flex flex-col gap-3 md:block md:gap-0">
-              {features.map((feature, index) => (
+              {features.slice(0, 4).map((feature, index) => (
+                <FeatureCard key={index} {...feature} />
+              ))}
+            </div>
+            <div className="entegrations z-[1] flex flex-col gap-3 md:block md:gap-0">
+              {features.slice(4, 6).map((feature, index) => (
                 <FeatureCard key={index} {...feature} />
               ))}
             </div>

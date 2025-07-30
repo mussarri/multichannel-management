@@ -95,6 +95,10 @@
   }
 }
 
+main {
+  padding-bottom: 100px;
+}
+
 html {
   font-family: ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji",
     "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
@@ -382,37 +386,6 @@ table th {
   height: 70%;
 }
 
-@media screen and (min-width: 768px) {
-  .entegrations > div:nth-of-type(odd) {
-    float: left;
-    flex-direction: row;
-  }
-  .entegrations > div:nth-of-type(even) {
-    float: right;
-    flex-direction: row-reverse;
-  }
-}
-
-@media screen and (max-width: 768px) {
-  .entegrations > div.flex {
-    float: unset;
-    flex-direction: column;
-    align-items: start;
-    gap: 0;
-    border-radius: 10px;
-    background: white;
-    padding: 30px 20px;
-  }
-}
-
-.entegration-item {
-  padding: 0;
-}
-
-.entegration-otel {
-  color: white;
-}
-
 table.product-variants,
 table.product-variants tbody,
 table.product-variants thead,
@@ -486,6 +459,34 @@ body {
   background-repeat: no-repeat;
   background-position: center center;
 }
-body>div{
-  opacity: .95;
+body > div {
+  opacity: 0.95;
 }
+.features {
+  aspect-ratio: 3.5;
+  height: auto;
+}
+
+/*  
+@media screen and (min-width: 768px) {
+  .entegrations > div:nth-of-type(odd) {
+    float: left;
+    flex-direction: row;
+  }
+  .entegrations > div:nth-of-type(even) {
+    float: right;
+    flex-direction: row-reverse;
+  }
+}
+
+@media screen and (max-width: 768px) {
+  .entegrations > div.flex {
+    float: unset;
+    flex-direction: column;
+    align-items: start;
+    gap: 0;
+    border-radius: 10px;
+    background: white;
+    padding: 30px 20px;
+  }
+} */

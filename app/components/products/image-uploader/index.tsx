@@ -50,13 +50,16 @@ export default function MultiImageUploader({
 
   const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
     if (e.target.files) {
+      const files = Array.from(e.target.files);
       handleFiles(e.target.files);
       setErrors((prev) => {
         return { ...prev, images: "" };
       });
-      setForm((prev) => {
-        return { ...prev, images: e.target.files };
-      });
+
+      setForm((prev) => ({
+        ...prev,
+        images: [...(prev.images || []), ...files],
+      }));
     }
   };
 

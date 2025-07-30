@@ -7,14 +7,13 @@ import { Suspense } from "react";
 
 export default function ProductsPage() {
   return (
-    <div className="space-y-4 overflow-y-auto">
-      <div className="flex items-center justify-between">
+    <div className="overflow-y-auto">
+      <div className="pb-3 flex items-center justify-between">
         <h1 className="text-xl font-semibold">Ürünler</h1>
-        <div className="flex items-center justify-end p-4 gap-3">
-          <Link href="/dashboard/products/new" className="">
-            <Button variant={"secondary"}>{"Yeni Ürün Oluştur"}</Button>
-          </Link>
-        </div>
+
+        <Link href="/dashboard/products/new" className="">
+          <Button variant={"secondary"}>{"Yeni Ürün Oluştur"}</Button>
+        </Link>
       </div>
       <Suspense fallback={<div>Yükleniyor...</div>}>
         <RenderProducts />

@@ -11,13 +11,15 @@ const ProductEdit = async ({ params }) => {
     return redirect("/dashboard/products");
   }
   return (
-    <Suspense fallback={<div>Loading...</div>}>
-      <RenderProductEdit id={id} />
-    </Suspense>
+    <>
+      <Suspense fallback={<div>Loading...</div>}>
+        <RenderProductInfo id={id} />
+      </Suspense>
+    </>
   );
 };
 
-const RenderProductEdit = async ({ id }: { id: string }) => {
+const RenderProductInfo = async ({ id }: { id: string }) => {
   const product = await prisma.product.findUnique({
     where: { id: id },
     include: {
@@ -28,11 +30,14 @@ const RenderProductEdit = async ({ id }: { id: string }) => {
         include: {
           attributes: {
             include: {
-              attribute: true,
+              attribute: {
+                include: {
+                  values: true,
+                },
+              },
             },
           },
           variantPrices: true,
-          images: true,
         },
       },
     },
@@ -41,13 +46,8 @@ const RenderProductEdit = async ({ id }: { id: string }) => {
   if (!product) {
     return redirect("/dashboard/products");
   }
-  
-  const categories = await prisma.category.findMany();
-  const brands = await prisma.brand.findMany();
 
-  return (
-    <ProductForm brands={brands} product={product} categories={categories} />
-  );
+  return <ProductForm product={product} />;
 };
 
 export default ProductEdit;

@@ -1,6 +1,6 @@
 import React, { Suspense } from "react";
 
-import ProductForm from "@/app/components/products/product-info";
+import ProductForm from "@/app/components/products/product-edit";
 import prisma from "@/lib/prisma";
 import { redirect } from "next/navigation";
 
@@ -28,11 +28,14 @@ const RenderProductEdit = async ({ id }: { id: string }) => {
         include: {
           attributes: {
             include: {
-              attribute: true,
+              attribute: {
+                include: {
+                  values: true,
+                },
+              },
             },
           },
           variantPrices: true,
-          images: true,
         },
       },
     },

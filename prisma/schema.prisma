@@ -62,10 +62,12 @@ model Product {
   title           String?
   sub_title       String?
   description     String?
+  barkod          String?
+  salePrice       Float
+  costPrice       Float?
+  listPrice       Float?
   stock           Int              @default(0)
   is_active       Boolean          @default(true)
-  barkod          String?
-  price           Float?
   desi            String           @default("1")
   brand           Brand            @relation(fields: [brandId], references: [id], onDelete: NoAction)
   category        Category         @relation(fields: [categoryId], references: [id], onDelete: NoAction)
@@ -105,7 +107,6 @@ model ProductVariant {
   is_default    Boolean          @default(true)
   product       Product          @relation(fields: [productId], references: [id], onDelete: Cascade)
   attributes    AttributeValue[]
-  images        VariantImage[]
   variantPrices VariantPrice[]
   createdAt     DateTime         @default(now())
   updatedAt     DateTime         @updatedAt
@@ -150,21 +151,13 @@ model Marketplace {
 }
 
 model ProductImage {
-  id           String         @id @default(cuid())
-  productId    String
-  url          String
-  alt          String?
-  order        Int            @default(0)
-  product      Product        @relation(fields: [productId], references: [id], onDelete: Cascade)
-  VariantImage VariantImage[]
-}
-
-model VariantImage {
-  id             String         @id @default(cuid())
-  variantId      String
-  image          ProductImage   @relation(fields: [productImageId], references: [id])
-  variant        ProductVariant @relation(fields: [variantId], references: [id], onDelete: Cascade)
-  productImageId String
+  id        String  @id @default(cuid())
+  productId String
+  url       String
+  variantId String?
+  alt       String?
+  order     Int     @default(0)
+  product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
 }
 
 enum OrderStatus {

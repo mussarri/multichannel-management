@@ -3,7 +3,14 @@
 "use client";
 
 import { use, useActionState, useEffect, useState } from "react";
-import { Pencil, PlusIcon, RefreshCcw, Trash2 } from "lucide-react";
+import {
+  Check,
+  Pencil,
+  PlusIcon,
+  RefreshCcw,
+  Trash2,
+  XIcon,
+} from "lucide-react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { useMediaQuery } from "usehooks-ts";
@@ -31,6 +38,7 @@ function filterProducts(products: any[], filters: any): any[] {
       maxStock,
       minStock,
       brand,
+      active,
     } = filters;
 
     // 1. Arama (title)
@@ -51,7 +59,12 @@ function filterProducts(products: any[], filters: any): any[] {
 
       if (hasVariant !== has) return false;
     }
-    console.log(product.stock);
+
+    if (active !== undefined) {
+      const isActive = product?.is_active;
+
+      if (active !== isActive) return false;
+    }
 
     // 3. Fiyat aralığı
     if (priceMin !== undefined && product.price < parseFloat(priceMin))
@@ -247,6 +260,7 @@ export function ProductTable({ products }: { products: any[] }) {
                   />
                 </th>
                 <th className="text-right p-2 border-b">Platform Durumu</th>
+                <th className="text-right p-2 border-b">Aktiflik</th>
                 <th className="text-right p-2 border-b">
                   <SortButton
                     setSortOptions={setSortOptions}
@@ -301,6 +315,15 @@ export function ProductTable({ products }: { products: any[] }) {
                       </td>
                       <td className="p-2">{product.stock}</td>
                       <td className="p-2"></td>
+                      <td className="p-2">
+                        <div className="flex justify-center items-center">
+                          {product.is_active ? (
+                            <Check size={15} color="green" />
+                          ) : (
+                            <XIcon size={15} color="red" />
+                          )}
+                        </div>
+                      </td>
                       <td className="p-2 text-right">{created}</td>
                       <td className="p-2 text-right space-x-2">
                         <div className="flex gap-2 justify-end">

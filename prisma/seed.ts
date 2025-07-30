@@ -108,10 +108,11 @@ async function main() {
       brand: {
         connect: { id: nike.id },
       },
-      price: 199.99,
+      salePrice: 199.99,
       stock: 100,
       barkod: "1234567890",
       desi: "0.5",
+      is_active: false,
       category: {
         connect: { id: giyim.id },
       },
@@ -360,28 +361,9 @@ async function main() {
       barkod: "9789751604037",
       desi: "1.2",
       stock: 11,
-      price: 100.0,
-      is_active: true,
-      variants: {
-        create: [
-          {
-            title: "Standart",
-            price: 99.9,
-            stock: 120,
-            sku: "NUTUK-V11",
-            barkod: "9789751604037",
-            is_default: true,
-            variantPrices: {
-              create: [
-                {
-                  marketplaceId: trendyol.id,
-                  salePrice: 100,
-                },
-              ],
-            },
-          },
-        ],
-      },
+      salePrice: 100.0,
+      is_active: false,
+      sku: "NUTUK-V11",
     },
   });
 

@@ -1,7 +1,13 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
-import { Pencil, Trash2 } from "lucide-react";
+import {
+  HeartIcon,
+  Pencil,
+  PlusCircleIcon,
+  ShoppingBag,
+  Trash2,
+} from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import React from "react";
@@ -11,7 +17,7 @@ const ProductCard = ({ data }: { data: any }) => {
   const mobile = useMediaQuery("(max-width: 500px)");
 
   return (
-    <>
+    <div className="mt-4">
       <div
         className={
           "flex frelative overflow-x-auto" +
@@ -31,7 +37,18 @@ const ProductCard = ({ data }: { data: any }) => {
               "min-w-[150px] " + (mobile ? " w-full p-2 border-b" : " ")
             }
           >
-            <div className="bg-slate-500 rounded w-[50px] h-[50px]"></div>
+            <div className="overflow-hidden flex items-center justify-center rounded w-[50px] h-[50px]">
+              <Image
+                width={100}
+                height={100}
+                src={
+                  process.env.NEXT_PUBLIC_IMAGE_URL +
+                  (data.images[0]?.url || "")
+                }
+                alt=""
+                objectFit="contain"
+              />
+            </div>
           </div>
           <div
             className={
@@ -44,15 +61,23 @@ const ProductCard = ({ data }: { data: any }) => {
                 Urun Adi
               </p>
               <span className="text-xs text-secondary-foreground">
+                {data.name || "Apple Macbook Pro M4 Pro 24GB RAM 512GB SSD"}
+              </span>
+            </div>
+            <div className="w-max">
+              <p className="text-foreground font-semibold text-[13px]">
+                Urun Basligi
+              </p>
+              <span className="text-xs text-secondary-foreground">
                 {data.title || "Apple Macbook Pro M4 Pro 24GB RAM 512GB SSD"}
               </span>
             </div>
             <div className="w-max">
               <p className="text-foreground font-semibold text-[13px]">
-                Urun Kodu
+                Urun SKU
               </p>
               <span className="text-xs text-secondary-foreground">
-                {data.stock_code || "PHN-123"}
+                {data.sku || "PHN-123"}
               </span>
             </div>
           </div>
@@ -90,105 +115,7 @@ const ProductCard = ({ data }: { data: any }) => {
           </div>
         </div>
       </div>
-
-      {data.variants && data.variants.length > 1 && (
-        <div className="p-3 mt-5 bg-card box overflow-scroll max-h-[500px]">
-          <h2 className="text-md pb-3 font-bold text-foreground">Varyantlar</h2>
-          <table className="product-variants min-w-max">
-            <thead>
-              <tr className="text-sm w-full">
-                <td className="text-left">Title</td>
-                <td className="text-left">SKU</td>
-                <td className="text-left">Varyant Bilgisi</td>
-                <td className="text-left">Varyant Kodu</td>
-                <td className="text-left">Acıklama</td>
-                <td className="text-right">Price</td>
-                <td className="text-right">Desi</td>
-                <td className="text-right">Stok</td>
-                <td className="text-center">Resimler</td>
-                <td className="text-center">İşlemler</td>
-              </tr>
-            </thead>
-            <tbody>
-              {data.variants.map((item, index) => (
-                <tr key={index} className="text-sm w-full font-extralight">
-                  <th className="text-left py-2 font-light">{item.title}</th>
-
-                  <th className="text-left py-2 font-light">{item.sku}</th>
-                  <th className="text-left font-light">
-                    {item.attributes
-                      .map((attribute, index) => attribute.value)
-                      .join(" - ")}
-                  </th>
-                  <th className="text-left font-light">{item.variant_code}</th>
-                  <th className="text-left font-light">{item.description}</th>
-                  <th className="text-right font-light">{item.price}</th>
-                  <th className="text-right font-light">{item.desi}</th>
-                  <th className="text-right font-light">{item.stock}</th>
-                  <th className="p-2 flex gap-2">
-                    {item.images.map((image, index) => (
-                      <Image
-                        src={image.url}
-                        width={80}
-                        height={80}
-                        key={index}
-                        alt=""
-                      />
-                    ))}
-                    {item.images.map((image, index) => (
-                      <Image
-                        src={image.url}
-                        width={80}
-                        height={80}
-                        key={index}
-                        alt=""
-                      />
-                    ))}
-                    {item.images.map((image, index) => (
-                      <Image
-                        src={image.url}
-                        width={80}
-                        height={80}
-                        key={index}
-                        alt=""
-                      />
-                    ))}
-                    {item.images.map((image, index) => (
-                      <Image
-                        src={image.url}
-                        width={80}
-                        height={80}
-                        key={index}
-                        alt=""
-                      />
-                    ))}
-                  </th>
-                  <th className="">
-                    <div className="flex gap-2">
-                      {" "}
-                      <Link href={`/dashboard/products/${item.id}`}>
-                        <Pencil
-                          size={16}
-                          className="hover:scale-110 duration-200 hover:cursor-pointer"
-                          color="var(--warning)"
-                        />
-                      </Link>
-                      <button>
-                        <Trash2
-                          size={16}
-                          className="hover:scale-110 duration-200 hover:cursor-pointer"
-                          color="var(--error)"
-                        />
-                      </button>
-                    </div>
-                  </th>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      )}
-    </>
+    </div>
   );
 };
 

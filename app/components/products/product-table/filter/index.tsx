@@ -12,6 +12,7 @@ export default function ProductFilters({
 }) {
   const [filters, setFilters] = useState({
     search: "",
+    active: undefined,
     brand: "",
     hasVariant: undefined, // 'yes', 'no', 'all'
     minPrice: "",
@@ -206,6 +207,52 @@ export default function ProductFilters({
             )
           )}
         </div>
+      </div>
+      <div className="flex items-center justify-start h-full gap-2 mb-4">
+        <button
+          onClick={() => {
+            setFilters((prev) => ({
+              ...prev,
+              active: undefined,
+            }));
+            handleChange();
+          }}
+          className={`px-4 py-1 text-sm rounded ${
+            filters.active === undefined
+              ? "bg-blue-600 text-white"
+              : "bg-gray-200"
+          }`}
+        >
+          Tümü
+        </button>
+        <button
+          onClick={() => {
+            setFilters((prev) => ({
+              ...prev,
+              active: true,
+            }));
+            handleChange();
+          }}
+          className={`px-4 py-1 text-sm rounded ${
+            filters.active === true ? "bg-green-600 text-white" : "bg-gray-200"
+          }`}
+        >
+          Aktif
+        </button>
+        <button
+          onClick={() => {
+            setFilters((prev) => ({
+              ...prev,
+              active: false,
+            }));
+            handleChange();
+          }}
+          className={`px-4 py-1 text-sm rounded ${
+            filters.active === false ? "bg-red-600 text-white" : "bg-gray-200"
+          }`}
+        >
+          Pasif
+        </button>
       </div>
     </div>
   );
