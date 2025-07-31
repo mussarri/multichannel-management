@@ -2,57 +2,97 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
-import { useState } from "react";
-import { Input } from "@/components/ui/input";
+import React, { useActionState, useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import axios from "axios";
+import TextInput from "@/app/components/settings/text-input";
+import { setHepsiburadaStore, setTrendyolStore } from "@/app/action";
+import { toast } from "react-toastify";
 
 export function TrendyolIntegration() {
-  const [supplierId, setSupplierId] = useState("");
-  const [apiKey, setApiKey] = useState("");
-  const [secret, setSecret] = useState("");
-  const [products, setProducts] = useState<any[]>([]);
+  const [message, formAction, isPending] = useActionState(
+    setTrendyolStore,
+    null
+  );
 
-  const fetchProducts = async () => {
-    try {
-      const res = await axios.get("/api/trendyol/products", {
-        params: { supplierId, apiKey, secret },
-      });
-      setProducts(res.data.content);
-    } catch (err: any) {
-      alert("Veri alınamadı.");
+  useEffect(() => {
+    if (message.error) {
+      toast.error(message.message);
     }
+    if (message.success) {
+      toast.success(message.message);
+    }
+  }, [message.error, message.message, message.success]);
+
+  const [form, setForm] = React.useState({
+    active: false,
+    storeName: "",
+    api_key: "",
+    api_secret: "",
+    store_supplier_id: "",
+  });
+
+  const submit = (e: any) => {
+    e.preventDefault();
+    const formData = new FormData();
+    formData.append("storeName", form.storeName);
+    formData.append("api_key", form.api_key);
+    formData.append("api_secret", form.api_secret);
+    formData.append("store_supplier_id", form.store_supplier_id);
+    formData.append("active", form.active === false ? "no" : "yes");
+    formAction(formData);
   };
 
   return (
-    <div className="space-y-4 p-4 border rounded bg-white">
+    <form action={formAction} className="space-y-4 p-4 border rounded bg-white">
       <div className="grid grid-cols-1 md:grid-cols-3 gap-2">
-        <Input
-          placeholder="Supplier ID"
-          value={supplierId}
-          onChange={(e) => setSupplierId(e.target.value)}
+        <input type="text" hidden name="marketname" value="trendyol" />
+        <TextInput
+          placeholder="Store Supplier ID"
+          label="Secret"
+          name="store_supplier_id"
+          vertical={false}
+          error={false}
+          required={true}
+          readOnly={false}
+          type="text"
+          value={form.store_supplier_id}
+          onChange={(e) =>
+            setForm((prev) => ({ ...prev, store_supplier_id: e }))
+          }
         />
-        <Input
+
+        <TextInput
           placeholder="API Key"
-          value={apiKey}
-          onChange={(e) => setApiKey(e.target.value)}
+          label="API Key"
+          name="api_key"
+          vertical={false}
+          error={false}
+          required={true}
+          readOnly={false}
+          type="text"
+          value={form.api_secret}
+          onChange={(e) => setForm((prev) => ({ ...prev, api_secret: e }))}
         />
-        <Input
+        <TextInput
           placeholder="Secret"
-          value={secret}
-          onChange={(e) => setSecret(e.target.value)}
+          label="Secret"
+          name="api_secret"
+          vertical={false}
+          error={false}
+          required={true}
+          readOnly={false}
+          type="text"
+          value={form.api_secret}
+          onChange={(e) => setForm((prev) => ({ ...prev, api_secret: e }))}
         />
       </div>
 
-      <Button onClick={fetchProducts}>Ürünleri Getir</Button>
-
-      <ul className="mt-4 space-y-1 text-sm">
-        {products.map((p) => (
-          <li key={p.id} className="border p-2 rounded">
-            {p.title}
-          </li>
-        ))}
-      </ul>
-    </div>
+      <div>
+        <Button type="submit" disabled={isPending}>
+          Kaydet
+        </Button>
+      </div>
+    </form>
   );
 }

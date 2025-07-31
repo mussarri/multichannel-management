@@ -3,27 +3,54 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { Button } from "@/components/ui/button";
 import TextInput from "@/app/components/settings/text-input";
-import React from "react";
+import React, { useActionState, useEffect } from "react";
+import { setHepsiburadaStore } from "@/app/action";
+import { setTrendyolStore } from "@/app/actions/marketplaceactions";
+import { toast } from "react-toastify";
 
 const Page = ({ data }: { data: any }) => {
+  const [message, formAction, isPending] = useActionState(
+    setTrendyolStore,
+    null
+  );
+
+  useEffect(() => {
+    if (message.error) {
+      toast.error(message.message);
+    }
+    if (message.success) {
+      toast.success(message.message);
+    }
+  }, [message.error, message.message, message.success]);
+
   const [form, setForm] = React.useState({
     active: false,
     storeName: "",
     api_key: "",
+    api_secret: "",
   });
 
   const submit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    const formData = new FormData();
+    formData.append("storeName", form.storeName);
+    formData.append("api_key", form.api_key);
+    formData.append("api_secret", form.api_secret);
+    formData.append("active", form.active === false ? "no" : "yes");
+    //setHepsiburadaStore(formData);
   };
+
   return (
-    <div className="">
+    <form action={formAction}>
       <h2 className="text-xl font-semibold mb-4">Hepsiburada Ayarlari</h2>
-      <form onSubmit={submit} className="flex flex-col gap-2 max-w-lg box p-4">
+      <div className="flex flex-col gap-2 max-w-lg box p-4">
+        <input type="hidden" name="marketname" value="hepsiburada" />
+
         <TextInput
           label="Magaza Adi"
           name="storeName"
           placeholder="Magaza"
-          value=""
+          value={form.storeName}
           onChange={(e: string) => {
             setForm((prev) => ({ ...prev, storeName: e }));
           }}
@@ -36,7 +63,20 @@ const Page = ({ data }: { data: any }) => {
           label="Api Key"
           name="api_key"
           placeholder="API Key"
-          value=""
+          value={form.api_key}
+          onChange={(e: string) => {
+            setForm((prev) => ({ ...prev, api_key: e }));
+          }}
+          type="text"
+          required={false}
+          error={false}
+          vertical={false}
+        />
+        <TextInput
+          label="Api Secret"
+          name="api_secret"
+          placeholder="API Secret"
+          value={form.api_key}
           onChange={(e: string) => {
             setForm((prev) => ({ ...prev, api_key: e }));
           }}
@@ -64,10 +104,12 @@ const Page = ({ data }: { data: any }) => {
         </div>
 
         <div className="text-right">
-          <Button type="submit">Kaydet</Button>
+          <Button type="submit" disabled={isPending}>
+            Kaydet
+          </Button>
         </div>
-      </form>
-    </div>
+      </div>
+    </form>
   );
 };
 

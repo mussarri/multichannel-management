@@ -2,10 +2,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 "use server";
 import prisma from "@/lib/prisma";
-import {
-  createTrendyolProduct,
-  getTrendyolProducts,
-} from "@/lib/services/trendyolApiService";
+import { getTrendyolProducts } from "@/lib/services/trendyolApiService";
 import { slugify } from "@/lib/utils";
 import { revalidatePath } from "next/cache";
 
@@ -15,7 +12,13 @@ import fs from "fs/promises";
 import { log } from "util";
 const uploadDir = path.join(process.cwd(), "public", "uploads");
 
-export default async function createUser(formData: FormData) {
+export async function createUser(formData: FormData) {
+  console.log(formData);
+}
+export async function setHepsiburadaStore(prevState: any, formData: FormData) {
+  console.log(formData);
+}
+export async function setTrendyolStore(prevState: any, formData: FormData) {
   console.log(formData);
 }
 
@@ -56,9 +59,9 @@ export async function createTrendyolProductAction(formData) {
   };
 
   try {
-    const result = await createTrendyolProduct(newProduct); // Trendyol API'ye fetch ile ürün ekle
+    // const result = await createTrendyolProduct(newProduct); // Trendyol API'ye fetch ile ürün ekle
     revalidatePath("/dashboard/products"); // Ürün listesi sayfasını yeniden doğrula
-    return { success: true, message: "Ürün başarıyla eklendi.", data: result };
+    return { success: true, message: "Ürün başarıyla eklendi." };
   } catch (error) {
     console.error("Server Action: Ürün eklenirken hata oluştu:", error);
     return {

@@ -1,12 +1,27 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable react-hooks/rules-of-hooks */
 "use client";
-import React from "react";
+import React, { useActionState, useEffect } from "react";
 import TextInput from "@/app/components/settings/text-input";
 import { Button } from "@/components/ui/button";
-import createUser from "@/app/action";
+import { setTrendyolStore } from "@/app/action";
+import { toast } from "react-toastify";
 
 const page = () => {
+  const [message, formAction, isPending] = useActionState(
+    setTrendyolStore,
+    null
+  );
+
+  useEffect(() => {
+    if (message.error) {
+      toast.error(message.message);
+    }
+    if (message.success) {
+      toast.success(message.message);
+    }
+  }, []);
+
   const [form, setForm] = React.useState({
     active: false,
     storeName: "",
@@ -16,7 +31,7 @@ const page = () => {
   });
 
   return (
-    <form action={createUser}>
+    <form action={formAction}>
       <h2 className="text-xl font-semibold mb-2">Trendyol Ayarlari</h2>
       <div className="box p-4 max-w-[750px] mt-5 flex flex-col gap-2">
         <TextInput
@@ -91,7 +106,9 @@ const page = () => {
       </div>
 
       <div className="text-right max-w-[750px] mt-4 pb-5">
-        <Button type="submit">Kaydet</Button>
+        <Button type="submit" disabled={isPending}>
+          Kaydet
+        </Button>
       </div>
     </form>
   );

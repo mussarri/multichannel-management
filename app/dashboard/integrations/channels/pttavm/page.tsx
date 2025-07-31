@@ -1,5 +1,5 @@
 import React, { Suspense } from "react";
-import Form from "@/app/components/integrations/hepsiburada";
+import Form from "@/app/components/integrations/pttavm";
 
 const page = () => {
   return (

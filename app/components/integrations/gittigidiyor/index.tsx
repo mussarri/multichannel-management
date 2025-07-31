@@ -2,7 +2,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable react-hooks/rules-of-hooks */
 "use client";
-import React, { useEffect } from "react";
+import React, { useActionState, useEffect } from "react";
 import TextInput from "@/app/components/settings/text-input";
 import SelectInput from "@/app/components/settings/select-input";
 import CheckBox from "@/app/components/settings/checkbox";
@@ -12,10 +12,24 @@ import "froala-editor/css/froala_editor.pkgd.min.css";
 import "froala-editor/js/plugins.pkgd.min.js";
 
 import FroalaEditorComponent from "react-froala-wysiwyg";
+import { setTrendyolStore } from "@/app/actions/marketplaceactions";
+import { toast } from "react-toastify";
 
 const page = ({ data }: { data: any }) => {
-  const [model, setModel] = React.useState("");
-  const [model2, setModel2] = React.useState("");
+  const [message, formAction, isPending] = useActionState(
+    setTrendyolStore,
+    null
+  );
+
+  useEffect(() => {
+    if (message.error) {
+      toast.error(message.message);
+    }
+    if (message.success) {
+      toast.success(message.message);
+    }
+  }, [message]);
+
   const [form, setForm] = React.useState({
     active: false,
     storeName: "",
@@ -31,6 +45,8 @@ const page = ({ data }: { data: any }) => {
     shipping_date_time: "",
     sub_title: false,
     sub_title2: false,
+    model: "",
+    model2: "",
   });
 
   useEffect(() => {
@@ -40,24 +56,25 @@ const page = ({ data }: { data: any }) => {
   }, []);
 
   const handleModelChange = (model: any) => {
-    setModel(model);
+    setForm((prev) => ({ ...prev, model }));
   };
   const handleModelChange2 = (model: any) => {
-    setModel2(model);
+    setForm((prev) => ({ ...prev, model2: model }));
   };
   const submit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
   };
 
   return (
-    <form onSubmit={submit}>
+    <form action={formAction} typeof="submit">
       <h2 className="text-xl font-semibold mb-2">Gittigidiyor Ayarlari</h2>
       <div className="box p-4 max-w-[750px] mt-5 flex flex-col gap-2">
+        <input type="hidden" name="marketname" value="gittigidiyor" />
         <TextInput
           label="Magaza Adi"
           name="storeName"
           placeholder="Magaza"
-          value=""
+          value={form.storeName}
           onChange={(e: string) => {
             setForm((prev) => ({ ...prev, storeName: e }));
           }}
@@ -70,7 +87,7 @@ const page = ({ data }: { data: any }) => {
           label="Api Key"
           name="api_key"
           placeholder="API Key"
-          value=""
+          value={form.api_key}
           onChange={(e: string) => {
             setForm((prev) => ({ ...prev, api_key: e }));
           }}
@@ -83,7 +100,7 @@ const page = ({ data }: { data: any }) => {
           label="Api Secret"
           name="api_secret"
           placeholder="Api Secret"
-          value=""
+          value={form.api_secret}
           onChange={(e: string) => {
             setForm((prev) => ({ ...prev, api_secret: e }));
           }}
@@ -96,7 +113,7 @@ const page = ({ data }: { data: any }) => {
           label="Role Name"
           name="role_name"
           placeholder="Role Name"
-          value=""
+          value={form.role_name}
           onChange={(e: string) => {
             setForm((prev) => ({ ...prev, role_name: e }));
           }}
@@ -109,7 +126,7 @@ const page = ({ data }: { data: any }) => {
           label="Role Password"
           name="role_password"
           placeholder="Role Password"
-          value=""
+          value={form.role_password}
           onChange={(e: string) => {
             setForm((prev) => ({ ...prev, role_password: e }));
           }}
@@ -276,7 +293,7 @@ const page = ({ data }: { data: any }) => {
               placeholderText: "Edit Your Content Here!",
               charCounterCount: false,
             }}
-            model={model}
+            model={form.model}
             onModelChange={handleModelChange}
           />
         </div>
@@ -290,14 +307,16 @@ const page = ({ data }: { data: any }) => {
               placeholderText: "Edit Your Content Here!",
               charCounterCount: false,
             }}
-            model={model2}
+            model={form.model2}
             onModelChange={handleModelChange2}
           />
         </div>
       </div>
 
       <div className="text-right max-w-[750px] mt-4 pb-5">
-        <Button type="submit">Kaydet</Button>
+        <Button type="submit" disabled={isPending}>
+          Kaydet
+        </Button>
       </div>
     </form>
   );

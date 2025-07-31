@@ -2,7 +2,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable react-hooks/rules-of-hooks */
 "use client";
-import React from "react";
+import React, { useActionState, useEffect, useTransition } from "react";
 import TextInput from "@/app/components/settings/text-input";
 import { Button } from "@/components/ui/button";
 import "froala-editor/css/froala_style.min.css";
@@ -10,20 +10,52 @@ import "froala-editor/css/froala_editor.pkgd.min.css";
 import "froala-editor/js/plugins.pkgd.min.js";
 
 import FroalaEditorComponent from "react-froala-wysiwyg";
+import { toast } from "react-toastify";
+import { setTrendyolStore } from "@/app/action";
 
 const Page = ({ data }: { data: any }) => {
-  const [model, setModel] = React.useState("");
-  const [model2, setModel2] = React.useState("");
+  const [message, formAction, isPending] = useActionState(
+    setTrendyolStore,
+    null
+  );
+  useEffect(() => {
+    if (message.error) {
+      toast.error(message.message);
+    }
+    if (message.success) {
+      toast.success(message.message);
+    }
+  }, [message.error, message.message, message.success]);
+
   const [form, setForm] = React.useState({
     active: false,
+    model: "",
+    model2: "",
+    storeName: "",
+    api_key: "",
+    api_secret: "",
   });
 
   const handleModelChange = (model: any) => {
-    setModel(model);
+    setForm((prev) => ({ ...prev, model }));
   };
   const handleModelChange2 = (model: any) => {
-    setModel2(model);
+    setForm((prev) => ({ ...prev, model1: model }));
   };
+
+  const submit = (e: any) => {
+    e.preventDefault();
+    const formData = new FormData();
+    formData.append("active", form.active === false ? "no" : "yes");
+    formData.append("storeName", form.storeName);
+    formData.append("api_key", form.api_key);
+    formData.append("api_secret", form.api_secret);
+    formData.append("model", form.model);
+    formData.append("model2", form.model2);
+    formData.append("marketname", "n11");
+    formAction(formData);
+  };
+
   return (
     <>
       <h2 className="text-xl font-semibold mb-2">N11 Ayarlari</h2>
@@ -91,7 +123,7 @@ const Page = ({ data }: { data: any }) => {
               placeholderText: "Edit Your Content Here!",
               charCounterCount: false,
             }}
-            model={model}
+            model={form.model}
             onModelChange={handleModelChange}
           />
         </div>
@@ -105,14 +137,16 @@ const Page = ({ data }: { data: any }) => {
               placeholderText: "Edit Your Content Here!",
               charCounterCount: false,
             }}
-            model={model2}
+            model={form.model2}
             onModelChange={handleModelChange2}
           />
         </div>
       </div>
 
       <div className="text-right max-w-[750px] mt-4 pb-5">
-        <Button>Kaydet</Button>
+        <Button disabled={isPending} type="button" onClick={submit}>
+          Kaydet
+        </Button>
       </div>
     </>
   );

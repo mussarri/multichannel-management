@@ -3,41 +3,69 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { Button } from "@/components/ui/button";
 import TextInput from "@/app/components/settings/text-input";
-import React from "react";
+import React, { useActionState, useEffect } from "react";
 import "froala-editor/css/froala_style.min.css";
 import "froala-editor/css/froala_editor.pkgd.min.css";
 import "froala-editor/js/plugins.pkgd.min.js";
 
 import FroalaEditorComponent from "react-froala-wysiwyg";
+import { setTrendyolStore } from "@/app/action";
+import { toast } from "react-toastify";
 
 const Page = ({ data }: { data: any }) => {
+  const [message, formAction, isPending] = useActionState(
+    setTrendyolStore,
+    null
+  );
+
+  useEffect(() => {
+    if (message.error) {
+      toast.error(message.message);
+    }
+    if (message.success) {
+      toast.success(message.message);
+    }
+  }, [message.error, message.message, message.success]);
+
   const [form, setForm] = React.useState({
     active: false,
     storeName: "",
     api_password: "",
     api_username: "",
+    model: "",
+    model2: "",
   });
-  const [model, setModel] = React.useState("");
-  const [model2, setModel2] = React.useState("");
+
   const handleModelChange = (model: string) => {
-    setModel(model);
+    setForm((prev) => ({ ...prev, model }));
   };
   const handleModelChange2 = (model: string) => {
-    setModel2(model);
+    setForm((prev) => ({ ...prev, model2: model }));
   };
 
-  const submit = (e: React.FormEvent<HTMLFormElement>) => {
+  const submit = (e: any) => {
     e.preventDefault();
+    const formData = new FormData();
+    formData.append("storeName", form.storeName);
+    formData.append("api_username", form.api_username);
+    formData.append("api_password", form.api_password);
+    formData.append("active", form.active == false ? "no" : "yes");
+    formData.append("model", form.model);
+    formData.append("model2", form.model2);
+    formData.append("marketname", "pttavm");
+    formAction(formData);
   };
   return (
     <div className="">
       <h2 className="text-xl font-semibold mb-4">PttAvm Ayarlari</h2>
       <form onSubmit={submit} className="flex flex-col gap-2 max-w-lg box p-4">
+        <input type="text" hidden name="marketname" value="pttavm" />
+
         <TextInput
           label="Magaza Adi"
           name="storeName"
           placeholder="Magaza"
-          value=""
+          value={form.storeName}
           onChange={(e: string) => {
             setForm((prev) => ({ ...prev, storeName: e }));
           }}
@@ -50,7 +78,7 @@ const Page = ({ data }: { data: any }) => {
           label="API Kullanici Adi"
           name="api_username"
           placeholder="API Kullanici Adi"
-          value=""
+          value={form.api_username}
           onChange={(e: string) => {
             setForm((prev) => ({ ...prev, api_username: e }));
           }}
@@ -63,7 +91,7 @@ const Page = ({ data }: { data: any }) => {
           label="API Şifresi"
           name="api_password"
           placeholder="API Şifresi"
-          value=""
+          value={form.api_password}
           onChange={(e: string) => {
             setForm((prev) => ({ ...prev, api_password: e }));
           }}
@@ -100,7 +128,7 @@ const Page = ({ data }: { data: any }) => {
                 placeholderText: "Edit Your Content Here!",
                 charCounterCount: false,
               }}
-              model={model}
+              model={form.model}
               onModelChange={handleModelChange}
             />
           </div>
@@ -114,14 +142,16 @@ const Page = ({ data }: { data: any }) => {
                 placeholderText: "Edit Your Content Here!",
                 charCounterCount: false,
               }}
-              model={model2}
+              model={form.model2}
               onModelChange={handleModelChange2}
             />
           </div>
         </div>
 
         <div className="text-right">
-          <Button type="submit">Kaydet</Button>
+          <Button type="button" onClick={submit} disabled={isPending}>
+            Kaydet
+          </Button>
         </div>
       </form>
     </div>

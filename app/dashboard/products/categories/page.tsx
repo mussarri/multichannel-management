@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { Button } from "@/components/ui/button";
 import prisma from "@/lib/prisma";
+import { getTrendyolCategories } from "@/lib/services/trendyolApiService";
 import { Check, CircleX, Pencil, Trash2 } from "lucide-react";
 import { tree } from "next/dist/build/templates/app-page";
 import Link from "next/link";
@@ -29,6 +30,7 @@ async function RenderCategories() {
       products: true,
     },
   });
+  const trendyol = await getTrendyolCategories();
   const check = (value: boolean) => {
     return value ? (
       <Check color="green" size={16} />

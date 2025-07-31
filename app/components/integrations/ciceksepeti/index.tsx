@@ -2,7 +2,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable react-hooks/rules-of-hooks */
 "use client";
-import React, { useEffect } from "react";
+import React, { useActionState, useEffect } from "react";
 import TextInput from "@/app/components/settings/text-input";
 import SelectInput from "@/app/components/settings/select-input";
 import CheckBox from "@/app/components/settings/checkbox";
@@ -12,10 +12,24 @@ import "froala-editor/css/froala_editor.pkgd.min.css";
 import "froala-editor/js/plugins.pkgd.min.js";
 
 import FroalaEditorComponent from "react-froala-wysiwyg";
+import { setTrendyolStore } from "@/app/actions/marketplaceactions";
+import { toast } from "react-toastify";
 
 const page = ({ data }: { data: any }) => {
-  const [model, setModel] = React.useState("");
-  const [model2, setModel2] = React.useState("");
+  const [message, formAction, isPending] = useActionState(
+    setTrendyolStore,
+    null
+  );
+
+  useEffect(() => {
+    if (message.error) {
+      toast.error(message.message);
+    }
+    if (message.success) {
+      toast.success(message.message);
+    }
+  }, [message.error, message.message, message.success]);
+
   const [form, setForm] = React.useState({
     active: false,
     storeName: "",
@@ -31,6 +45,8 @@ const page = ({ data }: { data: any }) => {
     shipping_date_time: "",
     sub_title: false,
     sub_title2: false,
+    model: "",
+    model2: "",
   });
 
   useEffect(() => {
@@ -40,17 +56,14 @@ const page = ({ data }: { data: any }) => {
   }, []);
 
   const handleModelChange = (model: any) => {
-    setModel(model);
+    setForm((prev) => ({ ...prev, model }));
   };
   const handleModelChange2 = (model: any) => {
-    setModel2(model);
-  };
-  const submit = (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
+    setForm((prev) => ({ ...prev, model2: model }));
   };
 
   return (
-    <form onSubmit={submit}>
+    <form action={formAction}>
       <h2 className="text-xl font-semibold mb-2">Çiçeksepeti Ayarlari</h2>
       <div className="box p-4 max-w-[750px] mt-5 flex flex-col gap-2">
         <TextInput
@@ -120,7 +133,7 @@ const page = ({ data }: { data: any }) => {
               placeholderText: "Edit Your Content Here!",
               charCounterCount: false,
             }}
-            model={model}
+            model={form.model}
             onModelChange={handleModelChange}
           />
         </div>
@@ -134,7 +147,7 @@ const page = ({ data }: { data: any }) => {
               placeholderText: "Edit Your Content Here!",
               charCounterCount: false,
             }}
-            model={model2}
+            model={form.model2}
             onModelChange={handleModelChange2}
           />
         </div>
