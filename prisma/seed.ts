@@ -1,4 +1,5 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
+import { slugify } from "@/lib/utils";
 import { PrismaClient } from "@prisma/client";
 import { connect } from "http2";
 
@@ -17,7 +18,7 @@ async function main() {
   const trendyol = await prisma.marketplace.create({
     data: {
       name: "Trendyol",
-      code: "TRENDYOL",
+      slug: slugify("trendyol"),
     },
   });
 
@@ -124,28 +125,24 @@ async function main() {
       data: {
         value: "Kırmızı",
         attributeId: renkAttr.id,
-        productId: product.id,
       },
     }),
     prisma.attributeValue.create({
       data: {
         value: "Mavi",
         attributeId: renkAttr.id,
-        productId: product.id,
       },
     }),
     prisma.attributeValue.create({
       data: {
         value: "M",
         attributeId: bedenAttr.id,
-        productId: product.id,
       },
     }),
     prisma.attributeValue.create({
       data: {
         value: "L",
         attributeId: bedenAttr.id,
-        productId: product.id,
       },
     }),
   ]);
@@ -155,7 +152,8 @@ async function main() {
       {
         title: "Basic Tişört Kirmizi",
         productId: product.id,
-        price: 199.99,
+        salePrice: 199.99,
+        listPrice: 149.99,
         stock: 25,
         barkod: "VARIANT-KIRMIZI-M",
         sku: "sku-12msk-KIRMIZI-M",
@@ -170,7 +168,8 @@ async function main() {
       {
         title: "Basic Tişört Mavi",
         productId: product.id,
-        price: 199.99,
+        salePrice: 199.99,
+        listPrice: 149.99,
         stock: 25,
         barkod: "VARIANT-MAVI-L",
         sku: "sku-12msk-MAVI-L",
@@ -193,7 +192,6 @@ async function main() {
 
     const relatedValues = await prisma.attributeValue.findMany({
       where: {
-        productId: product.id,
         value: {
           in: Object.values(comb),
         },
@@ -203,14 +201,8 @@ async function main() {
     await prisma.productVariant.update({
       where: { id: variant.id },
       data: {
-        attributes: {
+        AttributeValue: {
           connect: relatedValues.map((val) => ({ id: val.id })),
-        },
-        variantPrices: {
-          create: {
-            marketplaceId: trendyol.id,
-            salePrice: 199.99,
-          },
         },
       },
     });
@@ -362,6 +354,7 @@ async function main() {
       desi: "1.2",
       stock: 11,
       salePrice: 100.0,
+      listPrice: 50,
       is_active: false,
       sku: "NUTUK-V11",
     },

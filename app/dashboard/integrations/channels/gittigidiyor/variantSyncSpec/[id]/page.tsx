@@ -1,6 +1,6 @@
 import ProductCard from "@/app/components/products/product-card";
 import { Suspense } from "react";
-import Form from "@/app/components/integrations/gittigidiyor/variantSynSpec";
+import Form from "@/app/views/integrations/gittigidiyor/variantSynSpec";
 
 export default function ProductsPage() {
   return (

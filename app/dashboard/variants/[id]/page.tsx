@@ -1,15 +1,22 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import React, { Suspense } from "react";
 
-import ProductVariant from "@/app/components/products/product-variant";
+import ProductVariant from "@/app/views/product/product-info/variant-table-edit";
+import VariantCreate from "@/app/views/product/product-info/variant-settings-edit";
+
 import prisma from "@/lib/prisma";
 import { redirect } from "next/navigation";
+import Loading from "@/app/components/general/Loading";
 
 const New = ({ params }: { params: any }) => {
   return (
-    <Suspense fallback={<div>Loading...</div>}>
-      <RenderVariant params={params} />
-    </Suspense>
+    <>
+      <Suspense fallback={<Loading />}></Suspense>
+      <Suspense fallback={<Loading />}>
+        <RenderVariant params={params} />
+      </Suspense>
+    </>
   );
 };
 
@@ -31,7 +38,7 @@ async function RenderVariant({ params }: { params: any }) {
       variants: {
         include: {
           images: true,
-          attributes: {
+          AttributeValue: {
             include: {
               attribute: true,
             },
@@ -40,8 +47,19 @@ async function RenderVariant({ params }: { params: any }) {
       },
     },
   });
+  const marketplaces = await prisma.marketplaceAccount.findMany({
+    include: {
+      marketPlace: true,
+    },
+  });
 
   if (!product) return redirect("/dashboard/products");
 
-  return <ProductVariant product={product} />;
+  return (
+    <ProductVariant
+      variants={product.variants}
+      product={product}
+      marketplaces={marketplaces}
+    />
+  );
 }

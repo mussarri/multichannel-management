@@ -2,7 +2,7 @@
 /* eslint-disable prefer-const */
 import React, { Suspense } from "react";
 
-import ProductForm from "@/app/components/products/product-add";
+import ProductForm from "@/app/views/product/product-add";
 import prisma from "@/lib/prisma";
 
 const RenderProductAdd = async () => {

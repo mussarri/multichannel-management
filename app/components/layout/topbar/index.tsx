@@ -12,9 +12,14 @@ export function Topbar() {
   return (
     <header
       className={
-        "flex z-40 items-center justify-between py-3 border-b bg-sidebar gap-4" +
+        "flex z-40 items-center justify-between py-3 border-b gap-4 absolute bg-blur " +
         (mobile ? " px-2" : " px-8")
       }
+      style={{
+        width: "calc(100% - 260px)",
+        backdropFilter: "blue(8px)",
+        backgroundColor: "rgba(255,255,255, .9)",
+      }}
     >
       {mobile && (
         <div className="">

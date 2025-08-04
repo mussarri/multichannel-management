@@ -8,9 +8,11 @@ import React, { useState } from "react";
 const index = ({
   attributes,
   product,
+  marketplaces,
 }: {
   attributes: any[];
   product: any;
+  marketplaces: any[];
 }) => {
   function generateCombinations(variants, index = 0, current = {}) {
     if (index === variants.length) {
@@ -50,8 +52,8 @@ const index = ({
       sku: product.sku + "-" + option.variant,
       stock: 0,
       desi: product.desi,
-      title: product.title + " " + option.variant,
-      description: product.description + " " + option.variant,
+      title: product.title,
+      description: product.description,
       price: product.price,
       n11_price: product.price,
       trendyol_price: product.price,
@@ -218,6 +220,11 @@ const index = ({
                 </button>
               </div>
             </th>
+            {marketplaces
+              .map((i) => i.markatPlace)
+              .map((item: any) => (
+                <th key={item.id}>{item.name} Fiyat</th>
+              ))}
             <th>
               <div>
                 {" "}

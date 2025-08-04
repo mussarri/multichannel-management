@@ -43,12 +43,68 @@ const orderData = [
   { date: "07-07", orders: 38 },
 ];
 
+function IntegrationStatusCard({ integration }) {
+  const { platform, status, lastSyncAt, lastErrorMessage } = integration;
+
+  const formatTime = (iso: string | null) => {
+    if (!iso) return "Hiç senkronize edilmedi";
+    const dt = new Date(iso);
+    return dt.toLocaleString("tr-TR", { hour12: false });
+  };
+  const statusColors: { [key: string]: string } = {
+    ok: "text-green-500",
+    error: "text-red-500",
+    disconnected: "text-gray-500",
+  };
+
+  return (
+    <div className="bg-white p-2 rounded shadow flex items-center gap-4">
+      <div className="flex-shrink-0">
+        {/* Placeholder logo; gerçekte platforma göre ikon koy */}
+        <div className="w-12 h-12 bg-gray-100 rounded flex items-center justify-center">
+          <span className="uppercase font-bold text-sm">
+            {platform.slice(0, 2)}
+          </span>
+        </div>
+      </div>
+      <div className="flex-1">
+        <div className="flex justify-between">
+          <h3 className="font-semibold">
+            {platform.charAt(0).toUpperCase() + platform.slice(1)}
+          </h3>
+          <div
+            className={`font-medium ${statusColors[status] || "text-gray-500"}`}
+          >
+            {status === "ok"
+              ? "Bağlı"
+              : status === "error"
+              ? "Hata"
+              : status === "disconnected"
+              ? "Bağlı Değil"
+              : status}
+          </div>
+        </div>
+
+        {status === "error" && lastErrorMessage && (
+          <p
+            className="text-xs text-red-500 mt-1 truncate"
+            title={lastErrorMessage}
+          >
+            Hata: {lastErrorMessage}
+          </p>
+        )}
+      </div>
+    </div>
+  );
+}
+
 export default function DashboardPage() {
   const [range, setRange] = useState<{ from: Date; to: Date }>();
   const handleDateChange = (range: { from: Date; to: Date }) => {
     // API çağrısı burada yapılır
     setRange(range);
   };
+
   return (
     <div className="grid gap-4 p-2 py-4">
       {/* Stat Cards */}
@@ -84,6 +140,38 @@ export default function DashboardPage() {
                 <Bar dataKey="orders" fill="var(--primary)" />
               </BarChart>
             </ResponsiveContainer>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardContent className="p-4">
+            <h2 className="font-semibold">Entegre Edilmiş Pazaryerleri</h2>
+            <div className="grid gap-4 md:grid-cols-1">
+              {[
+                {
+                  id: 123,
+                  platform: "trendyol",
+                  status: "ok",
+                  lastSyncAt: "22.11.2025",
+                  lastErrorMessage: "key is incorrect",
+                },
+                {
+                  id: 12313,
+                  platform: "amazon",
+                  status: "ok",
+                  lastSyncAt: "22.11.2025",
+                  lastErrorMessage: "key is incorrect",
+                },
+                {
+                  id: 12313,
+                  platform: "gittigidiyor",
+                  status: "ok",
+                  lastSyncAt: "22.11.2025",
+                  lastErrorMessage: "key is incorrect",
+                },
+              ].map((i) => (
+                <IntegrationStatusCard key={i.id} integration={i} />
+              ))}
+            </div>
           </CardContent>
         </Card>
       </div>

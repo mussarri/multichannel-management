@@ -1,15 +1,8 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
-import {
-  HeartIcon,
-  Pencil,
-  PlusCircleIcon,
-  ShoppingBag,
-  Trash2,
-} from "lucide-react";
+ 
 import Image from "next/image";
-import Link from "next/link";
 import React from "react";
 import { useMediaQuery } from "usehooks-ts";
 
@@ -34,7 +27,7 @@ const ProductCard = ({ data }: { data: any }) => {
         >
           <div
             className={
-              "min-w-[150px] " + (mobile ? " w-full p-2 border-b" : " ")
+              "min-w-[70px] " + (mobile ? " w-full p-2 border-b" : " ")
             }
           >
             <div className="overflow-hidden flex items-center justify-center rounded w-[50px] h-[50px]">
@@ -42,8 +35,9 @@ const ProductCard = ({ data }: { data: any }) => {
                 width={100}
                 height={100}
                 src={
-                  process.env.NEXT_PUBLIC_IMAGE_URL +
-                  (data.images[0]?.url || "")
+                  data?.images && data?.images?.length > 0
+                    ? process.env.NEXT_PUBLIC_IMAGE_URL + data.images[0]?.url
+                    : "/package.jpg"
                 }
                 alt=""
                 objectFit="contain"

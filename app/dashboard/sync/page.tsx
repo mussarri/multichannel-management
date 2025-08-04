@@ -1,4 +1,4 @@
-import { ProductTable } from "@/app/components/products/product-table";
+import { ProductTable } from "@/app/views/product/product-table";
 
 export default function ProductsPage() {
   const initialProducts = [

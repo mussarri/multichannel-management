@@ -115,9 +115,13 @@ label.text-sm {
   @apply bg-card border rounded-lg text-card-foreground;
 }
 
+header.bg-blur {
+  backdrop-filter: blur(8px);
+}
+
 input,
 textarea {
-  @apply bg-input shadow-sm border p-2 rounded-lg w-full text-xs outline-none placeholder:text-xs h-[38px];
+  @apply bg-input shadow-sm border p-2 rounded w-full text-xs outline-none placeholder:text-xs h-[38px];
 }
 
 .filter input {
@@ -233,11 +237,12 @@ table.variant-table-create {
 }
 .variant-table thead th,
 .variant-table-create thead th {
-  @apply min-w-[120px] font-semibold text-left;
+  @apply font-semibold text-left;
 }
+
 .variant-table thead tr th > div > span,
 .variant-table-create thead tr th > div > span {
-  @apply w-max  font-semibold text-[11px];
+  @apply w-[60px] font-semibold text-[11px];
 }
 .variant-table thead tr th > div,
 .variant-table-create thead tr th > div {
@@ -257,6 +262,7 @@ table.variant-table-create {
 .variant-table-create tbody tr td {
   @apply text-[sm] py-2 px-1;
 }
+
 .variant-table tbody tr td input,
 .variant-table-create tbody tr td input {
   @apply h-[36px] text-xs outline-none rounded-sm max-w-[80px];
@@ -268,8 +274,8 @@ table.variant-table-create {
   @apply max-w-[200px];
 }
 .variant-table tbody tr td:first-child,
-.variant-table-create tbody tr td:first-child {
-  @apply capitalize;
+.variant-table-create tbody tr td{
+  @apply capitalize w-max;
 }
 
 table.product tbody tr td {
@@ -437,7 +443,8 @@ table.product-variants td {
   --rs-steps-state-process: green;
 }
 
-.marketplace-settings img {
+.marketplace-settings img,
+.channels img {
   object-fit: contain;
   height: 100%;
   width: auto;

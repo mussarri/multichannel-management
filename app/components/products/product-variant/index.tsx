@@ -17,7 +17,13 @@ import React, { useEffect, useState } from "react";
 import { Circle, CirclePlusIcon, Trash2 } from "lucide-react";
 import ProductCard from "@/app/components/products/product-card";
 
-const index = ({ product }: { product: any }) => {
+const index = ({
+  product,
+  marketplaces,
+}: {
+  product: any;
+  marketplaces: any;
+}) => {
   const [open, setOpen] = useState(false);
   const [option, setoption] = useState("");
   const [attInputs, setAttributesInput] = useState({});
@@ -263,7 +269,11 @@ const index = ({ product }: { product: any }) => {
         </div>
 
         {variants && variants.length > 0 && (
-          <VariantTable attributes={variants} product={product} />
+          <VariantTable
+            attributes={variants}
+            product={product}
+            marketplaces={marketplaces}
+          />
         )}
       </div>
     </div>

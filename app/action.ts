@@ -9,7 +9,7 @@ import { revalidatePath } from "next/cache";
 import { mkdir, writeFile } from "fs/promises";
 import path, { parse } from "path";
 import fs from "fs/promises";
-import { log } from "util";
+
 const uploadDir = path.join(process.cwd(), "public", "uploads");
 
 export async function createUser(formData: FormData) {
@@ -17,9 +17,7 @@ export async function createUser(formData: FormData) {
 }
 export async function setHepsiburadaStore(prevState: any, formData: FormData) {
   console.log(formData);
-}
-export async function setTrendyolStore(prevState: any, formData: FormData) {
-  console.log(formData);
+  return { success: true, message: "Ürün başarıyla eklendi." };
 }
 
 const deleteImages = async (deletedIds: string[], productId: string) => {
@@ -50,6 +48,11 @@ const deleteImages = async (deletedIds: string[], productId: string) => {
     // opsiyonel: veritabanından da sil
   }
 };
+
+export async function setTrendyolStore(prevState: any, formData: FormData) {
+  console.log(formData);
+  return { success: true, message: "Ürün başarıyla eklendi." };
+}
 
 export async function createTrendyolProductAction(formData) {
   const newProduct = {
@@ -179,12 +182,7 @@ export async function deleteProduct(prevState: any, formData: FormData) {
       where: { id: id },
       include: {
         images: true,
-        variants: {
-          include: {
-            variantPrices: true,
-            attributes: true,
-          },
-        },
+        variants: true,
       },
     });
 
@@ -266,10 +264,10 @@ export async function fetchProductsAction() {
         images: true,
         category: true,
         brand: true,
+        MarketplaceProductMapping: true,
         variants: {
           include: {
-            variantPrices: true,
-            attributes: true,
+            MarketplaceProductVariantMapping: true,
           },
         },
       },

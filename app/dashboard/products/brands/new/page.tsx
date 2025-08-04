@@ -22,10 +22,6 @@ const New = () => {
 export default New;
 
 async function RenderCategoryAdd() {
-  const categories = await prisma.category.findMany({
-    include: {
-      products: true,
-    },
-  });
+  const categories = await prisma.category.findMany({});
   return <CategoryAdd categories={categories} />;
 }

@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { fetchProductsAction } from "@/app/action";
-import { ProductTable } from "@/app/components/products/product-table";
+import { ProductTable } from "@/app/views/product/product-table";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { Suspense } from "react";

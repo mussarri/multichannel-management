@@ -33,15 +33,16 @@ model Brand {
 }
 
 model Category {
-  id         Int         @id @default(autoincrement())
-  name       String
-  slug       String      @unique
-  parentId   Int?
-  parent     Category?   @relation("Subcategories", fields: [parentId], references: [id], onDelete: SetNull)
-  children   Category[]  @relation("Subcategories")
-  attributes Attribute[]
-  products   Product[]
-  brands     Brand[]
+  id                         Int                          @id @default(autoincrement())
+  name                       String
+  slug                       String                       @unique
+  parentId                   Int?
+  parent                     Category?                    @relation("Subcategories", fields: [parentId], references: [id], onDelete: SetNull)
+  children                   Category[]                   @relation("Subcategories")
+  attributes                 Attribute[]
+  products                   Product[]
+  brands                     Brand[]
+  MarketplaceCategoryMapping MarketplaceCategoryMapping[]
 }
 
 model Attribute {
@@ -57,15 +58,14 @@ model Attribute {
 
 model AttributeValue {
   id                      Int                       @id @default(autoincrement())
-  productId               String
   attributeId             Int
   value                   String // örn: "Mavi", "L", "128GB" 
-  product                 Product                   @relation(fields: [productId], references: [id], onDelete: Cascade)
+  products                Product[]
   attribute               Attribute                 @relation(fields: [attributeId], references: [id], onDelete: Cascade)
   productVariants         ProductVariant[]
   ProductVariantAttribute ProductVariantAttribute[]
 
-  @@unique([productId, attributeId, value])
+  @@unique([attributeId, value])
 }
 
 model Product {
@@ -98,7 +98,9 @@ model Product {
 model ProductVariant {
   id                               String                             @id @default(cuid())
   productId                        String
-  price                            Float
+  salePrice                        Float
+  costPrice                        Float?
+  listPrice                        Float?
   sku                              String?                            @unique
   title                            String?
   subtitle                         String?
@@ -111,7 +113,6 @@ model ProductVariant {
   is_active                        Boolean                            @default(true)
   is_default                       Boolean                            @default(true)
   product                          Product                            @relation(fields: [productId], references: [id], onDelete: Cascade)
-  attributes                       ProductVariantAttribute[]
   images                           ProductImage[]
   createdAt                        DateTime                           @default(now())
   updatedAt                        DateTime                           @updatedAt
@@ -127,20 +128,27 @@ model Marketplace {
   name                             String                             @unique // e.g. "Trendyol"
   logoUrl                          String? // UI için
   description                      String? // Admin panelde gösterilecek alt açıklama
-  marketplaceAccountId             String                             @unique
+  marketplaceAccountId             String?                            @unique
   SyncLog                          SyncLog[]
   MarketplaceProductVariantMapping MarketplaceProductVariantMapping[]
+  MarketplaceAccount               MarketplaceAccount[]
+  MarketplaceCategoryMapping       MarketplaceCategoryMapping[]
 
+  @@unique([id, marketplaceAccountId])
   @@unique([slug, marketplaceAccountId])
 }
 
 //local ile marketplace kategori eslestirme
 model MarketplaceCategoryMapping {
-  id                 String @id @default(cuid())
-  localCategoryId    String // kendi sistemindeki kategori
-  marketplaceId      String // trendyol, hb, vb.
+  id                 String      @id @default(cuid())
+  localCategoryId    Int // kendi sistemindeki kategori
+  marketplaceId      Int // trendyol, hb, vb.
   remoteCategoryId   String // pazaryerindeki kategori ID’si
   remoteCategoryName String
+  marketplace        Marketplace @relation(fields: [marketplaceId], references: [id])
+  category           Category    @relation(fields: [localCategoryId], references: [id])
+
+  @@unique([localCategoryId, marketplaceId])
 }
 
 //marketin kategori attributeleri orn: giyim: renk, beden
@@ -161,7 +169,6 @@ model ProductVariantAttribute {
   attributeId      Int
   attributeValueId Int
 
-  variant        ProductVariant @relation(fields: [variantId], references: [id])
   attribute      Attribute      @relation(fields: [attributeId], references: [id])
   attributeValue AttributeValue @relation(fields: [attributeValueId], references: [id])
 }
@@ -177,20 +184,25 @@ model ProductAttributeValueMapping {
 
 //marketplacin bilgileri
 model MarketplaceAccount {
-  id            String   @id @default(cuid())
-  marketplaceId Int
-  userId        String?  @unique
-  user          User?    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  id            String      @id @default(cuid())
+  marketplaceId Int         @unique
+  userId        String?     @unique
+  user          User?       @relation(fields: [userId], references: [id], onDelete: Cascade)
   storeName     String
   apiKey        String
   secretKey     String
   sellerId      String?
+  supplierId    String?
   accessToken   String?
   refreshToken  String?
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
+  role_name     String?
+  role_password String?
+  marketPlace   Marketplace @relation(fields: [marketplaceId], references: [id])
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
 
   @@unique([id, marketplaceId])
+  @@unique([storeName, marketplaceId])
 }
 
 //marketplace ile urun eslestirme
@@ -250,7 +262,7 @@ model SyncLog {
   productId     String?
   marketplaceId Int
   marketplace   Marketplace @relation(fields: [marketplaceId], references: [id], onDelete: Cascade)
-  action        SyncAction // CREATE | UPDATE | DELETE
+  action        SyncAction // CONNECT | CATEGORY_MAPPING | VARIANT_SYNC | PRODUCT_SYNC
   status        SyncStatus  @default(PENDING)
   errorMessage  String?
   syncedAt      DateTime?
@@ -279,9 +291,10 @@ enum Status {
 }
 
 enum SyncAction {
-  CREATE
-  UPDATE
-  DELETE
+  CONNECT
+  CATEGORY_MAPPING
+  VARIANT_SYNC
+  PRODUCT_SYNC
 }
 
 enum SyncStatus {

@@ -1,4 +1,4 @@
-import { ProductTable } from "@/app/components/products/product-table";
+import { ProductTable } from "@/app/views/product/product-table";
 import { Suspense } from "react";
 
 export default function ProductsPage() {

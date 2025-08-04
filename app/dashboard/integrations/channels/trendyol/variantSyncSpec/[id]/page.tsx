@@ -1,6 +1,6 @@
 import ProductCard from "@/app/components/products/product-card";
 import { Suspense } from "react";
-import Form from "@/app/components/integrations/trendyol-integration/variantSynSpec";
+import Form from "@/app/views/integrations/trendyol-integration/variantSynSpec";
 
 export default function ProductsPage() {
   return (

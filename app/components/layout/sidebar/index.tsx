@@ -105,7 +105,7 @@ export function Sidebar() {
     return (
       <aside
         className={
-          "h-full w-[260px] bg-sidebar border-r px-2 py-4 overflow-y-auto space-y-2"
+          "h-screen w-[260px] bg-sidebar border-r px-2 py-4 overflow-y-auto space-y-2"
         }
       >
         <div className="pb-3">

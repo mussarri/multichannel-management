@@ -7,14 +7,7 @@ import { Button } from "@/components/ui/button";
 import { RefreshCcwIcon } from "lucide-react";
 
 const Form = ({ categories }: { categories: any[] }) => {
-  const [form, setForm] = React.useState({
-    parent: "",
-    category: "",
-    n11_category: "",
-    brand: "",
-    product_quantity: "",
-  });
-  const [categoryInput, setCategoryInput] = React.useState("");
+ 
 
   return (
     <form action="">
@@ -27,12 +20,8 @@ const Form = ({ categories }: { categories: any[] }) => {
               options={categories}
               vertical={false}
               required={true}
-              onChange={(e: string) => {
-                setForm((prev) => {
-                  return { ...prev, parent: e };
-                });
-              }}
-              value={form.parent}
+              onChange={() => {}}
+              value=""
             />
           </div>
           <div className="flex-1">
@@ -41,11 +30,9 @@ const Form = ({ categories }: { categories: any[] }) => {
               name={"category"}
               vertical={false}
               required={true}
-              value={categoryInput}
+              value=""
               placeholder=""
-              onChange={(value: string) => {
-                setCategoryInput(value);
-              }}
+              onChange={() => {}}
               error={false}
               type="text"
             />
