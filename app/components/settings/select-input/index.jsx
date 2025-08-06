@@ -8,6 +8,7 @@ const index = ({
   onChange,
   vertical = false,
   value,
+  minWidth = true,
   error = "",
 }) => {
   return (
@@ -17,7 +18,12 @@ const index = ({
         (vertical ? " flex-col items-start" : " items-center")
       }
     >
-      <label className="min-w-[200px] text-sm font-semibold " htmlFor="">
+      <label
+        className={
+          "text-sm font-semibold " + (minWidth ? "min-w-[200px] " : "min-w-max")
+        }
+        htmlFor=""
+      >
         {label}
       </label>
       {!vertical && ":"}
@@ -51,7 +57,7 @@ const index = ({
           )}
       </select>
       {error && (
-        <p className="text-xs text-red-500 absolute mt-[65px]">{error}</p>
+        <p className="text-[11px] text-red-500 absolute mt-[60px]">{error}</p>
       )}
     </div>
   );

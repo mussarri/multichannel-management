@@ -10,6 +10,7 @@ import {
   Calculator,
   ChevronDown,
   ChevronRight,
+  CreditCardIcon,
   Globe2Icon,
   ShoppingBag,
   Truck,
@@ -30,9 +31,18 @@ const menuItems = [
     href: "/dashboard/products",
     submenu: [
       { label: "Ürün Listesi", href: "/dashboard/products" },
-      { label: "Kategoriler", href: "/dashboard/products/categories" },
-      { label: "Markalar", href: "/dashboard/products/brands" },
-      { label: "Varyantlar", href: "/dashboard/products/variants" },
+      { label: "Kategoriler", href: "/dashboard/categories" },
+      { label: "Markalar", href: "/dashboard/brands" },
+      { label: "Varyantlar", href: "/dashboard/variants" },
+    ],
+  },
+  {
+    label: "Siparişler",
+    icon: <CreditCardIcon size={18} />,
+    href: "/dashboard/orders",
+    submenu: [
+      { label: "Sipariş Listesi", href: "/dashboard/orders" },
+      { label: "Sipariş Oluştur", href: "/dashboard/orders/groups" },
     ],
   },
   {
@@ -97,7 +107,11 @@ const menuItems = [
 
 export function Sidebar() {
   const pathname = usePathname();
-  const isActive = (href: string) => pathname === href;
+  const isActive = (href: string) =>
+    pathname === href ||
+    (href.startsWith("/dashboard/categories") && pathname.startsWith(href)) ||
+    (href.startsWith("/dashboard/products/") && pathname.startsWith(href));
+
   const mobile = useMediaQuery("(max-width: 1024px)");
 
   if (mobile) return <Mobile menuItems={menuItems} isActive={isActive} />;
@@ -125,7 +139,10 @@ export function Sidebar() {
                 href={item.href}
                 className={
                   "w-full flex items-center justify-between py-3 px-4 rounded hover:bg-hover text-md " +
-                  (pathname.startsWith(item.href) && " active font-semibold")
+                  ((pathname.startsWith(item.href) ||
+                    (pathname == "/dashboard/categories" &&
+                      item.href.startsWith("/dashboard/products"))) &&
+                    " active font-semibold")
                 }
               >
                 <div className="flex items-center gap-2">
@@ -139,7 +156,9 @@ export function Sidebar() {
                 )}
               </Link>
 
-              {pathname.startsWith(item.href) && (
+              {(pathname.startsWith(item.href) ||
+                (pathname == "/dashboard/categories" &&
+                  item.href.startsWith("/dashboard/products"))) && (
                 <div className="mt-1 ml-6 flex flex-col space-y-1">
                   {item.submenu.map((sub) => (
                     <Link
@@ -162,7 +181,7 @@ export function Sidebar() {
               key={item.href}
               href={item.href}
               className={cn(
-                "w-full flex items-center gap-2 px-4 py-3 rounded text-sm hover:bg-hover",
+                "w-full flex items-center gap-2 px-4 py-3 rounded text-sm hover:bg-hover text-md",
                 isActive(item.href) && " active font-semibold"
               )}
             >

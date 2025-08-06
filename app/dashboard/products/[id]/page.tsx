@@ -16,12 +16,6 @@ import VariantList from "@/app/components/products/VariantList";
 export default function ProductEdit({ params }) {
   const { id } = params;
 
-  console.log(id);
-
-  if (!id) {
-    return redirect("/dashboard/products");
-  }
-
   return (
     <div>
       <h2 className="text-xl font-semibold mb-4">Ürün Bilgileri</h2>
@@ -47,6 +41,7 @@ async function ProductDetailsSection({ id }: { id: string }) {
       id: true,
       is_active: true,
       description: true,
+      category: true,
       title: true,
       sub_title: true,
       images: true,

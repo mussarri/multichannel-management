@@ -14,7 +14,7 @@ import ImageInput from "@/app/components/products/image-uploader";
 
 import FroalaEditorComponent from "react-froala-wysiwyg";
 import { Button } from "@/components/ui/button";
-import { Category } from "@prisma/client";
+import { Brand, Category } from "@prisma/client";
 import { createProduct } from "@/app/action";
 import { toast } from "react-toastify";
 import VariantSettings from "@/app/views/product/product-add/variant-settings";
@@ -23,15 +23,19 @@ import "rsuite/Steps/styles/index.css";
 import ProductAddForm1 from "./price";
 import { ArrowLeft, ArrowRight, MoveRightIcon } from "lucide-react";
 import { redirect } from "next/navigation";
+import CategoryAdd from "@/app/components/categories/CategoryAdd";
+import CalculateDesi from "@/app/components/products/CalculateDesi";
 
 const New = ({
   categories,
   brands,
 }: {
   categories: Category[];
-  brands: any[];
+  brands: Brand[];
 }) => {
   const [message, formAction, isPending] = useActionState(createProduct, null);
+  const [open, setOpen] = useState(false);
+  const [desiOpen, setDesiOpen] = useState(false);
 
   useEffect(() => {
     if (message?.error) {
@@ -56,7 +60,7 @@ const New = ({
     description: "",
     is_active: false,
     is_default: true,
-    desi: "",
+    desi: 1,
     barkod: "",
     sku: "",
     variants: [],
@@ -80,12 +84,6 @@ const New = ({
   };
 
   const settings = [
-    {
-      label: "Desi",
-      name: "desi",
-      value: formValues.desi,
-      placeholder: "placeholder",
-    },
     {
       label: "Barkod",
       name: "barkod",
@@ -152,7 +150,7 @@ const New = ({
         </div>
         <MarkaForm />
       </div>
-      <div className="flex-1">
+      <div className="flex-1 flex gap-4 items-end">
         <SelectInput
           label={"Ürün Kategorisi"}
           name={"categoryId"}
@@ -170,6 +168,7 @@ const New = ({
           value={formValues.categoryId}
           error={errors.categoryId}
         />
+        <CategoryAdd categories={categories} open={open} setOpen={setOpen} />
       </div>
       <div className="flex gap-4">
         <TextInput
@@ -210,6 +209,39 @@ const New = ({
         </div>
       </div>
       <div className="flex flex-wrap gap-4">
+        <div className={"flex gap-1 flex-col items-start"}>
+          <label
+            htmlFor=""
+            className="min-w-[200px] text-sm uppercase font-semibold flex items-end gap-2"
+          >
+            Desi
+            <CalculateDesi
+              open={desiOpen}
+              setOpen={setDesiOpen}
+              setDesi={(v: number) =>
+                setFormValues({ ...formValues, desi: v.toFixed(2) })
+              }
+            />
+          </label>
+
+          <input
+            type="text"
+            placeholder="desi"
+            name={"desi"}
+            required
+            className={
+              "border p-2 rounded-lg w-full outline-none text-sm " +
+              (errors.desi ? "border-error" : "")
+            }
+            onChange={(e) => {
+              setFormValues({ ...formValues, desi: e.target.value });
+            }}
+            value={formValues.desi}
+          />
+          {errors.desi && (
+            <p className="text-[12px] text-error">{errors.desi}</p>
+          )}
+        </div>
         {settings.map((item, didem) => (
           <TextInput
             key={didem}

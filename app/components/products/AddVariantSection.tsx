@@ -10,7 +10,7 @@ const AddVariantSection = ({ id }: { id: string }) => {
         Varyantlar
         <Link
           className="text-[12px] font-[500]"
-          href={`/dashboard/products/edit/${id}`}
+          href={"/dashboard/variants/" + id}
         >
           {" "}
           (Düzenle)
@@ -19,7 +19,6 @@ const AddVariantSection = ({ id }: { id: string }) => {
       <div className="p-4">
         <Link
           href={"/dashboard/variants/" + id}
-          target={"_blank"}
           className="text-sm flex items-center gap-2"
         >
           {" "}

@@ -2,15 +2,20 @@
 import Link from "next/link";
 import { authOptions } from "@/auth";
 import { getServerSession } from "next-auth";
+import SignOut from "./components/buttons/SignOut";
 
 export default async function Header() {
   const session = await getServerSession(authOptions);
-  console.log(session);
 
-  const signOut = () => {};
   return (
     <>
-      <header className="fixed inset-x-0 top-0 z-50">
+      <header
+        className="fixed inset-x-0 top-0 z-50"
+        style={{
+          background: "rgba(255, 255, 255, 0.65)",
+          backdropFilter: "blur(10px)",
+        }}
+      >
         <nav
           aria-label="Global"
           className="flex items-center justify-between p-6 lg:px-8"
@@ -67,16 +72,7 @@ export default async function Header() {
             {session ? (
               <>
                 <div className="flex items-center space-x-4">
-                  <div className="text-sm text-gray-500">
-                    {session.user?.name && <div>{session.user.name}</div>}
-                    <div>{session.user?.email}</div>
-                  </div>
-                  <button
-                    onClick={() => signOut()}
-                    className="bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600 transition"
-                  >
-                    Sign Out
-                  </button>
+                  <SignOut />
                 </div>
               </>
             ) : (

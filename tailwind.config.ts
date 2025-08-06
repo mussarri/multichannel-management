@@ -43,6 +43,7 @@ export default {
         hover: "var(--hover)",
         border: "var(--border)",
         sidebar: "var(--sidebar)",
+        header: "var(--header)",
         input: "var(--input)",
         ring: "var(--ring)",
         error: "var(--error)",

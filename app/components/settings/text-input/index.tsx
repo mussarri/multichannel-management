@@ -69,7 +69,7 @@ const index = ({
       </label>
       {vertical || ":"}
       {InputElement()}
-      {error && <p className="text-red-500 text-xs">{error}</p>}
+      {error && <p className="text-red-500 text-[11px]">{error}</p>}
     </div>
   );
 };

@@ -6,6 +6,7 @@ import ProductCard from "@/app/components/products/product-card";
 import { Button } from "@/components/ui/button";
 import { BlocksIcon, RefreshCwIcon, Trash, Trash2 } from "lucide-react";
 import React, { useState } from "react";
+import VariantOptions from "@/app/components/products/product-variant";
 
 const index = ({
   product,
@@ -103,15 +104,15 @@ const index = ({
     );
   };
 
-  console.log(formData);
-
   return (
     <div className="w-full overflow-auto">
       <h2 className="text-xl font-semibold min-w-[250px]">
         {" "}
-        Seçenek Grupları{" "}
+        {product.name} Seçenek Grupları{" "}
       </h2>
       <ProductCard data={product} />
+      <VariantOptions product={product} marketplaces={marketplaces} />
+
       <div className="box p-4 mt-4">
         <div className="flex items-center justify-between pb-5 w-full ">
           <div className="flex gap-2 text-sm variant-table-buttons">

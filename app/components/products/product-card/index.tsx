@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
- 
+
 import Image from "next/image";
 import React from "react";
 import { useMediaQuery } from "usehooks-ts";
@@ -60,16 +60,22 @@ const ProductCard = ({ data }: { data: any }) => {
             </div>
             <div className="w-max">
               <p className="text-foreground font-semibold text-[13px]">
-                Urun Basligi
+                Basligi
               </p>
               <span className="text-xs text-secondary-foreground">
-                {data.title || "Apple Macbook Pro M4 Pro 24GB RAM 512GB SSD"}
+                {data.title || "-"}
               </span>
             </div>
             <div className="w-max">
               <p className="text-foreground font-semibold text-[13px]">
-                Urun SKU
+                Kategorisi
               </p>
+              <span className="text-xs text-secondary-foreground">
+                {data.category.name || "-"}
+              </span>
+            </div>
+            <div className="w-max">
+              <p className="text-foreground font-semibold text-[13px]">SKU</p>
               <span className="text-xs text-secondary-foreground">
                 {data.sku || "PHN-123"}
               </span>

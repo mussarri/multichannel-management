@@ -46,24 +46,25 @@ model Category {
 }
 
 model Attribute {
-  id         Int              @id @default(autoincrement())
-  name       String // örn: "Renk", "Beden", "Numara"
-  slug       String
-  categoryId Int
-  category   Category         @relation(fields: [categoryId], references: [id])
-  values     AttributeValue[]
-
-  ProductVariantAttribute ProductVariantAttribute[]
+  id                       Int                        @id @default(autoincrement())
+  name                     String // örn: "Renk", "Beden", "Numara"
+  slug                     String                     @unique
+  category                 Category[]
+  values                   AttributeValue[]
+  ProductVariantAttribute  ProductVariantAttribute[]
+  CategoryAttributeMapping CategoryAttributeMapping[]
 }
 
 model AttributeValue {
   id                      Int                       @id @default(autoincrement())
   attributeId             Int
-  value                   String // örn: "Mavi", "L", "128GB" 
-  products                Product[]
+  name                    String
+  value                   String                    @unique // örn: "Mavi", "L", "128GB" 
   attribute               Attribute                 @relation(fields: [attributeId], references: [id], onDelete: Cascade)
+  products                Product[]
   productVariants         ProductVariant[]
   ProductVariantAttribute ProductVariantAttribute[]
+  AttributeValueMapping   AttributeValueMapping[]
 
   @@unique([attributeId, value])
 }
@@ -116,7 +117,7 @@ model ProductVariant {
   images                           ProductImage[]
   createdAt                        DateTime                           @default(now())
   updatedAt                        DateTime                           @updatedAt
-  AttributeValue                   AttributeValue[]
+  attributeValues                  AttributeValue[]
   MarketplaceProductVariantMapping MarketplaceProductVariantMapping[]
 
   @@unique([productId, sku])
@@ -130,9 +131,11 @@ model Marketplace {
   description                      String? // Admin panelde gösterilecek alt açıklama
   marketplaceAccountId             String?                            @unique
   SyncLog                          SyncLog[]
+  marketplaceAccount               MarketplaceAccount[]
   MarketplaceProductVariantMapping MarketplaceProductVariantMapping[]
-  MarketplaceAccount               MarketplaceAccount[]
-  MarketplaceCategoryMapping       MarketplaceCategoryMapping[]
+  marketplaceCategoryMapping       MarketplaceCategoryMapping[]
+  categoryAttributeMapping         CategoryAttributeMapping[]
+  attributeValueMapping            AttributeValueMapping[]
 
   @@unique([id, marketplaceAccountId])
   @@unique([slug, marketplaceAccountId])
@@ -148,18 +151,35 @@ model MarketplaceCategoryMapping {
   marketplace        Marketplace @relation(fields: [marketplaceId], references: [id])
   category           Category    @relation(fields: [localCategoryId], references: [id])
 
-  @@unique([localCategoryId, marketplaceId])
+  @@unique([marketplaceId, localCategoryId, remoteCategoryId])
 }
 
-//marketin kategori attributeleri orn: giyim: renk, beden
-model MarketplaceCategoryAttribute {
-  id               String  @id @default(cuid())
-  marketplaceId    String
-  remoteCategoryId String
-  name             String // Örn: Renk
-  attributeId      String // Pazaryerinin ID'si
-  isRequired       Boolean
-  values           Json // ["Kırmızı", "Mavi", ...]
+// Attribute bazında eşleme
+model CategoryAttributeMapping {
+  id                  String      @id @default(cuid())
+  marketplaceId       Int
+  localAttributeId    Int
+  remoteAttributeId   String
+  remoteAttributeName String?
+  localCategoryId     Int
+  remoteCategoryId    String
+  marketplace         Marketplace @relation(fields: [marketplaceId], references: [id])
+  attribute           Attribute   @relation(fields: [localAttributeId], references: [id])
+
+  @@unique([marketplaceId, localAttributeId, remoteAttributeId, localCategoryId, remoteCategoryId])
+}
+
+model AttributeValueMapping {
+  // Attribute value bazında eşleme
+  id                    String         @id @default(cuid())
+  marketplaceId         Int
+  localAttributeValueId Int
+  remoteValueId         String
+  remoteValueName       String?
+  marketplace           Marketplace    @relation(fields: [marketplaceId], references: [id])
+  attributeValue        AttributeValue @relation(fields: [localAttributeValueId], references: [id])
+
+  @@unique([marketplaceId, localAttributeValueId, remoteValueId])
 }
 
 //prodyct varyantinin attribute değerleri:
@@ -173,23 +193,14 @@ model ProductVariantAttribute {
   attributeValue AttributeValue @relation(fields: [attributeValueId], references: [id])
 }
 
-//Her ürünün pazaryerine uygun attribute değer eşleşmeleri:
-model ProductAttributeValueMapping {
-  id                   String @id @default(cuid())
-  productId            String
-  marketplaceAccountId String
-  attributeId          String // pazaryerinin attribute id'si
-  value                String // örn: "Mavi"
-}
-
 //marketplacin bilgileri
 model MarketplaceAccount {
   id            String      @id @default(cuid())
   marketplaceId Int         @unique
   userId        String?     @unique
   user          User?       @relation(fields: [userId], references: [id], onDelete: Cascade)
-  storeName     String
-  apiKey        String
+  storeName     String?
+  apiKey        String?
   secretKey     String
   sellerId      String?
   supplierId    String?
@@ -295,6 +306,8 @@ enum SyncAction {
   CATEGORY_MAPPING
   VARIANT_SYNC
   PRODUCT_SYNC
+  CATEGORY_ATTRIBUTE_MAPPING
+  ATTRIBUTE_VALUE_MAPPING
 }
 
 enum SyncStatus {

@@ -4,6 +4,7 @@ import Section from "./views/landing/features-auto";
 import Section1 from "./views/landing/entegrations";
 import Section2 from "./views/landing/target";
 import Footer from "./views/landing/footer";
+import Header from "./Header";
 
 export default function Home() {
   return (
@@ -11,6 +12,7 @@ export default function Home() {
       className="flex-1"
       style={{ background: "linear-gradient(0deg,black,transparent)" }}
     >
+      <Header />
       <Hero />
       <Section />
       <Section1 />

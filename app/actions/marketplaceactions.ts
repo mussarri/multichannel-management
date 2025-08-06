@@ -4,7 +4,7 @@
 
 import prisma from "@/lib/prisma";
 import { slugify } from "@/lib/utils";
-import { MarketplaceAccount } from "@prisma/client";
+import { MarketplaceAccount, SyncAction } from "@prisma/client";
 import { revalidatePath, revalidateTag } from "next/cache";
 
 export async function revalidate() {
@@ -28,6 +28,8 @@ async function connect(prev, formData) {
   return response.json();
 }
 
+// category
+
 export async function categoryMap(prev, formData) {
   const localCategoryId = parseInt(
     formData.get("localCategoryId")?.toString() || ""
@@ -40,22 +42,24 @@ export async function categoryMap(prev, formData) {
 
   const externalCategoryName =
     formData.get("externalCategoryName")?.toString() || "";
-  const marketplaceStatus = await checkMarketplace(marketplaceId);
 
-  if (marketplaceStatus === false) {
-    return {
-      success: false,
-      message: "Marketplace baglanti bilgilerinizi konrtol ediniz.",
-      error: "MarketplaceConnError.",
-    };
-  }
+  // const marketplaceStatus = await checkMarketplace(marketplaceId);
+
+  // if (marketplaceStatus === false) {
+  //   return {
+  //     success: false,
+  //     message: "Marketplace baglanti bilgilerinizi konrtol ediniz.",
+  //     error: "MarketplaceConnError.",
+  //   };
+  // }
 
   try {
     const categoryMap = await prisma.marketplaceCategoryMapping.upsert({
       where: {
-        localCategoryId_marketplaceId: {
+        marketplaceId_localCategoryId_remoteCategoryId: {
           localCategoryId: localCategoryId,
           marketplaceId: marketplaceId,
+          remoteCategoryId: externalCategoryId,
         },
       },
       update: {
@@ -103,6 +107,185 @@ export async function categoryMap(prev, formData) {
       error: error.message,
     };
   }
+}
+
+export async function saveCategoryAttributeMappings(
+  marketplaceId: number,
+  mappings: Array<{
+    localCategoryId: number;
+    remoteCategoryId: string;
+    localAttributeId: number;
+    remoteAttributeId: string;
+    remoteAttributeName: string;
+  }>
+) {
+  await prisma.$transaction(async (tx) => {
+    for (const m of mappings) {
+      await tx.categoryAttributeMapping.upsert({
+        where: {
+          marketplaceId_localAttributeId_remoteAttributeId_localCategoryId_remoteCategoryId:
+            {
+              marketplaceId,
+              localAttributeId: m.localAttributeId,
+              localCategoryId: m.localCategoryId,
+              remoteAttributeId: m.remoteAttributeId,
+              remoteCategoryId: m.remoteCategoryId,
+            },
+        },
+        update: {
+          remoteAttributeName: m.remoteAttributeName,
+        },
+        create: {
+          marketplaceId,
+          localCategoryId: m.localCategoryId,
+          remoteCategoryId: m.remoteCategoryId,
+          localAttributeId: m.localAttributeId,
+          remoteAttributeId: m.remoteAttributeId,
+          remoteAttributeName: m.remoteAttributeName,
+        },
+      });
+    }
+  });
+}
+
+// attribute value
+
+export async function saveAttributeValueMappings(
+  marketplaceId: number,
+  mappings: Array<{
+    localAttributeValueId: number;
+    remoteValueId: string;
+    remoteValueName: string;
+  }>
+) {
+  await prisma.$transaction(async (tx) => {
+    for (const m of mappings) {
+      await tx.attributeValueMapping.upsert({
+        where: {
+          marketplaceId_localAttributeValueId_remoteValueId: {
+            marketplaceId,
+            localAttributeValueId: m.localAttributeValueId,
+            remoteValueId: m.remoteValueId,
+          },
+        },
+        update: {
+          remoteValueName: m.remoteValueName,
+        },
+        create: {
+          marketplaceId,
+          localAttributeValueId: m.localAttributeValueId,
+          remoteValueId: m.remoteValueId,
+          remoteValueName: m.remoteValueName,
+        },
+      });
+    }
+  });
+}
+
+export async function saveAttributeValueMappingAction(prev, formData) {
+  const marketplaceId = parseInt(
+    formData.get("marketplaceId")?.toString() || ""
+  );
+  const mappings = JSON.parse(formData.get("mappings")?.toString() || "");
+  console.log(formData);
+
+  // try {
+  //   const maps = await saveAttributeValueMappings(marketplaceId, mappings);
+  //   console.log(maps);
+
+  //   revalidatePath("/dashboard/categories/");
+  //   return {
+  //     success: true,
+  //     message: "Degerler basariyla kaydedildi.",
+  //   };
+  // } catch (error) {
+  //   return {
+  //     error: true,
+  //     message: "Degerler kaydedilirken hata oluştu",
+  //   };
+  // }
+}
+
+// export async function saveCategoryMapping(data: {
+//   marketplaceId: number;
+//   localCategoryId: number;
+//   remoteCategoryId: string;
+// }) {
+//   await prisma.marketplaceCategoryMapping.upsert({
+//     where: {
+//       // unique constraint'a göre uyarlaman gerek, burada örnek composite yoksa custom find+create
+//       id: `${data.marketplaceId}-${data.localCategoryId}-${data.remoteCategoryId}`,
+//     },
+//     update: {},
+//     create: {
+//       localCategoryId: data.localCategoryId,
+//       marketplaceId: data.marketplaceId,
+//       remoteCategoryId: data.remoteCategoryId,
+//       remoteCategoryName: "", // istenirse UI'dan geçilebilir
+//     },
+//   });
+
+//   await prisma.syncLog.create({
+//     data: {
+//       marketplaceId: data.marketplaceId,
+//       action: "CATEGORY_MAPPING",
+//       status: "SUCCESS",
+//       payload: {
+//         localCategoryId: data.localCategoryId,
+//         remoteCategoryId: data.remoteCategoryId,
+//       },
+//       syncedAt: new Date(),
+//     },
+//   });
+// }
+
+export async function saveAttributeMappings(data: {
+  marketplaceId: number;
+  localCategoryId: number;
+  remoteCategoryId: string;
+  mappings: Array<{
+    localAttributeId: number;
+    remoteAttributeId: string;
+    remoteAttributeName?: string;
+  }>;
+}) {
+  await prisma.$transaction(async (tx) => {
+    for (const m of data.mappings) {
+      await tx.categoryAttributeMapping.upsert({
+        where: {
+          marketplaceId_localAttributeId_remoteAttributeId_localCategoryId_remoteCategoryId:
+            {
+              marketplaceId: data.marketplaceId,
+              localAttributeId: m.localAttributeId,
+              remoteAttributeId: m.remoteAttributeId,
+              localCategoryId: data.localCategoryId,
+              remoteCategoryId: data.remoteCategoryId,
+            },
+        },
+        update: {
+          remoteAttributeName: m.remoteAttributeName,
+        },
+        create: {
+          marketplaceId: data.marketplaceId,
+          localCategoryId: data.localCategoryId,
+          remoteCategoryId: data.remoteCategoryId,
+          localAttributeId: m.localAttributeId,
+          remoteAttributeId: m.remoteAttributeId,
+          remoteAttributeName: m.remoteAttributeName,
+        },
+      });
+    }
+
+    await tx.syncLog.create({
+      data: {
+        marketplaceId: data.marketplaceId,
+        action: SyncAction.CATEGORY_ATTRIBUTE_MAPPING,
+        status: "SUCCESS",
+        payload: { mappings: data.mappings },
+        syncedAt: new Date(),
+      },
+    });
+  });
 }
 
 export async function createMarketPlace(prev, formData) {

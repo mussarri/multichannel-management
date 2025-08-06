@@ -9,11 +9,48 @@ import { revalidatePath } from "next/cache";
 import { mkdir, writeFile } from "fs/promises";
 import path, { parse } from "path";
 import fs from "fs/promises";
+import bcrypt from "bcryptjs";
+import { signIn } from "next-auth/react";
 
 const uploadDir = path.join(process.cwd(), "public", "uploads");
 
-export async function createUser(formData: FormData) {
+export async function register(prevState: any, formData: FormData) {
   console.log(formData);
+  const name = formData.get("name").toString();
+  const email = formData.get("email").toString();
+  const password = formData.get("password").toString();
+  try {
+    const user = await prisma.user.create({
+      data: {
+        name: name,
+        email: email,
+        password: bcrypt.hashSync(password, 10),
+      },
+    });
+    if (user) {
+      await signIn("credentials", {
+        email: email,
+        password: password,
+        redirect: false,
+      });
+    } else {
+      throw new Error("Kullanıcı oluşturulamadı.");
+    }
+
+    return {
+      success: true,
+      message: "Kullanıcı başarıyla oluşturuldu.",
+      data: user,
+    };
+  } catch (error) {
+    console.log(error);
+
+    return {
+      success: false,
+      message: "Kullanıcı oluşturulamadı.",
+      error: error.message,
+    };
+  }
 }
 export async function setHepsiburadaStore(prevState: any, formData: FormData) {
   console.log(formData);
@@ -89,6 +126,7 @@ export async function fetchTrendyolProductsAction(params) {
   }
 }
 
+//product
 export async function createProduct(prevState: any, formData: FormData) {
   const title = formData.get("title").toString();
   const name = formData.get("name").toString();
@@ -196,88 +234,6 @@ export async function deleteProduct(prevState: any, formData: FormData) {
     return {
       success: false,
       message: "Ürün silinirken bir hata oluştu.",
-      error: error.message,
-    };
-  }
-}
-
-export async function createCategory(prevState: any, formData: FormData) {
-  const name = formData.get("name").toString();
-  const parentId = formData.get("parentId");
-  const parent = await prisma.category.findUnique({
-    where: { id: parseInt(parentId.toString()) },
-  });
-
-  const newCategory = {
-    name: name,
-    slug: slugify(name),
-    parentId: parent.id || null,
-  };
-
-  try {
-    const result = await prisma.category.create({
-      data: newCategory,
-    });
-    revalidatePath("/dashboard/producst/categories");
-    return {
-      success: true,
-      message: "Kategori başarıyla eklendi.",
-      data: result,
-    };
-  } catch (error) {
-    console.error("Server Action: Kategori eklenirken hata oluştu:", error);
-    return {
-      success: false,
-      message: "Kategori eklenirken bir hata oluştu.",
-      error: error.message,
-    };
-  }
-}
-
-export async function createBrand(prevState: any, formData: FormData) {
-  const name = formData.get("name").toString();
-  const newBrand = {
-    name: name,
-    slug: slugify(name),
-  };
-
-  try {
-    const result = await prisma.brand.create({
-      data: newBrand,
-    });
-    revalidatePath("/dashboard/producst/brands");
-    return { success: true, message: "Marka başarıyla eklendi.", data: result };
-  } catch (error) {
-    console.error("Server Action: Marka eklenirken hata oluştu:", error);
-    return {
-      success: false,
-      message: "Marka eklenirken bir hata oluştu.",
-      error: error.message,
-    };
-  }
-}
-
-export async function fetchProductsAction() {
-  try {
-    const products = await prisma.product.findMany({
-      include: {
-        images: true,
-        category: true,
-        brand: true,
-        MarketplaceProductMapping: true,
-        variants: {
-          include: {
-            MarketplaceProductVariantMapping: true,
-          },
-        },
-      },
-    });
-    return { success: true, data: products };
-  } catch (error) {
-    console.error("Server Action: Ürünler çekilirken hata:", error);
-    return {
-      success: false,
-      message: "Ürünler alınamadı.",
       error: error.message,
     };
   }
@@ -400,34 +356,6 @@ export async function updateProductAction(prevState: any, formData: FormData) {
   }
 }
 
-export async function createAttributeAction(
-  prevState: any,
-  formData: FormData
-) {
-  const name = formData.get("name").toString();
-  const categoryId = parseInt(formData.get("categoryId").toString());
-
-  const newAttribute = {
-    name: name,
-    slug: slugify(name),
-    categoryId,
-  };
-  try {
-    const result = await prisma.attribute.create({
-      data: newAttribute,
-    });
-    revalidatePath("/dashboard/producst/attributes");
-    return { success: true };
-  } catch (error) {
-    console.error("Server Action: Özellik eklenirken hata oluştu:", error);
-    return {
-      success: false,
-      message: "Özellik eklenirken bir hata oluştu.",
-      error: error.message,
-    };
-  }
-}
-
 export async function deleteVariants(prevState: any, formData: FormData) {
   const id = formData.get("id").toString();
 
@@ -449,6 +377,7 @@ export async function deleteVariants(prevState: any, formData: FormData) {
     };
   }
 }
+
 export async function updateVariant(prevState: any, formData: FormData) {
   const id = formData.get("id").toString();
 
@@ -466,6 +395,152 @@ export async function updateVariant(prevState: any, formData: FormData) {
     return {
       success: false,
       message: "Ürünler alınamadı.",
+      error: error.message,
+    };
+  }
+}
+
+//category
+export async function createCategory(prevState: any, formData: FormData) {
+  const name = formData.get("name").toString();
+  const parentId = formData.get("parentId");
+  const parent = await prisma.category.findUnique({
+    where: { id: parseInt(parentId.toString()) },
+  });
+
+  const newCategory = {
+    name: name,
+    slug: slugify(name),
+    parentId: parent.id || null,
+  };
+
+  try {
+    const result = await prisma.category.create({
+      data: newCategory,
+    });
+    revalidatePath("/dashboard/producst/categories");
+    return {
+      success: true,
+      message: "Kategori başarıyla eklendi.",
+      data: result,
+    };
+  } catch (error) {
+    console.error("Server Action: Kategori eklenirken hata oluştu:", error);
+    return {
+      success: false,
+      message: "Kategori eklenirken bir hata oluştu.",
+      error: error.message,
+    };
+  }
+}
+
+export async function createBrand(prevState: any, formData: FormData) {
+  const name = formData.get("name").toString();
+  const newBrand = {
+    name: name,
+    slug: slugify(name),
+  };
+
+  try {
+    const result = await prisma.brand.create({
+      data: newBrand,
+    });
+    revalidatePath("/dashboard/producst/brands");
+    return { success: true, message: "Marka başarıyla eklendi.", data: result };
+  } catch (error) {
+    console.error("Server Action: Marka eklenirken hata oluştu:", error);
+    return {
+      success: false,
+      message: "Marka eklenirken bir hata oluştu.",
+      error: error.message,
+    };
+  }
+}
+
+export async function fetchProductsAction() {
+  try {
+    const products = await prisma.product.findMany({
+      include: {
+        images: true,
+        category: true,
+        brand: true,
+        MarketplaceProductMapping: true,
+        variants: {
+          include: {
+            MarketplaceProductVariantMapping: true,
+          },
+        },
+      },
+    });
+    return { success: true, data: products };
+  } catch (error) {
+    console.error("Server Action: Ürünler çekilirken hata:", error);
+    return {
+      success: false,
+      message: "Ürünler alınamadı.",
+      error: error.message,
+    };
+  }
+}
+
+export const saveAttributesForCategory = async (
+  attributesData: [string, string[]][],
+  categoryId: number
+) => {
+  for (const [attributeName, values] of attributesData) {
+    // 1. Attribute'u bul veya oluştur
+    const attribute = await prisma.attribute.upsert({
+      where: { slug: slugify(attributeName) },
+      update: {},
+      create: { name: attributeName, slug: slugify(attributeName) },
+    });
+
+    // 2. Attribute ile Category arasında bağlantıyı kur (çoktan çoğa)
+    await prisma.category.update({
+      where: { id: categoryId },
+      data: {
+        attributes: {
+          connect: [{ id: attribute.id }],
+        },
+      },
+    });
+
+    // 3. AttributeValue'ları tek tek oluştur (aynı value daha önce eklenmişse atla)
+    for (const value of values) {
+      await prisma.attributeValue.upsert({
+        where: {
+          attributeId_value: {
+            attributeId: attribute.id,
+            value: value,
+          },
+        },
+        update: {},
+        create: {
+          attributeId: attribute.id,
+          name: value,
+          value: slugify(value),
+        },
+      });
+    }
+  }
+};
+
+export async function createAttributeAction(
+  prevState: any,
+  formData: FormData
+) {
+  const categoryId = parseInt(formData.get("categoryId").toString());
+  const attributes = JSON.parse(formData.get("attributes").toString());
+
+  try {
+    await saveAttributesForCategory(attributes, categoryId);
+
+    return { success: true, message: "Özellikler başarıyla eklendi." };
+  } catch (error) {
+    console.error("Server Action: Özellik eklenirken hata oluştu:", error);
+    return {
+      success: false,
+      message: "Özellik eklenirken bir hata oluştu.",
       error: error.message,
     };
   }

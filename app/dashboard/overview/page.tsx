@@ -22,7 +22,6 @@ import {
   Bar,
 } from "recharts";
 import { useState } from "react";
-
 const salesData = [
   { date: "07-01", sales: 4300 },
   { date: "07-02", sales: 5200 },

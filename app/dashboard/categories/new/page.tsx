@@ -1,10 +1,10 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-"use client";
 
-import React, { Suspense, useState } from "react";
+import React, { Suspense } from "react";
 
 import CategoryAdd from "@/app/components/products/category-add";
 import prisma from "@/lib/prisma";
+import Loading from "@/app/components/general/Loading";
 
 const New = () => {
   return (
@@ -12,7 +12,7 @@ const New = () => {
       <div className="justify-between flex max-w-[700px] w-full ">
         <h2 className="text-xl font-semibold mb-4">Kategori Ekle</h2>
       </div>
-      <Suspense fallback={<div>Yükleniyor...</div>}>
+      <Suspense fallback={<Loading />}>
         <RenderCategoryAdd />
       </Suspense>
     </div>
@@ -27,5 +27,11 @@ async function RenderCategoryAdd() {
       products: true,
     },
   });
-  return <CategoryAdd categories={categories} />;
+  const marketplaces = await prisma.marketplaceAccount.findMany({
+    include: {
+      marketPlace: true,
+    },
+  });
+
+  return <CategoryAdd categories={categories} marketplaces={marketplaces} />;
 }

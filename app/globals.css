@@ -30,6 +30,7 @@
   --chart-5: oklch(0.769 0.188 70.08);
   --hover: #f2f4f7;
   --sidebar: oklch(1 0 0);
+  --header: oklch(100% 0.00011 271.152 / 0.858);
   --sidebar-foreground: oklch(0.141 0.005 285.823);
   --sidebar-primary: oklch(0.21 0.006 285.885);
   --sidebar-primary-foreground: oklch(0.985 0 0);
@@ -39,7 +40,9 @@
   --sidebar-ring: oklch(0.705 0.015 286.067);
   --error: #ff3448;
   --warning: #ffb933;
+  --success: #22bb33;
   --opacity-input: 1;
+  --bg-url: url("../public/logo/bg-logo2.png");
 }
 
 [data-theme="dark"] {
@@ -69,6 +72,7 @@
   --chart-5: oklch(0.645 0.246 16.439);
   --hover: #1c2332;
   --sidebar: #101828;
+  --header: #101828cc;
   --sidebar-foreground: oklch(0.985 0 0);
   --sidebar-primary: oklch(0.488 0.243 264.376);
   --sidebar-primary-foreground: oklch(0.985 0 0);
@@ -78,7 +82,9 @@
   --sidebar-ring: oklch(0.552 0.016 285.938);
   --error: #cc0003;
   --warning: #ff8702;
+  --success: #22bb33;
   --opacity-input: 0.4;
+  --bg-url: url("../public/logo/bg-logo.png");
 }
 
 @layer base {
@@ -93,6 +99,15 @@
     position: relative;
     @apply bg-background text-foreground;
   }
+}
+
+body {
+  background-image: var(--bg-url);
+  background-repeat: no-repeat;
+  background-position: center center;
+}
+body > div {
+  opacity: 0.95;
 }
 
 main {
@@ -274,7 +289,7 @@ table.variant-table-create {
   @apply max-w-[200px];
 }
 .variant-table tbody tr td:first-child,
-.variant-table-create tbody tr td{
+.variant-table-create tbody tr td {
   @apply capitalize w-max;
 }
 
@@ -283,6 +298,10 @@ table.product tbody tr td {
 }
 table.product tbody tr td a {
   @apply w-max inline-block;
+}
+
+table.attribute-table tbody tr td:first-child {
+  width: 330px;
 }
 
 aside.mobile {
@@ -439,8 +458,13 @@ table.product-variants td {
 }
 
 .rs-steps {
-  --rs-steps-state-finish: green;
-  --rs-steps-state-process: green;
+  --rs-steps-state-finish: var(--success);
+  --rs-steps-state-process: var(--success);
+}
+
+.rs-steps-item {
+  --rs-text-secondary: var(--secondary-foreground);
+  --rs-text-primary: var(--foreground);
 }
 
 .marketplace-settings img,
@@ -461,14 +485,6 @@ input[type="number"] {
   appearance: textfield;
 }
 
-body {
-  background-image: url("../public/logo/bg-logo.png");
-  background-repeat: no-repeat;
-  background-position: center center;
-}
-body > div {
-  opacity: 0.95;
-}
 .features {
   aspect-ratio: 3.5;
   height: auto;

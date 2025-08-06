@@ -20,11 +20,11 @@ export function MarkaForm() {
 
   useEffect(() => {
     if (state?.error) {
-      toast.error("Ürün güncellenirken bir hata oluştu.");
+      toast.error("Marke eklenirken bir hata oluştu.");
       setOpen(false);
     }
     if (state?.success) {
-      toast.success("Ürün başarıyla güncellendi.");
+      toast.success("Marka başarıyla eklendi.");
       setOpen(false);
     }
   }, [state]);
@@ -33,8 +33,10 @@ export function MarkaForm() {
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger asChild>
-        <Button>+</Button>
+      <DialogTrigger asChild style={{ height: 34 }}>
+        <button className="min-w-max mx-2 rounded-md text-primary-foreground border px-3 p-0 text-xs bg-primary">
+          Marka Ekle
+        </button>
       </DialogTrigger>
 
       <DialogContent>

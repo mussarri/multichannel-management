@@ -27,6 +27,7 @@ import { DialogTrigger } from "@radix-ui/react-dialog";
 import ProductsFilter from "./filter";
 import { useRouter } from "next/navigation";
 import SortButton from "./sort-button";
+import { useSession } from "next-auth/react";
 
 function filterProducts(products: any[], filters: any): any[] {
   return products.filter((product) => {
@@ -150,14 +151,14 @@ function filterAndSortProducts(
 
 export function ProductTable({ products }: { products: any[] }) {
   const [open, setOpen] = useState(false);
-  const mobile = useMediaQuery("(max-width: 840px)");
-  const [image, setImage] = useState(true);
   const [filtered, setFiltered] = useState([]);
   const [filters, setFilters] = useState({});
   const [sortOptions, setSortOptions] = useState({
     sortBy: "price",
     order: "desc",
   });
+  const { data } = useSession();
+  console.log(data);
 
   useEffect(() => {
     setFiltered(filterAndSortProducts(products, filters, sortOptions));
@@ -176,8 +177,8 @@ export function ProductTable({ products }: { products: any[] }) {
 
   const OnClick = () => {
     const router = useRouter();
-    router.push("/dashboard/products/");
     router.refresh();
+    router.push("/dashboard/products/");
   };
 
   return (

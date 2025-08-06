@@ -12,7 +12,7 @@ export default function ProductsPage() {
         <h1 className="text-xl font-semibold">Ürünler</h1>
 
         <Link href="/dashboard/products/new" className="">
-          <Button variant={"secondary"}>{"Yeni Ürün Oluştur"}</Button>
+          <Button variant={"default"}>{"Yeni Ürün Oluştur"}</Button>
         </Link>
       </div>
       <Suspense fallback={<div>Yükleniyor...</div>}>

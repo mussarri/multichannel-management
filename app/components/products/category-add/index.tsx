@@ -1,27 +1,44 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
-import React from "react";
+import React, { useState } from "react";
 import SelectInput from "@/app/components/settings/select-input";
 import TextInput from "@/app/components/settings/text-input";
 import { Button } from "@/components/ui/button";
 import { RefreshCcwIcon } from "lucide-react";
+import { Category, MarketplaceAccount } from "@prisma/client";
 
-const Form = ({ categories }: { categories: any[] }) => {
- 
+const Form = ({
+  categories,
+  marketplaces,
+}: {
+  categories: Category[];
+  marketplaces: MarketplaceAccount[];
+}) => {
+  const [form, setForm] = useState({
+    parent: null,
+    category: "",
+  });
 
   return (
     <form action="">
       <div className="mt-3">
-        <div className="box p-4 flex flex-col md:flex-row gap-3">
+        <div className="box p-4 flex flex-col md:flex-row gap-3 items-center">
           <div className="flex-1">
             <SelectInput
               label="Ust Kategori"
               name={"parent"}
-              options={categories}
+              options={["Yok", ...categories]}
               vertical={false}
               required={true}
-              onChange={() => {}}
-              value=""
+              onChange={(value: any) => {
+                setForm((prev) => {
+                  return {
+                    ...prev,
+                    parent: value,
+                  };
+                });
+              }}
+              value={form.parent}
             />
           </div>
           <div className="flex-1">
@@ -30,9 +47,16 @@ const Form = ({ categories }: { categories: any[] }) => {
               name={"category"}
               vertical={false}
               required={true}
-              value=""
+              value={form.category}
               placeholder=""
-              onChange={() => {}}
+              onChange={(value: any) => {
+                setForm((prev) => {
+                  return {
+                    ...prev,
+                    category: value,
+                  };
+                });
+              }}
               error={false}
               type="text"
             />
@@ -44,10 +68,9 @@ const Form = ({ categories }: { categories: any[] }) => {
       </div>
 
       <div className="mt-3 flex gap-4">
-        <N11 />
-        <N11 />
-        <N11 />
-        <N11 />
+        {marketplaces.map((i) => {
+          return <N11 key={i.id} />;
+        })}
       </div>
     </form>
   );

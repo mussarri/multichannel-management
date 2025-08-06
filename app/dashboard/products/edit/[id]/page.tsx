@@ -26,7 +26,7 @@ const RenderProductEdit = async ({ id }: { id: string }) => {
       brand: true,
       variants: {
         include: {
-          AttributeValue: {
+          attributeValues: {
             include: {
               attribute: {
                 include: {

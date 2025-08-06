@@ -1,0 +1,329 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
+/* eslint-disable @typescript-eslint/no-explicit-any */
+/* eslint-disable react-hooks/rules-of-hooks */
+"use client";
+import { Button } from "@/components/ui/button";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import TextInput from "@/app/components/settings/text-input";
+import CheckBox from "@/app/components/settings/checkbox";
+import VariantTable from "@/app/components/products/variant-table";
+import React, { useActionState, useEffect, useState } from "react";
+import { Circle, CirclePlusIcon, Trash2 } from "lucide-react";
+import ProductCard from "@/app/components/products/product-card";
+import { Category } from "@prisma/client";
+import { createAttributeAction } from "@/app/action";
+import { toast } from "react-toastify";
+import { useRouter } from "next/navigation";
+
+const index = ({
+  category,
+  marketplaces,
+}: {
+  category: Category;
+  marketplaces: any;
+}) => {
+  const [open, setOpen] = useState(false);
+  const [option, setoption] = useState("");
+  const [attInputs, setAttributesInput] = useState({});
+  const [optionList, setOptionList] = useState<any[]>([]);
+  const [attributes, setAttributes] = useState<any>([]);
+  const [variants, setVariants] = useState<any[]>();
+  const [message, formAction, isPending] = useActionState(
+    createAttributeAction,
+    null
+  );
+  const router = useRouter();
+
+  useEffect(() => {
+    if (message?.error) {
+      toast.error(message?.message);
+    }
+    if (message?.success) {
+      toast.success(message?.message);
+      router.refresh();
+      router.push("/dashboard/categories/" + category.id);
+    }
+  }, [message]);
+
+  useEffect(() => {
+    const grouped: { [key: string]: string[] } = {};
+
+    // for (const attrVal of category.attributes) {
+    //   const key = attrVal.attribute.name;
+    //   if (!grouped[key]) {
+    //     grouped[key] = [];
+    //   }
+    //   if (!grouped[key].includes(attrVal.value)) {
+    //     grouped[key].push(attrVal.value);
+    //   }
+    // }
+    // setAttributes(Object.entries(grouped));
+    // const emptyObj = Object.fromEntries(
+    //   Object.keys(grouped).map((key) => [key, ""])
+    // );
+    // setAttributesInput(emptyObj);
+  }, []);
+
+  const handleSubmit = (e: any) => {
+    e.preventDefault();
+    setOptionList((prevOptions) => [
+      ...prevOptions,
+      { name: option, active: false },
+    ]);
+    setAttributes((prev) => [...prev, [option, []]]);
+    setoption("");
+    setOpen(false);
+  };
+
+  function generateCombinations(variants, index = 0, current = {}) {
+    if (index === variants.length) {
+      return [
+        {
+          ...current,
+          variant: Object.values(current).join("-"),
+        },
+      ];
+    }
+
+    const [key, values] = variants[index];
+    const results = [];
+
+    values.forEach((value) => {
+      results.push(
+        ...generateCombinations(variants, index + 1, {
+          ...current,
+          [key]: value,
+        })
+      );
+    });
+
+    return results;
+  }
+
+  const result = generateCombinations(attributes);
+
+  const onSubmit = () => {
+    const formData = new FormData();
+    formData.append("categoryId", category.id.toString());
+    formData.append("attributes", JSON.stringify(attributes));
+
+    formAction(formData);
+  };
+
+  return (
+    <div>
+      <div className="pb-10">
+        <div className="justify-between flex max-w-[700px] w-full ">
+          <h2 className="text-xl font-semibold mb-4">Kategori Seçenekleri</h2>
+        </div>
+        <div className="w-full my-10 overflow-x-auto border rounded-md">
+          <div className="justify-between flex w-full p-4 bg-card border min-w-[750px] ">
+            <h2 className="text-lg font-semibold">Kategori Seçenek Gruplari</h2>
+            <Dialog open={open} onOpenChange={setOpen}>
+              <DialogTrigger asChild>
+                <Button variant="secondary">Yeni Kategori Seçeneği Ekle</Button>
+              </DialogTrigger>
+
+              <DialogContent>
+                <DialogHeader>
+                  <DialogTitle>Yeni Kategori Seçeneği Ekle</DialogTitle>
+                </DialogHeader>
+
+                <form onSubmit={handleSubmit} className="space-y-4 mt-2">
+                  <input
+                    type="hidden"
+                    name="categoryId"
+                    id=""
+                    value={category.id}
+                  />
+                  <TextInput
+                    name="name"
+                    label="Ürün Seçeneği"
+                    error={false}
+                    type="text"
+                    vertical={true}
+                    required={true}
+                    placeholder="Ürün Seçeneği"
+                    value={option}
+                    onChange={(e) => {
+                      setoption(e);
+                    }}
+                  />
+
+                  <div className="flex justify-end">
+                    <Button type="submit">Kaydet</Button>
+                  </div>
+                </form>
+              </DialogContent>
+            </Dialog>
+          </div>
+          {optionList?.length > 0 || (
+            <p className="text-xs p-3">
+              Ürünün seçeneği bulunamadı. Eklemek için Yeni Ürün Seçeneği Ekle
+              butonuna tıklayınız.
+            </p>
+          )}
+          {optionList?.length > 0 && (
+            <div className="w-full p-4 bg-card text-card-foreground min-w-[750px]">
+              <h2 className="text-md font-semibold mb-4">
+                Seçenek Gruplari Liste
+              </h2>
+
+              <div className="flex gap-3">
+                {optionList
+                  .filter((i) => i.name !== "")
+                  .map((item, index) => (
+                    <div key={index} className="">
+                      <CheckBox
+                        label={item.name}
+                        value={false}
+                        name="secenek"
+                        onChange={() => {
+                          setOptionList((prevOptions) =>
+                            prevOptions.map((option) =>
+                              option.name === item.name
+                                ? { ...option, active: !option.active }
+                                : option
+                            )
+                          );
+                        }}
+                        checked={item.active}
+                        required
+                      />
+                    </div>
+                  ))}
+              </div>
+
+              <div className="flex gap-3 mt-3">
+                {optionList
+                  .filter((i) => i.name !== "" && i.active)
+                  .map((item, index) => {
+                    const attIndex = attributes.findIndex(
+                      (att) => att[0] === item.name
+                    );
+                    const att = attributes[attIndex];
+
+                    return (
+                      <div key={index}>
+                        <form
+                          id={item.name}
+                          onSubmit={(e) => {
+                            e.preventDefault();
+                            setAttributes((prev) =>
+                              prev.map((att) => {
+                                return att[0] === item.name
+                                  ? [
+                                      item.name,
+                                      [...att[1], attInputs[item.name]],
+                                    ]
+                                  : att;
+                              })
+                            );
+                          }}
+                          className="flex flex-col gap-3 p-2 bg-secondary text-card-foreground rounded shadow-sm border min-w-[200px]"
+                        >
+                          <h3 className="capitalize text-xs">{item.name}</h3>
+                          <div className="flex gap-2 items-center">
+                            <input
+                              className="outline-none w-full"
+                              name={item.name}
+                              type="text"
+                              required={true}
+                              placeholder={item.name}
+                              value={attInputs[item.name]}
+                              onChange={(e) => {
+                                setAttributesInput((prev) => {
+                                  return {
+                                    ...prev,
+                                    [item.name]: e.target.value,
+                                  };
+                                });
+                              }}
+                            />
+
+                            <button
+                              type="submit"
+                              className="text-xs h-max py-1 px-2  rounded hover:scale-110 transition-all duration-300"
+                            >
+                              <CirclePlusIcon size={13} />
+                            </button>
+                          </div>
+                        </form>
+                        {
+                          <div key={index}>
+                            <div className="max-h-[200px] overflow-y-auto">
+                              <table className="text-xs font-light w-full my-2 ">
+                                <thead>
+                                  <tr className="">
+                                    <th className="text-left py-1">Seçenek</th>
+                                    <th className="">Sil</th>
+                                  </tr>
+                                </thead>
+
+                                <tbody>
+                                  {(att[1] as string[]).map((value, index) => (
+                                    <tr key={index} className="mt-4">
+                                      <th className="text-left font-light capitalize py-1">
+                                        {value}
+                                      </th>
+                                      <th>
+                                        <button
+                                          className="text-xs rounded text-red-500 hover:scale-110 transition-all duration-300"
+                                          onClick={() => {
+                                            setAttributes((prev) =>
+                                              prev.map((att) => {
+                                                return att[0] === item[0]
+                                                  ? [
+                                                      att[0],
+                                                      att[1].filter(
+                                                        (v) => v !== value
+                                                      ),
+                                                    ]
+                                                  : att;
+                                              })
+                                            );
+                                          }}
+                                        >
+                                          <Trash2 size={13} color="red" />
+                                        </button>
+                                      </th>
+                                    </tr>
+                                  ))}
+                                </tbody>
+                              </table>
+                            </div>
+                          </div>
+                        }
+                      </div>
+                    );
+                  })}
+              </div>
+            </div>
+          )}
+
+          {optionList?.length > 0 && (
+            <div className="p-4 text-right bg-card gap-4">
+              <Button onClick={onSubmit}>Kaydet</Button>
+            </div>
+          )}
+        </div>
+
+        {/* {variants && variants.length > 0 && (
+          <VariantTable
+            attributes={variants}
+            product={product}
+            marketplaces={marketplaces}
+          />
+        )} */}
+      </div>
+    </div>
+  );
+};
+
+export default index;

@@ -78,7 +78,7 @@ const Page = async ({ id }) => {
       category: true,
       variants: {
         include: {
-          AttributeValue: {
+          attributeValues: {
             include: {
               attribute: {
                 include: {
@@ -152,7 +152,7 @@ const Page = async ({ id }) => {
           />
 
           {data.variants.length > 0 &&
-            data.variants[0].AttributeValue.map((item, index) => (
+            data.variants[0].attributeValues.map((item, index) => (
               <div key={index} className="mt-6">
                 <p className="pb-2 text-xs text-gray-500">
                   {item.attribute.name}

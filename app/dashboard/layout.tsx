@@ -19,7 +19,7 @@ export default function DashboardLayout({
           className={
             "flex-1 overflow-y-auto overflow-x-hidden px-4 pt-4 bg-background"
           }
-          style={{ paddingTop : 80 }}
+          style={{ paddingTop: 80 }}
         >
           <Breadcrumb />
           {children}

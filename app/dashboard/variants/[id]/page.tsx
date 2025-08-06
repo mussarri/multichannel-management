@@ -12,7 +12,6 @@ import Loading from "@/app/components/general/Loading";
 const New = ({ params }: { params: any }) => {
   return (
     <>
-      <Suspense fallback={<Loading />}></Suspense>
       <Suspense fallback={<Loading />}>
         <RenderVariant params={params} />
       </Suspense>
@@ -29,7 +28,15 @@ async function RenderVariant({ params }: { params: any }) {
     },
     include: {
       images: true,
-      category: true,
+      category: {
+        include: {
+          attributes: {
+            include: {
+              values: true,
+            },
+          },
+        },
+      },
       AttributeValues: {
         include: {
           attribute: true,
@@ -38,7 +45,7 @@ async function RenderVariant({ params }: { params: any }) {
       variants: {
         include: {
           images: true,
-          AttributeValue: {
+          attributeValues: {
             include: {
               attribute: true,
             },

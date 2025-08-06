@@ -22,6 +22,29 @@ async function main() {
     },
   });
 
+  const kitapCategory = await prisma.category.upsert({
+    where: { slug: "kitap" },
+    update: {},
+    create: {
+      name: "Kitap",
+      slug: "kitap",
+    },
+  });
+  const renkAttr = await prisma.attribute.create({
+    data: {
+      name: "Renk",
+      slug: "renk",
+    },
+  });
+
+  const bedenAttr = await prisma.attribute.create({
+    data: {
+      name: "Beden",
+      slug: "beden",
+    },
+  });
+
+  /*
   const giyim = await prisma.category.upsert({
     where: { slug: "giyim" },
     update: {},
@@ -34,14 +57,12 @@ async function main() {
             name: "Erkek Tişört",
             slug: "erkek-tisort",
             attributes: {
-              create: [
+              connect: [
                 {
-                  name: "Renk",
-                  slug: "renk",
+                  id: bedenAttr.id,
                 },
                 {
-                  name: "Beden",
-                  slug: "beden",
+                  id: renkAttr.id,
                 },
               ],
             },
@@ -50,14 +71,12 @@ async function main() {
             name: "Kadın Elbise",
             slug: "kadin-elbise",
             attributes: {
-              create: [
+              connect: [
                 {
-                  name: "Renk",
-                  slug: "renk",
+                  id: bedenAttr.id,
                 },
                 {
-                  name: "Beden",
-                  slug: "beden",
+                  id: renkAttr.id,
                 },
               ],
             },
@@ -67,35 +86,10 @@ async function main() {
     },
   });
 
-  const kitapCategory = await prisma.category.upsert({
-    where: { slug: "kitap" },
-    update: {},
-    create: {
-      name: "Kitap",
-      slug: "kitap",
-    },
-  });
-
   const nike = await prisma.brand.create({
     data: {
       name: "Nike",
       slug: "nike",
-    },
-  });
-
-  const renkAttr = await prisma.attribute.create({
-    data: {
-      name: "Renk",
-      slug: "renk",
-      categoryId: giyim.id,
-    },
-  });
-
-  const bedenAttr = await prisma.attribute.create({
-    data: {
-      name: "Beden",
-      slug: "beden",
-      categoryId: giyim.id,
     },
   });
 
@@ -123,25 +117,29 @@ async function main() {
   const [kirmizi, mavi, m, l] = await Promise.all([
     prisma.attributeValue.create({
       data: {
-        value: "Kırmızı",
+        value: "kirmizi",
+        name: "Kırmızı",
         attributeId: renkAttr.id,
       },
     }),
     prisma.attributeValue.create({
       data: {
-        value: "Mavi",
+        value: "mavi",
+        name: "Mavi",
         attributeId: renkAttr.id,
       },
     }),
     prisma.attributeValue.create({
       data: {
-        value: "M",
+        value: "medium",
+        name: "M",
         attributeId: bedenAttr.id,
       },
     }),
     prisma.attributeValue.create({
       data: {
-        value: "L",
+        value: "large",
+        name: "L",
         attributeId: bedenAttr.id,
       },
     }),
@@ -161,8 +159,16 @@ async function main() {
         variant_code: "KIRMIZI-M",
 
         combination: {
-          renk: "Kırmızı",
-          beden: "M",
+          renk: {
+            connect: {
+              id: kirmizi.id,
+            },
+          },
+          beden: {
+            connect: {
+              id: l.id,
+            },
+          },
         },
       },
       {
@@ -176,8 +182,16 @@ async function main() {
         is_default: false,
         variant_code: "MAVI-L",
         combination: {
-          renk: "Mavi",
-          beden: "L",
+          renk: {
+            connect: {
+              id: mavi.id,
+            },
+          },
+          beden: {
+            connect: {
+              id: m.id,
+            },
+          },
         },
       },
     ],
@@ -187,147 +201,128 @@ async function main() {
     where: { productId: product.id },
   });
 
-  for (const variant of variants) {
-    const comb = variant.combination;
+  
 
-    const relatedValues = await prisma.attributeValue.findMany({
-      where: {
-        value: {
-          in: Object.values(comb),
-        },
+  2. Ürün oluştur
+  const product22 = await prisma.product.create({
+    data: {
+      title: "Oversize Tişört",
+      brand: "XYZ Marka",
+      categoryId: giyim.id,
+      description: "Geniş kesim rahat tişört",
+      barkod: "1234567890123",
+      desi: "1.5",
+      price: 130.0,
+      stock: 100,
+      is_active: true,
+      variants: {
+        create: [
+          {
+            variant_code: "RED-M",
+            stock: 30,
+            price: 120.0,
+            barkod: "1234567890124",
+            sku: "SKU-REDOVERTEE-001",
+            title: "Oversize Tişört Kirmizi",
+            desi: "1.5",
+            is_active: true,
+            combination: [
+              { attribute: "renk", values: "Kirmizi" },
+              { attribute: "beden", values: "M" },
+            ],
+            sources: {
+              create: [
+                {
+                  source: "trendyol",
+                  externalId: "trendyol-1001",
+                  price: 119.0,
+                  stock: 25,
+                  is_active: true,
+                },
+                {
+                  source: "n11",
+                  externalId: "n11-5001",
+                  price: 118.5,
+                  stock: 20,
+                  is_active: true,
+                },
+              ],
+            },
+            images: {
+              create: [
+                {
+                  url: "https://i.imgur.com/QkIa5tT.jpeg",
+                  alt: "Kırmızı Tişört M Beden - Ön",
+                  order: 0,
+                },
+              ],
+            },
+            attributes: {
+              create: [
+                {
+                  value: "mavi",
+                  attribute: {
+                    create: {
+                      name: "renk",
+                    },
+                  },
+                },
+                {
+                  value: "kirmizi",
+                },
+                {
+                  value: "beyaz",
+                },
+              ],
+            },
+          },
+          {
+            variant_code: "BLUE-L",
+            stock: 40,
+            price: 130.0,
+            title: "Oversize Tişört Mavi",
+            sku: "SKU-BLUEOVERTEE-001",
+            barkod: "1234567890125",
+            desi: "1.5",
+            is_active: true,
+            combination: [
+              { attribute: "renk", values: "Mavi" },
+              { attribute: "beden", values: "L" },
+            ],
+            sources: {
+              create: [
+                {
+                  source: "trendyol",
+                  externalId: "trendyol-1002",
+                  price: 129.0,
+                  stock: 35,
+                  is_active: true,
+                },
+              ],
+            },
+            images: {
+              create: [
+                {
+                  url: "https://fakestoreapi.com/img/61pHAEJ4NML._AC_UX679_.jpg",
+                  alt: "Mavi Tişört L Beden - Ön",
+                  order: 0,
+                },
+              ],
+            },
+          },
+        ],
       },
-    });
-
-    await prisma.productVariant.update({
-      where: { id: variant.id },
-      data: {
-        AttributeValue: {
-          connect: relatedValues.map((val) => ({ id: val.id })),
-        },
+      images: {
+        create: [
+          {
+            url: "https://fakestoreapi.com/img/61pHAEJ4NML._AC_UX679_.jpg",
+            alt: "Oversize Tişört Genel Görsel 1",
+            order: 0,
+          },
+        ],
       },
-    });
-  }
-
-  // 2. Ürün oluştur
-  // const product22 = await prisma.product.create({
-  //   data: {
-  //     title: "Oversize Tişört",
-  //     brand: "XYZ Marka",
-  //     categoryId: giyim.id,
-  //     description: "Geniş kesim rahat tişört",
-  //     barkod: "1234567890123",
-  //     desi: "1.5",
-  //     price: 130.0,
-  //     stock: 100,
-  //     is_active: true,
-  //     variants: {
-  //       create: [
-  //         {
-  //           variant_code: "RED-M",
-  //           stock: 30,
-  //           price: 120.0,
-  //           barkod: "1234567890124",
-  //           sku: "SKU-REDOVERTEE-001",
-  //           title: "Oversize Tişört Kirmizi",
-  //           desi: "1.5",
-  //           is_active: true,
-  //           combination: [
-  //             { attribute: "renk", values: "Kirmizi" },
-  //             { attribute: "beden", values: "M" },
-  //           ],
-  //           sources: {
-  //             create: [
-  //               {
-  //                 source: "trendyol",
-  //                 externalId: "trendyol-1001",
-  //                 price: 119.0,
-  //                 stock: 25,
-  //                 is_active: true,
-  //               },
-  //               {
-  //                 source: "n11",
-  //                 externalId: "n11-5001",
-  //                 price: 118.5,
-  //                 stock: 20,
-  //                 is_active: true,
-  //               },
-  //             ],
-  //           },
-  //           images: {
-  //             create: [
-  //               {
-  //                 url: "https://i.imgur.com/QkIa5tT.jpeg",
-  //                 alt: "Kırmızı Tişört M Beden - Ön",
-  //                 order: 0,
-  //               },
-  //             ],
-  //           },
-  //           attributes: {
-  //             create: [
-  //               {
-  //                 value: "mavi",
-  //                 attribute: {
-  //                   create: {
-  //                     name: "renk",
-  //                   },
-  //                 },
-  //               },
-  //               {
-  //                 value: "kirmizi",
-  //               },
-  //               {
-  //                 value: "beyaz",
-  //               },
-  //             ],
-  //           },
-  //         },
-  //         {
-  //           variant_code: "BLUE-L",
-  //           stock: 40,
-  //           price: 130.0,
-  //           title: "Oversize Tişört Mavi",
-  //           sku: "SKU-BLUEOVERTEE-001",
-  //           barkod: "1234567890125",
-  //           desi: "1.5",
-  //           is_active: true,
-  //           combination: [
-  //             { attribute: "renk", values: "Mavi" },
-  //             { attribute: "beden", values: "L" },
-  //           ],
-  //           sources: {
-  //             create: [
-  //               {
-  //                 source: "trendyol",
-  //                 externalId: "trendyol-1002",
-  //                 price: 129.0,
-  //                 stock: 35,
-  //                 is_active: true,
-  //               },
-  //             ],
-  //           },
-  //           images: {
-  //             create: [
-  //               {
-  //                 url: "https://fakestoreapi.com/img/61pHAEJ4NML._AC_UX679_.jpg",
-  //                 alt: "Mavi Tişört L Beden - Ön",
-  //                 order: 0,
-  //               },
-  //             ],
-  //           },
-  //         },
-  //       ],
-  //     },
-  //     images: {
-  //       create: [
-  //         {
-  //           url: "https://fakestoreapi.com/img/61pHAEJ4NML._AC_UX679_.jpg",
-  //           alt: "Oversize Tişört Genel Görsel 1",
-  //           order: 0,
-  //         },
-  //       ],
-  //     },
-  //   },
-  // });
+    },
+  });
 
   const ttk = await prisma.brand.create({
     data: {
@@ -360,6 +355,7 @@ async function main() {
     },
   });
 
+  */
   console.log("Seed işlemi tamamlandı!");
 }
 

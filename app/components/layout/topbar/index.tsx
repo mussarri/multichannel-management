@@ -1,4 +1,5 @@
 "use client";
+import { useSession } from "next-auth/react";
 import { useTheme } from "next-themes";
 import Link from "next/link";
 import React from "react";
@@ -8,17 +9,18 @@ export function Topbar() {
   const { setTheme, theme } = useTheme();
   const mobile = useMediaQuery("(max-width: 1024px)");
   const sm = useMediaQuery("(max-width: 600px)");
+  const { data } = useSession();
+  console.log(data);
 
   return (
     <header
       className={
-        "flex z-40 items-center justify-between py-3 border-b gap-4 absolute bg-blur " +
+        "flex z-40 items-center justify-between bg-header py-3 border-b gap-4 absolute bg-blur " +
         (mobile ? " px-2" : " px-8")
       }
       style={{
         width: "calc(100% - 260px)",
         backdropFilter: "blue(8px)",
-        backgroundColor: "rgba(255,255,255, .9)",
       }}
     >
       {mobile && (

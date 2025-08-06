@@ -1,27 +1,32 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 "use client";
 
-import { useState } from "react";
+import { useActionState, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import { register } from "../action";
 import { signIn } from "next-auth/react";
+import { log } from "node:console";
 
 export default function RegisterPage() {
   const router = useRouter();
   const [error, setError] = useState<string | null>(null);
+  const [message, formAction, isPending] = useActionState(register, null);
+  useEffect(() => {
+    if (message?.error) {
+      setError(message.message);
+      return;
+    }
+  }, message);
 
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     try {
       event.preventDefault();
       const formData = new FormData(event.currentTarget);
-      const signInResult = await signIn("credentials", {
-        ...Object.fromEntries(formData),
-        redirect: false,
-      });
 
-      if (signInResult?.error) {
-        setError("Failed to sign in after registration");
-        return;
-      }
+      const user = await formAction(formData);
+
+      console.log(user);
 
       router.push("/");
       router.refresh();
