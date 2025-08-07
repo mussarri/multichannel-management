@@ -158,7 +158,7 @@ const CategoryList = ({ categories, marketplaces }) => {
 
   return (
     <div className="overflow-x-auto   rounded-lg">
-      <CategoryTitle />
+      <CategoryTitle categories={categories} />
       <div className="box">
         <h2 className="p-3 font-semibold ">Filtre</h2>
         <div className="p-3 grid grid-cols-3 gap-3 ">
@@ -269,7 +269,7 @@ const CategoryList = ({ categories, marketplaces }) => {
                               )
                             }
                             category={category}
-                            marketPlace={i}
+                            marketplaces={marketplaces}
                           />
                         )}
                       </div>

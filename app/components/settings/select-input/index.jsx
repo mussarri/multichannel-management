@@ -7,7 +7,7 @@ const index = ({
   required = false,
   onChange,
   vertical = false,
-  value,
+
   minWidth = true,
   error = "",
 }) => {
@@ -42,15 +42,11 @@ const index = ({
         {options.length > 0 &&
           options?.map((option, index) =>
             typeof option === "string" ? (
-              <option value={option} key={index} selected={value === option}>
+              <option value={option} key={index}>
                 {option}
               </option>
             ) : (
-              <option
-                value={option.id}
-                key={index}
-                selected={value == option.id}
-              >
+              <option value={option.id} key={index}>
                 {option.name}
               </option>
             )

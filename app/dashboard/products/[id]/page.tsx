@@ -45,7 +45,14 @@ async function ProductDetailsSection({ id }: { id: string }) {
       title: true,
       sub_title: true,
       images: true,
+      name: true,
       // ProductCard ihtiyaç duyuyorsa daha fazlasını ekle veya include kullan
+    },
+  });
+
+  const marketplaces = await prisma.marketplaceAccount.findMany({
+    include: {
+      marketPlace: true,
     },
   });
 
@@ -56,7 +63,7 @@ async function ProductDetailsSection({ id }: { id: string }) {
   return (
     <>
       <ProductStatus id={product.id} isActive={product.is_active} />
-      <ProductCard data={product} />
+      <ProductCard data={product} marketplaces={marketplaces} />
       <ProductDescription id={product.id} description={product.description} />
       <ProductImages id={product.id} images={product.images} />
     </>

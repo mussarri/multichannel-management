@@ -10,7 +10,11 @@ const page = async ({ searchParams }) => {
       id: parseInt(id),
     },
     include: {
-      attributes: true,
+      attributes: {
+        include: {
+          values: true,
+        },
+      },
     },
   });
 

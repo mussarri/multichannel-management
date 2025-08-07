@@ -16,205 +16,165 @@ import VariantTable from "@/app/components/products/variant-table";
 import React, { useEffect, useState } from "react";
 import { Circle, CirclePlusIcon, Trash2 } from "lucide-react";
 import ProductCard from "@/app/components/products/product-card";
+import Link from "next/link";
+
+function cartesianProduct(arrays: string[][]): string[][] {
+  return arrays.reduce<string[][]>(
+    (acc, curr) => acc.flatMap((a) => curr.map((c) => [...a, c])),
+    [[]]
+  );
+}
 
 const index = ({
   product,
   marketplaces,
+  formData,
+  setFormData,
 }: {
   product: any;
   marketplaces: any;
+  formData: any;
+  setFormData: any;
 }) => {
-  const [open, setOpen] = useState(false);
-  const [option, setoption] = useState("");
-  const [attInputs, setAttributesInput] = useState({});
-  const [optionList, setOptionList] = useState<any[]>([]);
   const [attributes, setAttributes] = useState<any>([]);
-  const [variants, setVariants] = useState<any[]>();
 
   useEffect(() => {
-    const grouped: { [key: string]: string[] } = {};
-
-    for (const attrVal of product.AttributeValues) {
-      const key = attrVal.attribute.name;
-      if (!grouped[key]) {
-        grouped[key] = [];
-      }
-      if (!grouped[key].includes(attrVal.value)) {
-        grouped[key].push(attrVal.value);
-      }
-    }
-    setAttributes(Object.entries(grouped));
-    const emptyObj = Object.fromEntries(
-      Object.keys(grouped).map((key) => [key, ""])
-    );
-    setAttributesInput(emptyObj);
-  }, [product]);
-
-  useEffect(() => {
-    setOptionList(product.category.attributes);
     if (product.category.attributes.length > 0)
       setAttributes(
         product.category.attributes.map((item) => [
           item.name,
-          item.values.map((i) => i.value),
+          item.values.map((value) => value.value),
         ])
       );
-  }, [product]);
+  }, []);
 
-  function generateCombinations(variants, index = 0, current = {}) {
-    if (index === variants.length) {
-      return [
-        {
-          ...current,
-          variant: Object.values(current).join("-"),
-        },
-      ];
-    }
+  const [selected, setSelected] = useState<{ [key: string]: string[] }>({});
 
-    const [key, values] = variants[index];
-    const results = [];
+  const handleToggle = (attribute: string, value: string) => {
+    setSelected((prev) => {
+      const current = prev[attribute] || [];
+      const isSelected = current.includes(value);
 
-    values.forEach((value) => {
-      results.push(
-        ...generateCombinations(variants, index + 1, {
-          ...current,
-          [key]: value,
-        })
-      );
+      return {
+        ...prev,
+        [attribute]: isSelected
+          ? current.filter((v) => v !== value)
+          : [...current, value],
+      };
     });
+  };
 
-    return results;
-  }
+  const handleGenerate = () => {
+    const selectedEntries = Object.entries(selected).filter(
+      ([, v]) => v.length > 0
+    );
 
-  const result = generateCombinations(attributes);
+    const selectedValuesOnly = selectedEntries.map(([, v]) => v);
+
+    const combinations = cartesianProduct(selectedValuesOnly);
+    return combinations;
+  };
+
+  const onClick = () => {
+    const variants = handleGenerate();
+    setFormData(
+      variants.map((item: any) => ({
+        variant_code: item.join("-"),
+        barkod: product.barkod,
+        sku: product.sku,
+        stock: product.stock,
+        desi: product.desi,
+        title: product.title,
+        salePrice: product.salePrice,
+        listPrice: product.listPrice,
+        costPrice: product.costPrice,
+      }))
+    );
+  };
 
   return (
     <div>
       <div className="w-full my-10 overflow-x-auto border rounded-md">
-        <div className="justify-between flex w-full p-4 bg-card border min-w-[750px] ">
-          <h2 className="text-lg font-semibold">
-            Ürün Kategorisi Seçenek Gruplari
+        <div className="justify-start gap-2 items-center flex w-full p-4 bg-card border min-w-[750px] ">
+          <h2 className="font-semibold text-md">
+            {"Ürün Kategorisinin Secenekler Değerleri "}
+            <Link
+              href={"/dashboard/categories/" + product.category.id}
+              className={"text-xs font-medium text-primary"}
+            >
+              (Duzenle)
+            </Link>
           </h2>
         </div>
-        {optionList?.length > 0 || (
+        {attributes?.length > 0 || (
           <p className="text-xs p-3">
             Ürünün kategorisinin seçeneği bulunamadı. Kategorinin secenek
             bilgisini düzenlemek için Kategori Ürün Seçeneği Ekle butonuna
             tıklayınız.
           </p>
         )}
-        {optionList?.length > 0 && (
-          <div className="w-full p-4 bg-card text-card-foreground min-w-[750px]">
-            <h2 className="text-md font-semibold mb-4">
-              Seçenek Gruplari Liste
-            </h2>
-
-            <div className="flex gap-3">
-              <div className="flex gap-3">
-                {optionList
-                  .filter((i) => i.name !== "")
-                  .map((item, index) => (
-                    <div key={index} className="">
-                      <CheckBox
-                        label={item.name}
-                        value={false}
-                        name="secenek"
-                        onChange={() => {
-                          setOptionList((prevOptions) =>
-                            prevOptions.map((option) =>
-                              option.name === item.name
-                                ? { ...option, active: !option.active }
-                                : option
-                            )
-                          );
-                        }}
-                        checked={item.active}
-                        required
-                      />
+        {attributes?.length > 0 && (
+          <>
+            <div className="w-full p-4 bg-card text-card-foreground min-w-[750px]">
+              <div className="flex gap-3 mt-3">
+                {attributes.map((item, index) => {
+                  return (
+                    <div key={index}>
+                      <div
+                        id={item[0]}
+                        className="flex flex-col gap-3 p-2 bg-secondary text-card-foreground rounded shadow-sm border min-w-[200px]"
+                      >
+                        <h3 className="capitalize text-xs">{item[0]}</h3>
+                      </div>
+                      <div className="max-h-[200px] overflow-y-auto">
+                        {item[1].length > 0 && (
+                          <table className="text-xs font-light w-full my-2 ">
+                            <thead>
+                              <tr className="">
+                                <th className="text-left py-1">Seçenek</th>
+                                <th className=""></th>
+                              </tr>
+                            </thead>
+                            <tbody>
+                              {item[1].map((value, index) => {
+                                return (
+                                  <tr key={index} className="mt-4">
+                                    <th className="text-left font-light capitalize py-1">
+                                      {value}
+                                    </th>
+                                    <th>
+                                      <input
+                                        type="checkbox"
+                                        name={item[0]}
+                                        checked={
+                                          selected[item[0]]?.includes(value) ||
+                                          false
+                                        }
+                                        onChange={() => {
+                                          handleToggle(item[0], value);
+                                        }}
+                                      />
+                                    </th>
+                                  </tr>
+                                );
+                              })}
+                            </tbody>
+                          </table>
+                        )}
+                      </div>
                     </div>
-                  ))}
+                  );
+                })}
+              </div>
+              <div className="flex justify-end mt-4">
+                <Button type="button" variant="secondary" onClick={onClick}>
+                  Varyantlari Oluştur
+                </Button>
               </div>
             </div>
-
-            <div className="flex gap-3 mt-3">
-              {attributes.map((item, index) => (
-                <div key={index}>
-                  <form
-                    id={item[0]}
-                    onSubmit={(e) => {
-                      e.preventDefault();
-                      setAttributes((prev) =>
-                        prev.map((att) => {
-                          return att[0] === item[0]
-                            ? [att[0], [...att[1], attInputs[item[0]]]]
-                            : att;
-                        })
-                      );
-                    }}
-                    className="flex flex-col gap-3 p-2 bg-secondary text-card-foreground rounded shadow-sm border min-w-[200px]"
-                  >
-                    <h3 className="capitalize text-xs">{item[0]}</h3>
-                  </form>
-                  <div className="max-h-[200px] overflow-y-auto">
-                    {item[1] && (
-                      <table className="text-xs font-light w-full my-2 ">
-                        <thead>
-                          <tr className="">
-                            <th className="text-left py-1">Seçenek</th>
-                            <th className="">Sil</th>
-                          </tr>
-                        </thead>
-                        <tbody>
-                          {(item[1] as string[]).map((value, index) => (
-                            <tr key={index} className="mt-4">
-                              <th className="text-left font-light capitalize py-1">
-                                {value}
-                              </th>
-                              <th>
-                                <button
-                                  className="text-xs rounded text-red-500 hover:scale-110 transition-all duration-300"
-                                  onClick={() => {
-                                    setAttributes((prev) =>
-                                      prev.map((att) => {
-                                        return att[0] === item[0]
-                                          ? [
-                                              att[0],
-                                              att[1].filter((v) => v !== value),
-                                            ]
-                                          : att;
-                                      })
-                                    );
-                                  }}
-                                >
-                                  <Trash2 size={13} color="red" />
-                                </button>
-                              </th>
-                            </tr>
-                          ))}
-                        </tbody>
-                      </table>
-                    )}
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
-
-        {optionList?.length > 0 && (
-          <div className="p-4 text-right bg-card gap-4">
-            <Button onClick={() => setVariants(attributes)}>Oluştur</Button>
-          </div>
+          </>
         )}
       </div>
-
-      {variants && variants.length > 0 && (
-        <VariantTable
-          attributes={variants}
-          product={product}
-          marketplaces={marketplaces}
-        />
-      )}
     </div>
   );
 };

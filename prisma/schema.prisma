@@ -59,7 +59,7 @@ model AttributeValue {
   id                      Int                       @id @default(autoincrement())
   attributeId             Int
   name                    String
-  value                   String                    @unique // örn: "Mavi", "L", "128GB" 
+  value                   String
   attribute               Attribute                 @relation(fields: [attributeId], references: [id], onDelete: Cascade)
   products                Product[]
   productVariants         ProductVariant[]
@@ -151,7 +151,7 @@ model MarketplaceCategoryMapping {
   marketplace        Marketplace @relation(fields: [marketplaceId], references: [id])
   category           Category    @relation(fields: [localCategoryId], references: [id])
 
-  @@unique([marketplaceId, localCategoryId, remoteCategoryId])
+  @@unique([marketplaceId, localCategoryId])
 }
 
 // Attribute bazında eşleme
@@ -164,7 +164,7 @@ model CategoryAttributeMapping {
   localCategoryId     Int
   remoteCategoryId    String
   marketplace         Marketplace @relation(fields: [marketplaceId], references: [id])
-  attribute           Attribute   @relation(fields: [localAttributeId], references: [id])
+  attribute           Attribute   @relation(fields: [localAttributeId], references: [id], onDelete: Cascade)
 
   @@unique([marketplaceId, localAttributeId, remoteAttributeId, localCategoryId, remoteCategoryId])
 }

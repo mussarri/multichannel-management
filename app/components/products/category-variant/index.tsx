@@ -25,19 +25,28 @@ const index = ({
   category,
   marketplaces,
 }: {
-  category: Category;
+  category: any;
   marketplaces: any;
 }) => {
   const [open, setOpen] = useState(false);
   const [option, setoption] = useState("");
   const [attInputs, setAttributesInput] = useState({});
-  const [optionList, setOptionList] = useState<any[]>([]);
-  const [attributes, setAttributes] = useState<any>([]);
+  const [optionList, setOptionList] = useState<any[]>(
+    category.attributes.map((item) => ({ name: item.name, active: true }))
+  );
+  const [attributes, setAttributes] = useState<any>(
+    category.attributes.map((item) => [
+      item.name,
+      item.values.map((value) => value.name),
+    ])
+  );
   const [variants, setVariants] = useState<any[]>();
   const [message, formAction, isPending] = useActionState(
     createAttributeAction,
     null
   );
+  console.log(optionList);
+
   const router = useRouter();
 
   useEffect(() => {
@@ -120,11 +129,13 @@ const index = ({
     <div>
       <div className="pb-10">
         <div className="justify-between flex max-w-[700px] w-full ">
-          <h2 className="text-xl font-semibold mb-4">Kategori Seçenekleri</h2>
+          <h2 className="text-xl font-semibold mb-4">
+            {category.name + " "}Kategori Seçenekleri
+          </h2>
         </div>
         <div className="w-full my-10 overflow-x-auto border rounded-md">
           <div className="justify-between flex w-full p-4 bg-card border min-w-[750px] ">
-            <h2 className="text-lg font-semibold">Kategori Seçenek Gruplari</h2>
+            <h2 className="text-lg font-semibold">Seçenek Gruplari</h2>
             <Dialog open={open} onOpenChange={setOpen}>
               <DialogTrigger asChild>
                 <Button variant="secondary">Yeni Kategori Seçeneği Ekle</Button>

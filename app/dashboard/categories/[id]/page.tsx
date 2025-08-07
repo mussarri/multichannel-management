@@ -10,9 +10,6 @@ import { notFound } from "next/navigation";
 
 const page = async ({ params }) => {
   const { id } = await params;
-  if (!id) {
-    return notFound();
-  }
 
   const category = await prisma.category.findUnique({
     where: {
@@ -20,6 +17,8 @@ const page = async ({ params }) => {
     },
     include: {
       MarketplaceCategoryMapping: true,
+      children: true,
+      parent: true,
       attributes: {
         include: {
           values: {
@@ -36,6 +35,12 @@ const page = async ({ params }) => {
   const marketplaces = await prisma.marketplaceAccount.findMany({
     include: {
       marketPlace: true,
+    },
+  });
+
+  const syncLogs = await prisma.syncLog.findMany({
+    where: {
+      action: "CATEGORY_ATTRIBUTE_MAPPING",
     },
   });
 
@@ -69,12 +74,12 @@ const page = async ({ params }) => {
           category={category}
           marketplaces={marketplaces}
           attributes={category.attributes}
+          syncLogs={syncLogs}
         />
       ) : (
         <div className="box mt-4 p-4">
           <Link
-            href={"/dashboard/variants/" + id}
-            target={"_blank"}
+            href={"/dashboard/variants/create/?id=" + category.id}
             className="text-sm flex items-center gap-2"
           >
             {" "}

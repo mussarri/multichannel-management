@@ -1,5 +1,4 @@
 "use client";
-import { useSession } from "next-auth/react";
 import { useTheme } from "next-themes";
 import Link from "next/link";
 import React from "react";
@@ -9,8 +8,6 @@ export function Topbar() {
   const { setTheme, theme } = useTheme();
   const mobile = useMediaQuery("(max-width: 1024px)");
   const sm = useMediaQuery("(max-width: 600px)");
-  const { data } = useSession();
-  console.log(data);
 
   return (
     <header
@@ -19,7 +16,7 @@ export function Topbar() {
         (mobile ? " px-2" : " px-8")
       }
       style={{
-        width: "calc(100% - 260px)",
+        width: mobile ? "100%" : "calc(100% - 260px)",
         backdropFilter: "blue(8px)",
       }}
     >
@@ -34,9 +31,15 @@ export function Topbar() {
         </div>
       )}
       <div className="flex items-center gap-4 flex-1 justify-end">
-        <div className="w-1/2 max-w-md flex-1">
-          <input className="outline-none" type="text" placeholder="Search..." />
-        </div>
+        {!mobile && (
+          <div className="w-1/2 max-w-md flex-1">
+            <input
+              className="outline-none"
+              type="text"
+              placeholder="Search..."
+            />
+          </div>
+        )}
 
         <div className="flex items-center gap-4">
           <button

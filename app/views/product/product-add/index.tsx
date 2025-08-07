@@ -2,29 +2,25 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 "use client";
 
-import { MarkaForm } from "@/app/components/products/marka-form";
 import React, { useActionState, useEffect, useState } from "react";
-import SelectInput from "@/app/components/settings/select-input";
-import TextInput from "@/app/components/settings/text-input";
 
-import "froala-editor/css/froala_style.min.css";
-import "froala-editor/css/froala_editor.pkgd.min.css";
-import "froala-editor/js/plugins.pkgd.min.js";
 import ImageInput from "@/app/components/products/image-uploader";
 
-import FroalaEditorComponent from "react-froala-wysiwyg";
 import { Button } from "@/components/ui/button";
 import { Brand, Category } from "@prisma/client";
 import { createProduct } from "@/app/action";
 import { toast } from "react-toastify";
-import VariantSettings from "@/app/views/product/product-add/variant-settings";
 import { Steps } from "rsuite";
 import "rsuite/Steps/styles/index.css";
-import ProductAddForm1 from "./price";
-import { ArrowLeft, ArrowRight, MoveRightIcon } from "lucide-react";
+import { ArrowLeft, ArrowRight } from "lucide-react";
 import { redirect } from "next/navigation";
-import CategoryAdd from "@/app/components/categories/CategoryAdd";
-import CalculateDesi from "@/app/components/products/CalculateDesi";
+
+import ProductAddForm1 from "./price";
+import BrandSelect from "./BrandSelect";
+import CategorySelect from "./CategorySelect";
+import TitleAndName from "./TitleAndName";
+import DesiBarkodSku from "./DesiBarkodSku";
+import SubtitleDescription from "./SubtitleDescription";
 
 const New = ({
   categories,
@@ -34,23 +30,17 @@ const New = ({
   brands: Brand[];
 }) => {
   const [message, formAction, isPending] = useActionState(createProduct, null);
-  const [open, setOpen] = useState(false);
-  const [desiOpen, setDesiOpen] = useState(false);
-
   useEffect(() => {
     if (message?.error) {
       toast.error(message?.message);
     }
     if (message?.success) {
       toast.success(message?.message);
-      redirect("/products/" + message.id);
+      redirect("/products/");
     }
   }, [message?.error, message?.message, message?.success, message?.id]);
 
   const [errors, setErrors] = useState<any>({});
-
-  useEffect(() => {});
-
   const [formValues, setFormValues] = useState<any>({
     title: "",
     name: "",
@@ -77,222 +67,43 @@ const New = ({
     // variant_code: "",
   });
 
-  const handleModelChange = (event: InputEvent) => {
-    setFormValues((prev: any) => {
-      return { ...prev, description: event };
-    });
-  };
-
-  const settings = [
-    {
-      label: "Barkod",
-      name: "barkod",
-      value: formValues.barkod,
-      placeholder: "placeholder",
-    },
-    {
-      label: "SKU",
-      name: "sku",
-      value: formValues.sku,
-      placeholder: "placeholder",
-    },
-  ];
-
-  const onChange = (value, name) => {
-    setErrors((prev) => {
-      return { ...prev, [name]: "" };
-    });
-    setFormValues({ ...formValues, [name]: value });
-  };
-
   const [index, setIndex] = useState(0);
   const forms = [
     <div
       key={0}
       className="box p-4 max-w-[750px] w-full flex flex-col gap-5 relative"
     >
-      {/* <div className="flex flex-col gap-1 items-start">
-        <label className="text-sm font-semibold" htmlFor="">
-          Ürün Satış Durumu
-        </label>
-        <div
-          className={
-            " p-2 text-sm text-center  rounded cursor-pointer w-full max-w-[400px] transition-all duration-200 " +
-            (formValues.is_active
-              ? "bg-green-500 text-white"
-              : " bg-secondary text-secondary-foreground")
-          }
-          onClick={() => {
-            setFormValues({
-              ...formValues,
-              is_active: !formValues.is_active,
-            });
-          }}
-        >
-          {formValues.is_active ? "Aktif" : "Pasif"}
-        </div>
-      </div> */}
-
-      <div className="flex gap-4 items-end ">
-        <div className=" flex-1">
-          <SelectInput
-            label={"Ürün Markasi"}
-            name={"brandId"}
-            options={brands.map((item) => item)}
-            required={true}
-            onChange={(value: any) => {
-              onChange(value, "brandId");
-            }}
-            vertical={true}
-            value={formValues.brandId}
-            error={errors.brandId}
-          />
-        </div>
-        <MarkaForm />
-      </div>
-      <div className="flex-1 flex gap-4 items-end">
-        <SelectInput
-          label={"Ürün Kategorisi"}
-          name={"categoryId"}
-          options={categories}
-          required={true}
-          onChange={(value: any) => {
-            setErrors((prev) => {
-              return { ...prev, categoryId: "" };
-            });
-            setFormValues((prev) => {
-              return { ...prev, categoryId: value };
-            });
-          }}
-          vertical={true}
-          value={formValues.categoryId}
-          error={errors.categoryId}
-        />
-        <CategoryAdd categories={categories} open={open} setOpen={setOpen} />
-      </div>
-      <div className="flex gap-4">
-        <TextInput
-          label={"Ürün Adi"}
-          name={"name"}
-          value={formValues.name}
-          error={errors.name}
-          required={true}
-          placeholder="Ürün adi.."
-          onChange={(value: string) => {
-            setErrors((prev) => {
-              return { ...prev, name: "" };
-            });
-            setFormValues({ ...formValues, name: value });
-          }}
-          type="text"
-          vertical={true}
-        />
-
-        <div className="w-full flex-1">
-          {" "}
-          <TextInput
-            label={"Ürün Basligi"}
-            name={"title"}
-            value={formValues.title}
-            error={errors.title}
-            required={true}
-            placeholder="Ürün başlığı"
-            onChange={(value: string) => {
-              setErrors((prev) => {
-                return { ...prev, title: "" };
-              });
-              setFormValues({ ...formValues, title: value });
-            }}
-            type="text"
-            vertical={true}
-          />
-        </div>
-      </div>
-      <div className="flex flex-wrap gap-4">
-        <div className={"flex gap-1 flex-col items-start"}>
-          <label
-            htmlFor=""
-            className="min-w-[200px] text-sm uppercase font-semibold flex items-end gap-2"
-          >
-            Desi
-            <CalculateDesi
-              open={desiOpen}
-              setOpen={setDesiOpen}
-              setDesi={(v: number) =>
-                setFormValues({ ...formValues, desi: v.toFixed(2) })
-              }
-            />
-          </label>
-
-          <input
-            type="text"
-            placeholder="desi"
-            name={"desi"}
-            required
-            className={
-              "border p-2 rounded-lg w-full outline-none text-sm " +
-              (errors.desi ? "border-error" : "")
-            }
-            onChange={(e) => {
-              setFormValues({ ...formValues, desi: e.target.value });
-            }}
-            value={formValues.desi}
-          />
-          {errors.desi && (
-            <p className="text-[12px] text-error">{errors.desi}</p>
-          )}
-        </div>
-        {settings.map((item, didem) => (
-          <TextInput
-            key={didem}
-            label={item.label}
-            name={item.name}
-            value={formValues[item.name]}
-            error={errors[item.name]}
-            required={true}
-            placeholder={item.name}
-            onChange={(value: string) => {
-              setFormValues({ ...formValues, [item.name]: value });
-            }}
-            type="text"
-            vertical={true}
-          />
-        ))}
-      </div>
-      <div className="flex gap-4 items-end my-4 ">
-        <div className=" flex-1">
-          <TextInput
-            label={"Ürün Alt Başlığı(Maksımum 60 karakter)"}
-            name={"sub_title"}
-            required={true}
-            onChange={(value: string) => {
-              setErrors((prev) => {
-                return { ...prev, sub_title: "" };
-              });
-              setFormValues({ ...formValues, sub_title: value });
-            }}
-            vertical={true}
-            error={errors.sub_title}
-            type={"text"}
-            placeholder="1"
-            value={formValues.sub_title}
-          />
-        </div>
-      </div>
-      <div>
-        <label htmlFor="" className="pb-1">
-          Aciklama
-        </label>
-        <FroalaEditorComponent
-          tag="textarea"
-          config={{
-            placeholderText: "Edit Your Content Here!",
-            charCounterCount: false,
-          }}
-          model={formValues.decsription}
-          onModelChange={handleModelChange}
-        />
-      </div>
+      <BrandSelect
+        brands={brands}
+        errors={errors}
+        formValues={formValues}
+        setFormValues={setFormValues}
+        setErrors={setErrors}
+      />
+      <CategorySelect
+        categories={categories}
+        errors={errors}
+        setErrors={setErrors}
+        setFormValues={setFormValues}
+        formValues={formValues}
+      />
+      <TitleAndName
+        formValues={formValues}
+        setFormValues={setFormValues}
+        errors={errors}
+        setErrors={setErrors}
+      />
+      <DesiBarkodSku
+        formValues={formValues}
+        setFormValues={setFormValues}
+        errors={errors}
+      />
+      <SubtitleDescription
+        formValues={formValues}
+        setFormValues={setFormValues}
+        setErrors={setErrors}
+        errors={errors}
+      />
     </div>,
     <div
       key={1}
@@ -325,14 +136,6 @@ const New = ({
     if (!formValues.categoryId) errors.categoryId = "Kategori seçilmelidir";
     if (!formValues.brandId) errors.brandId = "Marka seçilmelidir";
     if (!formValues.desi) errors.desi = "Desi zorunludur";
-    return errors;
-  }
-
-  function validateStep5() {
-    const errors: Record<string, string> = {};
-    if (!formValues.is_default && formValues.variants.length == 0) {
-      errors.variants = "Variantlari ayarlayiniz.";
-    }
     return errors;
   }
 

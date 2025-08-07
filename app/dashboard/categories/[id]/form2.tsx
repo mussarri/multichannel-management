@@ -4,12 +4,16 @@
 
 import { useState, useEffect } from "react";
 
-import { FileQuestion, Pencil, Trash2 } from "lucide-react";
+import { Check, Trash2, XIcon } from "lucide-react";
 import { check } from "@/app/views/CategoryList";
 
-import { Button } from "@/components/ui/button";
-import { IoIosClose } from "react-icons/io";
 import Link from "next/link";
+import AttributeValueMap from "@/app/components/attribute/AttributeValueMap";
+import AttributeMap from "@/app/components/attribute/AttributeMap";
+import { CreateAttribute } from "@/app/components/attribute/CreateAttribute";
+import CreateValue from "@/app/components/attribute/CreateValue";
+import DeleteAttribute from "@/app/components/attribute/DeleteAttribute";
+
 // server actions
 // Not: server actionları çağırmak için form submit veya fetch wrapper gerekebilir, burada örnek fetch ile
 
@@ -17,23 +21,26 @@ export default function CategoryAttributeStepper({
   category,
   marketplaces,
   attributes,
+  syncLogs,
 }: {
   category: any;
   marketplaces: any;
   attributes: any;
+  syncLogs;
 }) {
   const [open, setOpen] = useState({
     category: null,
     marketPlace: null,
     attribute: null,
+    createAttribute: null,
     value: null,
+    createValue: null,
   });
 
-  const handleOpen = (a, b, c) => {
+  const handleOpen = (a, b) => {
     setOpen((prev) => {
       return {
         ...prev,
-        marketPlace: c,
         [a]: b,
       };
     });
@@ -43,7 +50,7 @@ export default function CategoryAttributeStepper({
     <>
       {/* kategori attribute value eslenmis mi */}
       <div className="overflow-x-auto box rounded-lg mt-4">
-        <h2 className="font-semibold text-md p-4">
+        <h2 className="font-semibold text-md p-4 border-b">
           {category.name + "  Secenekler Değerleri "}
           <Link
             href={"/dashboard/variants/create/?id=" + category.id}
@@ -53,10 +60,12 @@ export default function CategoryAttributeStepper({
           </Link>
         </h2>
         <div className="p-4">
-          <table className="attribute-table  w-full shadow-sm text-sm">
-            <thead className="bg-inherit">
+          <table className="attribute-table  w-full rounded-md text-sm">
+            <thead className="bg-inherit border ">
               <tr className="">
-                <th className="text-left p-2"></th>
+                <th className="text-left p-2">
+                  {process.env.NEXT_PUBLIC_BRAND_NAME}
+                </th>
                 {marketplaces.map((i) => {
                   return (
                     <th key={i.id} className="text-left p-2">
@@ -67,45 +76,54 @@ export default function CategoryAttributeStepper({
                 <th>İşlemler</th>
               </tr>
             </thead>
-            <tbody>
-              {attributes.map((attr) => {
+            <tbody className="border-l-2 border-r-2 border-background  ">
+              {attributes.map((attr1) => {
                 return (
                   <>
                     <tr
-                      key={attr.id}
-                      className="border-4 rounded border-background bg-card hover:bg-muted/40"
+                      key={attr1.id}
+                      className="rounded border-background bg-secondary"
                     >
                       <td className="text-left capitalize p-1">
-                        <div className="flex flex-col items-start font-semibold">
-                          {attr.name}
+                        <div className="flex gap-2 items-start font-semibold">
+                          {attr1.name}
                         </div>
                       </td>
                       {marketplaces.map((i) => {
-                        const map = attr.CategoryAttributeMapping.find(
+                        const map = attr1.CategoryAttributeMapping.find(
                           (m) => m.marketplaceId === parseInt(i.marketplaceId)
                         );
 
                         return (
                           <td key={i.id} className="text-left p-2">
-                            {check(!!map)} {map ? map.remoteAttributeName : ""}
+                            <div className="flex gap-2 items-center text-sm">
+                              {check(!!map)}{" "}
+                              {map ? map.remoteAttributeName : ""}
+                            </div>
                           </td>
                         );
                       })}
                       <td>
-                        <div className="flex justify-center gap-2">
-                          <button>
-                            <Pencil size={15} color="var(--warning)" />
-                          </button>
-                          <button>
-                            <Trash2 size={15} color="var(--error)" />{" "}
-                          </button>
+                        <div className="flex justify-center items-center gap-2">
+                          <AttributeMap
+                            open={open.attribute === attr1.id}
+                            setOpen={(val: boolean) =>
+                              handleOpen(
+                                "attribute",
+                                val == true ? attr1.id : null
+                              )
+                            }
+                            attribute={attr1}
+                            marketplaces={marketplaces}
+                          />
+                          <DeleteAttribute id={attr1.id} />
                         </div>
                       </td>
                     </tr>
-                    {attr.values.map((value) => {
+                    {attr1.values.map((value) => {
                       return (
                         <tr
-                          className="border-4 rounded border-background bg-card hover:bg-muted/40"
+                          className="border-b-4 rounded border-background bg-card hover:bg-muted/40"
                           key={value.id}
                         >
                           <td className="px-2 py-1">
@@ -122,37 +140,68 @@ export default function CategoryAttributeStepper({
                               <td key={i.id} className="px-2">
                                 <div className="flex justify-start">
                                   {map ? (
-                                    map.remoteValueName
+                                    <div className="flex gap-2 items-center text-sm">
+                                      <Check color="green" size={16} />
+                                      {map.remoteValueName}
+                                    </div>
                                   ) : (
-                                    <IoIosClose size={15} />
+                                    <div className="flex gap-2 items-center text-sm">
+                                      <XIcon size={16} />
+                                    </div>
                                   )}
                                 </div>
                               </td>
                             );
                           })}
                           <td>
-                            <div className="flex justify-center gap-2">
-                              <Button
-                                style={{
-                                  fontSize: 10,
-                                  padding: "0px 5px!important",
-                                  height: "1.4rem",
-                                }}
-                                variant="secondary"
-                                size="sm"
-                              >
-                                Düzenle
-                              </Button>
+                            <div className="flex justify-center items-center gap-2">
+                              <AttributeValueMap
+                                open={open.value === value.id}
+                                setOpen={(val: boolean) =>
+                                  handleOpen(
+                                    "value",
+                                    val == true ? value.id : null
+                                  )
+                                }
+                                value={value}
+                                marketplaces={marketplaces}
+                              />
+                              <DeleteAttribute id={attr1.id} />
                             </div>
                           </td>
                         </tr>
                       );
                     })}
+                    <tr className="border-b-2 rounded border-background bg-card hover:bg-muted/40">
+                      <td className="p-2">
+                        <CreateValue
+                          attribute={attr1}
+                          category={category}
+                          open={open.createValue === attr1.id}
+                          setOpen={(val: boolean) =>
+                            handleOpen(
+                              "createValue",
+                              val == true ? attr1.id : null
+                            )
+                          }
+                        />
+                      </td>
+                    </tr>
                   </>
                 );
               })}
             </tbody>
           </table>
+          <div className="p-2">
+            <CreateAttribute
+              category={category}
+              attributes={attributes}
+              open={open.createAttribute === category.id}
+              setOpen={(val: boolean) =>
+                handleOpen("createAttribute", val == true ? category.id : null)
+              }
+            />
+          </div>
         </div>
       </div>
     </>

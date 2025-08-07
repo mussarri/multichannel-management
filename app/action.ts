@@ -403,22 +403,19 @@ export async function updateVariant(prevState: any, formData: FormData) {
 //category
 export async function createCategory(prevState: any, formData: FormData) {
   const name = formData.get("name").toString();
-  const parentId = formData.get("parentId");
-  const parent = await prisma.category.findUnique({
-    where: { id: parseInt(parentId.toString()) },
-  });
+  const parentId = parseInt((formData.get("parentId") || "").toString());
 
   const newCategory = {
     name: name,
     slug: slugify(name),
-    parentId: parent.id || null,
+    parentId: parentId || null,
   };
 
   try {
     const result = await prisma.category.create({
       data: newCategory,
     });
-    revalidatePath("/dashboard/producst/categories");
+    revalidatePath("/dashboard/categories");
     return {
       success: true,
       message: "Kategori başarıyla eklendi.",
@@ -483,8 +480,9 @@ export async function fetchProductsAction() {
   }
 }
 
+//attribute
 export const saveAttributesForCategory = async (
-  attributesData: [string, string[]][],
+  attributesData: [string, string[]],
   categoryId: number
 ) => {
   for (const [attributeName, values] of attributesData) {
@@ -525,15 +523,72 @@ export const saveAttributesForCategory = async (
   }
 };
 
+export async function createOrUpdateAttributeWithValues(data) {
+  const { attributeName, values, categoryId } = data;
+
+  const slug = slugify(attributeName);
+
+  return await prisma.$transaction(async (tx) => {
+    // Attribute'ü upsert et
+    const attribute = await tx.attribute.upsert({
+      where: { slug },
+      update: { name: attributeName },
+      create: {
+        name: attributeName,
+        slug,
+      },
+    });
+
+    // AttributeValue'ları upsert et
+    const valueOps = values.map((val) =>
+      tx.attributeValue.upsert({
+        where: {
+          attributeId_value: {
+            value: val,
+            attributeId: attribute.id,
+          },
+        },
+        update: {},
+        create: {
+          name: val,
+          value: val,
+          attributeId: attribute.id,
+        },
+      })
+    );
+    await Promise.all(valueOps);
+
+    // Attribute ile kategori arasındaki ilişkiyi kur
+    await tx.attribute.update({
+      where: { id: attribute.id },
+      data: {
+        category: {
+          connect: { id: categoryId }, // mevcut kategoriyle ilişkilendir
+        },
+      },
+    });
+
+    return {
+      success: true,
+      attributeId: attribute.id,
+    };
+  });
+}
+
 export async function createAttributeAction(
   prevState: any,
   formData: FormData
 ) {
   const categoryId = parseInt(formData.get("categoryId").toString());
-  const attributes = JSON.parse(formData.get("attributes").toString());
+  const attributeName = formData.get("attributeName").toString();
+  const values = JSON.parse(formData.get("values").toString());
 
   try {
-    await saveAttributesForCategory(attributes, categoryId);
+    await createOrUpdateAttributeWithValues({
+      attributeName,
+      categoryId,
+      values,
+    });
 
     return { success: true, message: "Özellikler başarıyla eklendi." };
   } catch (error) {
@@ -542,6 +597,74 @@ export async function createAttributeAction(
       success: false,
       message: "Özellik eklenirken bir hata oluştu.",
       error: error.message,
+    };
+  }
+}
+
+export async function addValueToAttribute(prevState: any, formData: FormData) {
+  const attributeId = parseInt(formData.get("attributeId").toString());
+  const value = formData.get("attributeName").toString();
+
+  try {
+    const attribute = await prisma.attribute.findUnique({
+      where: { id: attributeId },
+    });
+
+    if (!attribute) {
+      return {
+        error: true,
+        message: "Özellik bulunamadı.",
+      };
+    }
+
+    const newValue = await prisma.attributeValue.create({
+      data: {
+        attributeId: attributeId,
+        name: value,
+        value: slugify(value),
+      },
+    });
+
+    revalidatePath("dashboard/categories");
+    return {
+      success: true,
+      message: "Değer başarıyla eklendi.",
+      data: newValue,
+    };
+  } catch (error) {
+    console.error("Server Action: Özellik eklenirken hata oluştu");
+    return {
+      error: true,
+      message: "Özellik eklenirken bir hata oluştu",
+    };
+  }
+}
+
+export async function deleteAttributeAction(
+  prevState: any,
+  formData: FormData
+) {
+  const id = formData.get("attributeId").toString();
+  try {
+    await prisma.attribute.delete({
+      where: { id: parseInt(id) },
+      include: {
+        values: true,
+        CategoryAttributeMapping: true,
+      },
+    });
+    revalidatePath("dashboard/categories");
+    return {
+      success: true,
+      message: "Özellik başarıyla silindi.",
+    };
+  } catch (error) {
+    console.error("Server Action: Özellik silinirken hata oluştu");
+    console.log(error);
+
+    return {
+      error: true,
+      message: "Özellik silinirken bir hata oluştu",
     };
   }
 }

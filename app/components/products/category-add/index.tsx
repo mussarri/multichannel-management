@@ -38,7 +38,6 @@ const Form = ({
                   };
                 });
               }}
-              value={form.parent}
             />
           </div>
           <div className="flex-1">
@@ -89,7 +88,6 @@ function N11() {
           vertical={true}
           required={true}
           onChange={() => {}}
-          value={""}
         />
       </div>
       <div className="p-3 flex-1 flex flex-col gap-1">
@@ -109,7 +107,6 @@ function N11() {
           vertical={true}
           required={true}
           onChange={() => {}}
-          value={""}
         />
         <SelectInput
           label="Ürün Miktarı"
@@ -118,7 +115,6 @@ function N11() {
           vertical={true}
           required={true}
           onChange={() => {}}
-          value={""}
         />
       </div>
     </div>

@@ -3,14 +3,15 @@
 "use client";
 
 import Image from "next/image";
+import Link from "next/link";
 import React from "react";
 import { useMediaQuery } from "usehooks-ts";
 
-const ProductCard = ({ data }: { data: any }) => {
+const ProductCard = ({ data, marketplaces }) => {
   const mobile = useMediaQuery("(max-width: 500px)");
 
   return (
-    <div className="mt-4">
+    <div className="mt-4 ">
       <div
         className={
           "flex frelative overflow-x-auto" +
@@ -55,7 +56,7 @@ const ProductCard = ({ data }: { data: any }) => {
                 Urun Adi
               </p>
               <span className="text-xs text-secondary-foreground">
-                {data.name || "Apple Macbook Pro M4 Pro 24GB RAM 512GB SSD"}
+                {data.name || ""}
               </span>
             </div>
             <div className="w-max">
@@ -83,36 +84,22 @@ const ProductCard = ({ data }: { data: any }) => {
           </div>
         </div>
         <div className={"flex gap-2 " + (mobile ? " p-2 border-b " : "")}>
-          <div className="flex flex-col items-center gap-1">
-            <div className="w-8 h-8 rounded-full bg-gray-500 overflow-hidden"></div>
-            <div className="px-1 rounded-sm border border-green-600 text-[10px] text-green-600">
-              Aktif
-            </div>
-          </div>
-          <div className="flex flex-col items-center gap-1">
-            <div className="w-8 h-8 rounded-full bg-gray-500 overflow-hidden"></div>
-            <div className="px-1 rounded-sm border border-green-600 text-[10px] text-green-600">
-              Aktif
-            </div>
-          </div>
-          <div className="flex flex-col items-center gap-1">
-            <div className="w-8 h-8 rounded-full bg-gray-500 overflow-hidden"></div>
-            <div className="px-1 rounded-sm border border-green-600 text-[10px] text-green-600">
-              Aktif
-            </div>
-          </div>
-          <div className="flex flex-col items-center gap-1">
-            <div className="w-8 h-8 rounded-full bg-gray-500 overflow-hidden"></div>
-            <div className="px-1 rounded-sm border border-green-600 text-[10px] text-green-600">
-              Aktif
-            </div>
-          </div>
-          <div className="flex flex-col items-center gap-1">
-            <div className="w-8 h-8 rounded-full bg-gray-500 overflow-hidden"></div>
-            <div className="px-1 rounded-sm border border-green-600 text-[10px] text-green-600">
-              Aktif
-            </div>
-          </div>
+          {marketplaces.map((item) => (
+            <Link
+              href={`/dashboard/variants/${data.id}`}
+              key={item.id}
+              className="flex flex-col items-center gap-1"
+            >
+              <div className="w-8 h-8 rounded-full bg-gray-400 overflow-hidden flex items-center justify-center">
+                {item.marketPlace.name.charAt(0).toUpperCase()}
+              </div>
+              {
+                <div className="px-1 rounded-sm border border-green-600 text-[10px] text-green-600">
+                  Aktif
+                </div>
+              }
+            </Link>
+          ))}
         </div>
       </div>
     </div>

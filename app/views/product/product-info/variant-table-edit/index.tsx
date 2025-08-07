@@ -29,7 +29,9 @@ const index = ({
       stock: option.stock,
       desi: option.desi,
       title: option.title,
-      price: option.price,
+      salePrice: option.salePrice,
+      listPrice: option.listPrice,
+      costPrice: option.costPrice,
     }))
   );
 
@@ -108,232 +110,283 @@ const index = ({
     <div className="w-full overflow-auto">
       <h2 className="text-xl font-semibold min-w-[250px]">
         {" "}
-        {product.name} Seçenek Grupları{" "}
+        {product.name} Varyant Ayarları{" "}
       </h2>
-      <ProductCard data={product} />
-      <VariantOptions product={product} marketplaces={marketplaces} />
+      <ProductCard data={product} marketplaces={marketplaces} />
+      <VariantOptions
+        product={product}
+        marketplaces={marketplaces}
+        formData={formData}
+        setFormData={setFormData}
+      />
 
-      <div className="box p-4 mt-4">
-        <div className="flex items-center justify-between pb-5 w-full ">
-          <div className="flex gap-2 text-sm variant-table-buttons">
-            <button onClick={() => {}}>
-              {" "}
-              <Trash size={15} /> Tüm Seçenekleri Sil{" "}
-            </button>
-            <button onClick={handleClearVariants}>
-              {" "}
-              <RefreshCwIcon size={15} /> Tüm Seçenekleri Temizle{" "}
-            </button>
+      {formData.length > 0 && (
+        <div className="box p-4 mt-4">
+          <div className="flex items-center justify-between pb-5 w-full ">
+            <div className="flex gap-2 text-sm variant-table-buttons">
+              <button onClick={() => {}}>
+                {" "}
+                <Trash size={15} /> Tüm Seçenekleri Sil{" "}
+              </button>
+              <button onClick={handleClearVariants}>
+                {" "}
+                <RefreshCwIcon size={15} /> Tüm Seçenekleri Temizle{" "}
+              </button>
+            </div>
           </div>
-        </div>
-        <table className="variant-table-create">
-          <thead>
-            <tr className="border-b">
-              <th>Seçenek</th>
-              <th>
-                <div>
-                  <span>Barkod</span>
-                  <button onClick={handleGenerateBarcode}>Barkod Uret</button>
-                </div>
-              </th>
-              <th>
-                <div>
-                  <span>Stok Kodu</span>
-                  <button onClick={handleGenerateBarcode}>SKU Uret</button>
-                </div>
-              </th>
-              <th>
-                <div>
-                  <span>Stok</span>
-                  <button onClick={handleGenerateBarcode}>
-                    Toplu Guncelle
-                  </button>
-                </div>
-              </th>
-              <th>
-                <div>
-                  <span>Satis Fiyati</span>
-                  <button onClick={handleGenerateBarcode}>
-                    Toplu Guncelle
-                  </button>
-                </div>
-              </th>
-              <th>
-                <div>
-                  <span>Liste Fiyati</span>
-                  <button onClick={handleGenerateBarcode}>
-                    Toplu Guncelle
-                  </button>
-                </div>
-              </th>
-              {marketplaces
-                .map((i) => i.marketPlace)
-                .map((item) => (
-                  <>
-                    <th>
-                      <div>
-                        <span className="capitalize">
-                          {item?.name + " "}Satis Fiyat
-                        </span>
-                        <button onClick={handleGenerateBarcode}>
-                          Toplu Guncelle
-                        </button>
-                      </div>
-                    </th>
-                    <th>
-                      <div>
-                        <span className="capitalize">
-                          {item?.name + " "}List Fiyat
-                        </span>
-                        <button onClick={handleGenerateBarcode}>
-                          Toplu Guncelle
-                        </button>
-                      </div>
-                    </th>
-                  </>
-                ))}
-              <th>
-                <div>
-                  <span>Maliyet</span>
-                  <button onClick={handleGenerateBarcode}>
-                    Toplu Guncelle
-                  </button>
-                </div>
-              </th>
-              <th className="text-right">Sil</th>
-            </tr>
-          </thead>
-          <tbody>
-            {formData.map((item: any, index: number) => (
-              <tr key={index}>
-                <td className="text-left">
-                  <div className="w-max">{item.variant_code}</div>
-                </td>
-                <td className="text-left">
-                  <input
-                    type="text"
-                    name="barkod"
-                    id=""
-                    className="w-max"
-                    value={item.barkod}
-                    onChange={(e) =>
-                      handleChange(index, "barkod", e.target.value)
-                    }
-                  />
-                </td>
-                <td className="text-left text-[13px]">
-                  <div className="w-max">{item.sku}</div>
-                </td>
-                <td className="text-left">
-                  <input
-                    type="number"
-                    name="Stok"
-                    id=""
-                    value={item.stock}
-                    onChange={(e) =>
-                      handleChange(index, "stock", e.target.value)
-                    }
-                  />
-                </td>
-                <td className="text-left">
-                  <input
-                    type="number"
-                    className=""
-                    name="list_price"
-                    id=""
-                    value={item.stock}
-                    onChange={(e) =>
-                      handleChange(index, "list_price", e.target.value)
-                    }
-                  />
-                </td>
-                <td className="text-left">
-                  <input
-                    type="number"
-                    className=""
-                    name="sale_price"
-                    id=""
-                    value={item.stock}
-                    onChange={(e) =>
-                      handleChange(index, "sale_price", e.target.value)
-                    }
-                  />
-                </td>
-
+          <table className="variant-table-create">
+            <thead>
+              <tr className="border-b">
+                <th className="">Seçenek</th>
+                <th>
+                  <div>
+                    <span>Barkod</span>
+                    <button onClick={handleGenerateBarcode}>Barkod Uret</button>
+                  </div>
+                </th>
+                <th>
+                  <div>
+                    <span>Stok Kodu</span>
+                    <button onClick={handleGenerateBarcode}>SKU Uret</button>
+                  </div>
+                </th>
+                <th>
+                  <div>
+                    <span>Stok</span>
+                    <button
+                      onClick={() =>
+                        setBulkModal({ open: true, field: "stock", value: "" })
+                      }
+                    >
+                      Toplu Guncelle
+                    </button>
+                  </div>
+                </th>
+                <th>
+                  <div>
+                    <span>Satis Fiyati</span>
+                    <button
+                      onClick={() =>
+                        setBulkModal({
+                          open: true,
+                          field: "salePrice",
+                          value: "",
+                        })
+                      }
+                    >
+                      Toplu Guncelle
+                    </button>
+                  </div>
+                </th>
+                <th>
+                  <div>
+                    <span>Liste Fiyati</span>
+                    <button
+                      onClick={() =>
+                        setBulkModal({
+                          open: true,
+                          field: "listPrice",
+                          value: "",
+                        })
+                      }
+                    >
+                      Toplu Guncelle
+                    </button>
+                  </div>
+                </th>
                 {marketplaces
                   .map((i) => i.marketPlace)
                   .map((item) => (
                     <>
-                      <td className="text-left">
-                        <input
-                          type="number"
-                          className=""
-                          name={item.name + "_list_price"}
-                          id=""
-                          value={item[item.name + "_sale_price"]}
-                          onChange={(e) =>
-                            handleChange(
-                              index,
-                              item.name + "_list_price",
-                              e.target.value
-                            )
-                          }
-                        />
-                      </td>
-                      <td className="text-left">
-                        <input
-                          type="number"
-                          className=""
-                          name={item.name + "_sale_price"}
-                          id=""
-                          value={item[item.name + "_sale_price"]}
-                          onChange={(e) =>
-                            handleChange(
-                              index,
-                              item.name + "_sale_price",
-                              e.target.value
-                            )
-                          }
-                        />
-                      </td>
+                      <th>
+                        <div>
+                          <span className="capitalize">
+                            {item?.name + " "}Satis Fiyat
+                          </span>
+                          <button
+                            onClick={() =>
+                              setBulkModal({
+                                open: true,
+                                field: "stock",
+                                value: "",
+                              })
+                            }
+                          >
+                            Toplu Guncelle
+                          </button>
+                        </div>
+                      </th>
+                      <th>
+                        <div>
+                          <span className="capitalize">
+                            {item?.name + " "}List Fiyat
+                          </span>
+                          <button
+                            onClick={() =>
+                              setBulkModal({
+                                open: true,
+                                field: "stock",
+                                value: "",
+                              })
+                            }
+                          >
+                            Toplu Guncelle
+                          </button>
+                        </div>
+                      </th>
                     </>
                   ))}
-
-                <td className="text-left">
-                  <input
-                    type="number"
-                    className=""
-                    name="price"
-                    id=""
-                    value={item.costPrice}
-                    onChange={(e) =>
-                      handleChange(index, "stock", e.target.value)
-                    }
-                  />
-                </td>
-                <td className="text-right">
-                  <button onClick={() => handleDeleteVariant(index)}>
-                    <Trash2
-                      size={16}
-                      className="hover:scale-110 duration-200 hover:cursor-pointer"
-                      color="var(--error)"
-                    />
-                  </button>
-                </td>
+                <th>
+                  <div>
+                    <span>Maliyet</span>
+                    <button
+                      onClick={() =>
+                        setBulkModal({
+                          open: true,
+                          field: "costPrice",
+                          value: "",
+                        })
+                      }
+                    >
+                      Toplu Guncelle
+                    </button>
+                  </div>
+                </th>
+                <th className="text-right">Sil</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
-        <div className="mt-4 text-right">
-          <button
-            type="button"
-            className="text-sm p-2 px-3 rounded bg-[#008000] text-white"
-            onClick={handleSave}
-          >
-            Kaydet
-          </button>
+            </thead>
+            <tbody>
+              {formData.map((item: any, index: number) => (
+                <tr key={index}>
+                  <td className="text-left">
+                    <div className="w-max">{item.variant_code}</div>
+                  </td>
+                  <td className="text-left">
+                    <input
+                      type="text"
+                      name="barkod"
+                      id=""
+                      className="w-max"
+                      value={item.barkod}
+                      onChange={(e) =>
+                        handleChange(index, "barkod", e.target.value)
+                      }
+                    />
+                  </td>
+                  <td className="text-left text-[13px]">
+                    <div className="w-max">{item.sku}</div>
+                  </td>
+                  <td className="text-left">
+                    <input
+                      type="number"
+                      name="Stok"
+                      id=""
+                      value={item.stock}
+                      onChange={(e) =>
+                        handleChange(index, "stock", e.target.value)
+                      }
+                    />
+                  </td>
+                  <td className="text-left">
+                    <input
+                      type="number"
+                      className=""
+                      name="list_price"
+                      id=""
+                      value={item.listPrice}
+                      onChange={(e) =>
+                        handleChange(index, "list_price", e.target.value)
+                      }
+                    />
+                  </td>
+                  <td className="text-left">
+                    <input
+                      type="number"
+                      className=""
+                      name="sale_price"
+                      id=""
+                      value={item.salePrice}
+                      onChange={(e) =>
+                        handleChange(index, "sale_price", e.target.value)
+                      }
+                    />
+                  </td>
+
+                  {marketplaces
+                    .map((i) => i.marketPlace)
+                    .map((item) => (
+                      <>
+                        <td className="text-left">
+                          <input
+                            type="number"
+                            className=""
+                            name={item.name + "_list_price"}
+                            id=""
+                            value={item[item.name + "_sale_price"]}
+                            onChange={(e) =>
+                              handleChange(
+                                index,
+                                item.name + "_list_price",
+                                e.target.value
+                              )
+                            }
+                          />
+                        </td>
+                        <td className="text-left">
+                          <input
+                            type="number"
+                            className=""
+                            name={item.name + "_sale_price"}
+                            id=""
+                            value={item[item.name + "_sale_price"]}
+                            onChange={(e) =>
+                              handleChange(
+                                index,
+                                item.name + "_sale_price",
+                                e.target.value
+                              )
+                            }
+                          />
+                        </td>
+                      </>
+                    ))}
+
+                  <td className="text-left">
+                    <input
+                      type="number"
+                      className=""
+                      name="price"
+                      id=""
+                      value={item.costPrice}
+                      onChange={(e) =>
+                        handleChange(index, "stock", e.target.value)
+                      }
+                    />
+                  </td>
+                  <td className="text-right">
+                    <button onClick={() => handleDeleteVariant(index)}>
+                      <Trash2
+                        size={16}
+                        className="hover:scale-110 duration-200 hover:cursor-pointer"
+                        color="var(--error)"
+                      />
+                    </button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+          <div className="mt-4 text-right">
+            <button
+              type="button"
+              className="text-sm p-2 px-3 rounded bg-[#008000] text-white"
+              onClick={handleSave}
+            >
+              Kaydet
+            </button>
+          </div>
         </div>
-      </div>
+      )}
       {bulkModal.open && (
         <div className="fixed inset-0 bg-black bg-opacity-80 flex items-center justify-center z-50">
           <div className="bg-card p-6 rounded shadow-md w-[300px]">

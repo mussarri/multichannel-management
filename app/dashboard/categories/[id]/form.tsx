@@ -21,11 +21,6 @@ export default function CategoryAttributeStepper({
   marketplaces: any;
   attributes: any;
 }) {
-  const [step, setStep] = useState(1);
-  const [marketplaceId, setMarketplaceId] = useState(1);
-  const [selectedLocalCategory, setSelectedLocalCategory] = useState(category);
-  const handleNext = () => {};
-
   const [open, setOpen] = useState({
     category: null,
     marketPlace: null,
@@ -38,14 +33,17 @@ export default function CategoryAttributeStepper({
     });
   };
 
-  console.log(attributes);
-
   return (
     <div className="overflow-x-auto box rounded-lg">
       <div className="flex justify-between items-center p-4 border-b">
-        <h2 className="font-semibold text-md">
-          {category.name + " Kategorisi"}
-        </h2>
+        <div>
+          <h2 className="font-semibold text-md">
+            {category.name + " Kategorisi"}
+          </h2>
+          {category?.parent?.name}
+          {category?.children?.length > 0 &&
+            category.children.map((i) => <span key={i.id}>{i.name}</span>)}
+        </div>
         <div className="text-right">
           <button className="bg-error rounded px-3 p-1 text-white text-sm flex gap-2 items-center">
             <Trash size={15} /> Kategoriyi Sil
@@ -91,7 +89,7 @@ export default function CategoryAttributeStepper({
                       <td>
                         <MakeCategoryMap
                           category={category}
-                          marketPlace={i}
+                          marketplaces={marketplaces}
                           open={
                             open.category === category.id &&
                             open.marketPlace === i.id

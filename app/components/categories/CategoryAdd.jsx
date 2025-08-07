@@ -1,7 +1,7 @@
 "use client";
-import { categoryMap } from "@/app/actions/marketplaceactions";
+import { createCategory } from "@/app/action";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
+import TextInput from "@/app/components/settings/text-input";
 import {
   Dialog,
   DialogContent,
@@ -14,7 +14,7 @@ import { toast } from "react-toastify";
 import SelectInput from "@/app/components/settings/select-input";
 
 const CategoryAdd = ({ open, setOpen, categories }) => {
-  const [state, formAction, isPending] = useActionState(categoryMap, null);
+  const [state, formAction, isPending] = useActionState(createCategory, null);
   const [parent, setParent] = useState("");
   useEffect(() => {
     if (state?.error) {
@@ -55,12 +55,13 @@ const CategoryAdd = ({ open, setOpen, categories }) => {
             />
           </div>
           <div>
-            <label htmlFor="name">{" Kategori adı:"}</label>
-            <Input
+            <TextInput
               id="name"
               type="text"
               placeholder="Kategori adı"
               name="name"
+              label="Kategori adı"
+              vertical={true}
               required
             />
           </div>
