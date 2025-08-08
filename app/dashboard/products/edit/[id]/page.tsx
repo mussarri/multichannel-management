@@ -4,12 +4,9 @@ import ProductForm from "@/app/views/product/product-edit";
 import prisma from "@/lib/prisma";
 import { redirect } from "next/navigation";
 
-const ProductEdit = async ({ params }) => {
-  const { id } = await params;
+const ProductEdit = ({ params }) => {
+  const { id } = params;
 
-  if (!id) {
-    return redirect("/dashboard/products");
-  }
   return (
     <Suspense fallback={<div>Loading...</div>}>
       <RenderProductEdit id={id} />

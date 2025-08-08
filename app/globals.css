@@ -325,6 +325,13 @@ table th {
   width: max-content;
 }
 
+table.order tbody tr td{
+  @apply px-2 text-sm ;
+}
+
+ 
+
+
 .market li {
   display: flex;
   align-items: center;
@@ -417,6 +424,7 @@ table.product-variants thead,
 table.product-variants tr {
   width: 100%;
 }
+
 table.product-variants th,
 table.product-variants td {
   padding: 10px 10px;

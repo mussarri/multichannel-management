@@ -5,7 +5,7 @@ import { Check, CircleX, Pencil, Trash2 } from "lucide-react";
 import React, { useEffect, useState } from "react";
 import MakeCategoryMap from "@/app/components/categories/CategoryMap";
 import Link from "next/link";
-import SortButton from "./product/product-table/sort-button";
+import SortButton from "../components/sortButton";
 import CategoryTitle from "@/app/components/categories/CategoryTitle";
 
 export const check = (value: boolean) => {
@@ -281,7 +281,7 @@ const CategoryList = ({ categories, marketplaces }) => {
                 <td className="p-2 ">
                   <div className="flex items-center justify-end text-right space-x-2">
                     <Link
-                      href={`/dashboard/products/categories/${category.id}`}
+                      href={`/dashboard/categories/${category.id}`}
                       className=""
                     >
                       <Pencil

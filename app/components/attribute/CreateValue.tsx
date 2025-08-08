@@ -41,7 +41,7 @@ export default function CreateAttribute({
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild style={{ height: 14 }}>
-        <button className="flex gap-1 text-xs items-center cursor-pointer">
+        <button className="flex gap-1 text-xs items-center cursor-pointer  hover:scale-105 transition-all duration-300">
           <div>
             <PlusCircleIcon size={13} />
           </div>

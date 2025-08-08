@@ -42,7 +42,7 @@ const menuItems = [
     href: "/dashboard/orders",
     submenu: [
       { label: "Sipariş Listesi", href: "/dashboard/orders" },
-      { label: "Sipariş Oluştur", href: "/dashboard/orders/groups" },
+      { label: "Sipariş Oluştur", href: "/dashboard/orders/new" },
     ],
   },
   {

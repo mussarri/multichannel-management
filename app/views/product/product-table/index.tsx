@@ -12,9 +12,7 @@ import {
   XIcon,
 } from "lucide-react";
 import Link from "next/link";
-import { Button } from "@/components/ui/button";
-import { useMediaQuery } from "usehooks-ts";
-import Image from "next/image";
+
 import { deleteProduct } from "@/app/action";
 import { toast } from "react-toastify";
 import {
@@ -26,7 +24,7 @@ import {
 import { DialogTrigger } from "@radix-ui/react-dialog";
 import ProductsFilter from "./filter";
 import { useRouter } from "next/navigation";
-import SortButton from "./sort-button";
+import SortButton from "@/app/components/sortButton";
 import { useSession } from "next-auth/react";
 
 function filterProducts(products: any[], filters: any): any[] {

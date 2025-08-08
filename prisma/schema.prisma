@@ -136,6 +136,7 @@ model Marketplace {
   marketplaceCategoryMapping       MarketplaceCategoryMapping[]
   categoryAttributeMapping         CategoryAttributeMapping[]
   attributeValueMapping            AttributeValueMapping[]
+  Order                            Order[]
 
   @@unique([id, marketplaceAccountId])
   @@unique([slug, marketplaceAccountId])
@@ -282,11 +283,80 @@ model SyncLog {
   createdAt     DateTime    @default(now())
 }
 
+//order
+
+model Order {
+  id          String @id @default(cuid())
+  orderNumber String // Pazaryerine ait sipariş numarası
+
+  // enum: TRENDYOL, HEPSIBURADA, SHOPIFY, etc.
+  //accountId    String // Hangi mağaza/hesap bu siparişi aldı
+  status       OrderStatus // enum: PENDING, SHIPPED, CANCELLED, etc.
+  orderDate    DateTime
+  deliveryDate DateTime? // Kargo tahmini/gerçek teslim tarihi
+
+  orderItems OrderItem[] // Sipariş ürünleri
+
+  totalPrice Float
+  currency   String @default("TRY")
+
+  shippingCode    String? // Kargo takip no
+  shippingCarrier String? // Aras, Yurtiçi, MNG vb.
+
+  customer   Customer @relation(fields: [customerId], references: [id]) // Müşteri bilgileri
+  customerId String
+
+  address           DeliveryAddress @relation(fields: [deliveryAddressId], references: [id]) // Adres bilgileri
+  deliveryAddressId String
+
+  marketplace   Marketplace @relation(fields: [marketplaceId], references: [id])
+  marketplaceId Int
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([marketplaceId, orderNumber])
+}
+
+model OrderItem {
+  id      String @id @default(cuid())
+  orderId String
+  order   Order  @relation(fields: [orderId], references: [id])
+
+  productId String // Sistemimizdeki ürünle eşleşirse
+  quantity  Int
+  price     Float?
+  currency  String @default("TRY")
+}
+
+model DeliveryAddress {
+  id                   String  @id @default(cuid())
+  name                 String
+  addressDetail        String?
+  email                String?
+  countryCode          String?
+  phoneNumber          String?
+  alternatePhoneNumber String?
+  town                 String?
+  district             String?
+  city                 String?
+  Order                Order[]
+}
+
+model Customer {
+  id    String  @id @default(cuid())
+  name  String
+  email String?
+  phone String?
+  Order Order[]
+}
+
 enum OrderStatus {
   PENDING
   SHIPPED
   DELIVERED
   CANCELLED
+  RETURNED
 }
 
 enum Role {
