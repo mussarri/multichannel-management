@@ -98,7 +98,6 @@ const Form = ({ data }: { data: any }) => {
             onChange={(e: string) => {
               setTrendyolCategory(e);
             }}
-            value={trendyolCategory}
             vertical={true}
           />
         </div>
@@ -144,7 +143,6 @@ const Form = ({ data }: { data: any }) => {
                           label={""}
                           name={"category"}
                           required={true}
-                          value={item.trendyolAttribute}
                           onChange={(e: string) => {
                             setSmarthubProductAttributes((prev) =>
                               prev.map((item2) =>

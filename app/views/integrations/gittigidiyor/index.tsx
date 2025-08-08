@@ -160,7 +160,6 @@ const page = ({ data }: { data: any }) => {
             }}
             required={false}
             vertical={true}
-            value={""}
           />
           <SelectInput
             options={["Alıcı", "Satıcı"]}
@@ -171,7 +170,6 @@ const page = ({ data }: { data: any }) => {
             }}
             required={false}
             vertical={true}
-            value={""}
           />
           <SelectInput
             options={[]}
@@ -182,7 +180,6 @@ const page = ({ data }: { data: any }) => {
             }}
             required={false}
             vertical={true}
-            value={""}
           />
           <SelectInput
             options={[]}
@@ -193,7 +190,6 @@ const page = ({ data }: { data: any }) => {
             }}
             required={false}
             vertical={true}
-            value={""}
           />
           <SelectInput
             options={[]}
@@ -204,7 +200,6 @@ const page = ({ data }: { data: any }) => {
             }}
             required={false}
             vertical={true}
-            value={""}
           />
           <SelectInput
             options={[]}
@@ -215,7 +210,6 @@ const page = ({ data }: { data: any }) => {
             }}
             required={false}
             vertical={true}
-            value={""}
           />
         </div>
       </div>

@@ -7,7 +7,7 @@ const index = ({
   required = false,
   onChange,
   vertical = false,
-
+  value = "",
   minWidth = true,
   error = "",
 }) => {

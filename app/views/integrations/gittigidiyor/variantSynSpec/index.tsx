@@ -118,7 +118,6 @@ export default function VariantPage({ data }: { data: any }) {
                       label={""}
                       name={"category"}
                       required={true}
-                      value={item.gittigidiyorValue}
                       onChange={(e: string) => {
                         setSmartHubAttributeValues((prev) =>
                           prev.map((item2, index) =>
