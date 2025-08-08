@@ -23,5 +23,6 @@ export default New;
 
 async function RenderCategoryAdd() {
   const categories = await prisma.category.findMany({});
-  return <CategoryAdd categories={categories} />;
+  const marketplaces = await prisma.marketplaceAccount.findMany({});
+  return <CategoryAdd categories={categories} marketplaces={marketplaces} />;
 }
