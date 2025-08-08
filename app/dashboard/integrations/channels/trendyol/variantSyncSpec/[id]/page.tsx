@@ -1,6 +1,7 @@
 import ProductCard from "@/app/components/products/product-card";
 import { Suspense } from "react";
 import Form from "@/app/views/integrations/trendyol-integration/variantSynSpec";
+import prisma from "@/lib/prisma";
 
 export default function ProductsPage() {
   return (
@@ -25,8 +26,13 @@ export default function ProductsPage() {
 async function RenderProduct() {
   const res = await fetch("https://api.escuelajs.co/api/v1/prod2ucts");
   const data = await res.json();
+  const marketplaces = await prisma.marketplaceAccount.findMany({});
 
-  return !data.error ? <ProductCard data={data} /> : "no data";
+  return !data.error ? (
+    <ProductCard marketplaces={marketplaces} data={data} />
+  ) : (
+    "no data"
+  );
 }
 
 async function RenderForm() {

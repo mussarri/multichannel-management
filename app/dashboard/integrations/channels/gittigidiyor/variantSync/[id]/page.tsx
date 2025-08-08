@@ -2,6 +2,7 @@ import ProductCard from "@/app/components/products/product-card";
 
 import { Suspense } from "react";
 import Form from "@/app/views/integrations/gittigidiyor/variantSync";
+import prisma from "@/lib/prisma";
 
 export default function ProductsPage() {
   return (
@@ -32,6 +33,7 @@ async function RenderVariants() {
 
 async function RenderProduct() {
   const response = await fetch("https://api.escuelajs.co/api/v1/products");
+  const marketplaces = await prisma.marketplaceAccount.findMany({});
   const data = await response.json();
-  return <ProductCard data={data} />;
+  return <ProductCard marketplaces={marketplaces} data={data} />;
 }
