@@ -10,7 +10,6 @@ import CheckBox from "@/app/components/settings/checkbox";
 import { Button } from "@/components/ui/button";
 import "froala-editor/css/froala_style.min.css";
 import "froala-editor/css/froala_editor.pkgd.min.css";
-import "froala-editor/js/plugins.pkgd.min.js";
 
 const FroalaEditorComponent = dynamic(() => import("react-froala-wysiwyg"), {
   ssr: false,

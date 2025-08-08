@@ -5,8 +5,6 @@ import Image from "next/image";
 import Link from "next/link";
 
 export default function IntegrationList({ data }: { data: any }) {
-  console.log(data);
-
   const list = [
     { name: "trendyol", url: "/logo/trendyol.com.png" },
     { name: "hepsiburada", url: "/logo/hepsiburada.png" },

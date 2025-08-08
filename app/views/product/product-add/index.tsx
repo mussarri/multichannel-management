@@ -11,9 +11,9 @@ import { Brand, Category } from "@prisma/client";
 import { createProduct } from "@/app/action";
 import { toast } from "react-toastify";
 import { Steps } from "rsuite";
-import "rsuite/Steps/styles/index.css";
 import { ArrowLeft, ArrowRight } from "lucide-react";
 import { redirect } from "next/navigation";
+import "rsuite/Steps/styles/index.css";
 
 import ProductAddForm1 from "./price";
 import BrandSelect from "./BrandSelect";
