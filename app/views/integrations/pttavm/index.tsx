@@ -23,13 +23,13 @@ const Page = ({ data }: { data: any }) => {
   );
 
   useEffect(() => {
-    if (message.error) {
-      toast.error(message.message);
+    if (message?.error) {
+      toast.error(message?.message);
     }
-    if (message.success) {
-      toast.success(message.message);
+    if (message?.success) {
+      toast.success(message?.message);
     }
-  }, [message.error, message.message, message.success]);
+  }, [message?.error, message?.message, message?.success]);
 
   const [form, setForm] = React.useState({
     active: false,

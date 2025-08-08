@@ -17,7 +17,7 @@ const page = () => {
 };
 
 const RenderPage = async () => {
-  const marketplace = await prisma.marketplace.findFirst({
+  const marketplace = await prisma.marketplace.findUnique({
     where: {
       slug: "pttavm",
     },
@@ -25,7 +25,7 @@ const RenderPage = async () => {
 
   const data = {};
   if (marketplace) {
-    const data = await prisma.marketplaceAccount.findFirst({
+    const data = await prisma.marketplaceAccount.findUnique({
       where: {
         marketplaceId: marketplace?.id,
       },
