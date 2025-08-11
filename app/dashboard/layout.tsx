@@ -1,34 +1,32 @@
 import { Sidebar } from "@/app/components/layout/sidebar";
 import { Topbar } from "@/app/components/layout/topbar";
 
-import Breadcrumb from "@/app/components/bradcrumb";
-import { ToastContainer } from "react-toastify";
+ import { ToastContainer } from "react-toastify";
 
-export default function DashboardLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
-  return (
-    <div className="flex h-screen overflow-hidden ">
-      <Sidebar />
-      <div className={"flex flex-col flex-1 overflow-hidden"}>
-        <Topbar />
+ export default function DashboardLayout({
+   children,
+ }: {
+   children: React.ReactNode;
+ }) {
+   return (
+     <div className="flex h-screen overflow-hidden ">
+       <Sidebar />
+       <div className={"flex flex-col flex-1 overflow-hidden"}>
+         <Topbar />
 
-        <main
-          className={
-            "flex-1 overflow-y-auto overflow-x-hidden px-4 pt-4 bg-background"
-          }
-          style={{ paddingTop: 80 }}
-        >
-          <Breadcrumb />
-          {children}
-          <ToastContainer />
-        </main>
-      </div>
-    </div>
-  );
-}
+         <main
+           className={
+             "flex-1 overflow-y-auto overflow-x-hidden px-4 pt-4 bg-background"
+           }
+           style={{ paddingTop: 80 }}
+         >
+           {children}
+           <ToastContainer />
+         </main>
+       </div>
+     </div>
+   );
+ }
 
 // export default function DashboardLayout({ children }) {
 //   const { menuMasterLoading } = useGetMenuMaster();

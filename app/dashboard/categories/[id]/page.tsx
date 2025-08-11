@@ -43,18 +43,13 @@ const page = async ({ params }) => {
       action: "CATEGORY_ATTRIBUTE_MAPPING",
     },
   });
-
   if (!category) {
-    return notFound();
+    return <Form category={category} marketplaces={marketplaces} />;
   }
 
   return (
     <>
-      <Form
-        category={category}
-        marketplaces={marketplaces}
-        attributes={category.attributes}
-      />
+      <Form category={category} marketplaces={marketplaces} />
       {marketplaces.length > 0 || (
         <div className="box mt-4 p-4">
           <Link
@@ -77,18 +72,12 @@ const page = async ({ params }) => {
           syncLogs={syncLogs}
         />
       ) : (
-        <div className="box mt-4 p-4">
-          <Link
-            href={"/dashboard/variants/create/?id=" + category.id}
-            className="text-sm flex items-center gap-2"
-          >
-            {" "}
-            <PlusCircleIcon size={17} />
-            <span className=" font-[600] text-[13px]">
-              Boyut , Renk gibi seçenekler ekleyin
-            </span>
-          </Link>
-        </div>
+        <Form2
+          category={category}
+          marketplaces={marketplaces}
+          attributes={category.attributes}
+          syncLogs={syncLogs}
+        />
       )}
     </>
   );

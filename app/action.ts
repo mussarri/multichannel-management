@@ -127,6 +127,31 @@ export async function fetchTrendyolProductsAction(params) {
 }
 
 //product
+export async function fetchProductsAction() {
+  try {
+    const products = await prisma.product.findMany({
+      include: {
+        images: true,
+        category: true,
+        brand: true,
+        MarketplaceProductMapping: true,
+        variants: {
+          include: {
+            MarketplaceProductVariantMapping: true,
+          },
+        },
+      },
+    });
+    return { success: true, data: products };
+  } catch (error) {
+    console.error("Server Action: Ürünler çekilirken hata:", error);
+    return {
+      success: false,
+      message: "Ürünler alınamadı.",
+      error: error.message,
+    };
+  }
+}
 export async function createProduct(prevState: any, formData: FormData) {
   const title = formData.get("title").toString();
   const name = formData.get("name").toString();
@@ -136,7 +161,7 @@ export async function createProduct(prevState: any, formData: FormData) {
   const description = formData.get("description").toString();
   const is_active = formData.get("is_active").toString() === "true";
   const is_default = formData.get("is_default").toString() === "true";
-  const desi = formData.get("desi").toString();
+  const desi = parseFloat(formData.get("desi").toString() || "1");
   const sku = formData.get("sku").toString();
   const barkod = formData.get("barkod").toString();
   const variants = JSON.parse(formData.get("variants").toString());
@@ -282,7 +307,7 @@ export async function updateProductAction(prevState: any, formData: FormData) {
   const description = formData.get("description").toString();
   const is_active = formData.get("is_active").toString() === "true";
   const barkod = formData.get("barkod").toString();
-  const desi = parseFloat(formData.get("desi") as string);
+  const desi = parseFloat(formData.get("desi").toString());
   const salePrice = parseFloat(formData.get("salePrice").toString());
   const listPrice = parseFloat(formData.get("listPrice").toString());
   const costPrice = parseFloat(formData.get("costPrice").toString());
@@ -296,7 +321,7 @@ export async function updateProductAction(prevState: any, formData: FormData) {
         title: title,
         sub_title: sub_title,
         barkod: barkod,
-        desi: desi.toString(),
+        desi: desi,
         description: description,
         salePrice: salePrice,
         listPrice: listPrice,
@@ -454,29 +479,46 @@ export async function createBrand(prevState: any, formData: FormData) {
   }
 }
 
-export async function fetchProductsAction() {
+export async function deleteCategory(prevState: any, formData: FormData) {
+  const id = formData.get("id").toString();
   try {
-    const products = await prisma.product.findMany({
+    await prisma.category.delete({
+      where: { id: parseInt(id) },
       include: {
-        images: true,
-        category: true,
-        brand: true,
-        MarketplaceProductMapping: true,
-        variants: {
-          include: {
-            MarketplaceProductVariantMapping: true,
-          },
-        },
+        attributes: true,
+        MarketplaceCategoryMapping: true,
       },
     });
-    return { success: true, data: products };
-  } catch (error) {
-    console.error("Server Action: Ürünler çekilirken hata:", error);
+    revalidatePath("/dashboard/categories");
     return {
-      success: false,
-      message: "Ürünler alınamadı.",
-      error: error.message,
+      success: true,
+      message: "Kategori başarıyla silindi.",
     };
+  } catch (error) {
+    console.error("Server Action: Kategori silinirken hata oluştu");
+    console.log(error);
+  }
+}
+
+export async function editCategory(prevState: any, formData: FormData) {
+  const id = formData.get("id").toString();
+  const name = formData.get("name").toString();
+  try {
+    await prisma.category.update({
+      where: { id: parseInt(id) },
+      data: {
+        name: formData.get("name").toString(),
+        slug: slugify(formData.get("name").toString()),
+      },
+    });
+    revalidatePath("/dashboard/categories");
+    return {
+      success: true,
+      message: "Kategori başarıyla güncellendi.",
+    };
+  } catch (error) {
+    console.error("Server Action: Kategori güncellenirken hata oluştu");
+    console.log(error);
   }
 }
 
@@ -665,6 +707,28 @@ export async function deleteAttributeAction(
     return {
       error: true,
       message: "Özellik silinirken bir hata oluştu",
+    };
+  }
+}
+export async function deleteValueAction(prevState: any, formData: FormData) {
+  const attrId = parseInt(formData.get("attributeId").toString());
+  const valueId = parseInt(formData.get("valueId").toString());
+  try {
+    await prisma.attributeValue.delete({
+      where: { id: valueId, attributeId: attrId },
+    });
+    revalidatePath("dashboard/categories");
+    return {
+      success: true,
+      message: "Deger başarıyla silindi.",
+    };
+  } catch (error) {
+    console.error("Server Action: Deger silinirken hata oluştu");
+    console.log(error);
+
+    return {
+      error: true,
+      message: "Deger silinirken bir hata oluştu",
     };
   }
 }

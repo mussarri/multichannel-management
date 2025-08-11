@@ -28,9 +28,9 @@ export default function TrendyolIntegration({ data }: { data: any }) {
     storeName: data?.storeName || "",
     api_key: data?.apiKey || "",
     secret_key: data?.secretKey || "",
-    store_supplier_id: data?.storeSupplierId || "",
+    store_supplier_id: data?.supplierId || "",
   });
-
+  
   const submit = (e: any) => {
     e.preventDefault();
     const formData = new FormData();

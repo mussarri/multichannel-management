@@ -157,6 +157,10 @@ path {
   fill: inherit;
 }
 
+button:not(.hover-no):hover {
+  filter: brightness(110%);
+}
+
 button.active,
 a.active {
   background: color-mix(in oklab, var(--primary) 12%, transparent);
@@ -180,10 +184,6 @@ label {
 
 table a {
   @apply text-foreground text-[14px];
-}
-
-button:hover {
-  filter: brightness(110%);
 }
 
 div.fr-box * {
@@ -325,12 +325,24 @@ table th {
   width: max-content;
 }
 
-table.order tbody tr td{
-  @apply px-2 text-sm ;
+table.order tbody tr td {
+  @apply px-2 text-sm;
 }
 
- 
+table.order-card tbody tr td {
+  @apply text-center;
+}
 
+table.order-card tbody tr td:first-child {
+  @apply text-left;
+}
+
+table.order-details thead tr th:last-child {
+  @apply text-right;
+}
+table.order-details thead tr th {
+  @apply text-foreground font-semibold text-[13px];
+}
 
 .market li {
   display: flex;

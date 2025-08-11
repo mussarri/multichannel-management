@@ -29,7 +29,22 @@ import ProductsFilter from "./filter";
 import { useRouter } from "next/navigation";
 import SortButton from "@/app/components/sortButton";
 import { useSession } from "next-auth/react";
-import OrderActions from "@/app/components/orders/OrderAction";
+import OrderActions from "@/app/components/orders/OrderActionButtons";
+import StatusButtons from "@/lib/statusButtons";
+
+const OrderStatusTR = {
+  PENDING: "Bekliyor",
+  PICKING: "Hazırlanıyor",
+  INVOICED: "Fatura Kesildi",
+  SHIPPED: "Kargoya Verildi",
+  DELIVERED: "Teslim Edildi",
+  ATCOLLECTIONPOINT: "Toplama Noktasına Geldi",
+  CANCELLED: "İptal Edildi",
+  UNSUPLIED: "Tedarik Edilemedi",
+  UNPACKED: "Alınmadı",
+  UNDELIVERED: "Teslim Edilemedi",
+  RETURNED: "İade Edildi",
+};
 
 function filterOrders(orders: any[], filters: any): any[] {
   return orders.filter((order) => {
@@ -70,7 +85,7 @@ function filterOrders(orders: any[], filters: any): any[] {
       if (active !== isActive) return false;
     }
     if (status !== undefined) {
-      const orderStatus = order?.status;
+      const orderStatus = OrderStatusTR[order?.status];
 
       if (status !== orderStatus) return false;
     }
@@ -168,7 +183,10 @@ export default function OrderTable({ orders }: { orders: any[] }) {
     sortBy: "price",
     order: "desc",
   });
-  const [isItemsOpen, setIsItemsOpen] = useState(false);
+
+  const [isItemsOpen, setIsItemsOpen] = useState({
+    orderID: null,
+  });
 
   useEffect(() => {
     setFiltered(filterAndSortOrders(orders, filters, sortOptions));
@@ -219,6 +237,7 @@ export default function OrderTable({ orders }: { orders: any[] }) {
             <thead className="bg-inherit">
               <tr>
                 <th className="text-left p-2 border-b">Siparis No</th>
+                <th className="text-center p-2 border-b">Durum</th>
                 <th className="text-left p-2 border-b">
                   <SortButton
                     setSortOptions={setSortOptions}
@@ -235,7 +254,6 @@ export default function OrderTable({ orders }: { orders: any[] }) {
                     sortBy="marketplace"
                   />
                 </th>
-                <th className="text-left p-2 border-b">Durum</th>
                 <th className="text-left p-2 border-b">Toplam</th>
 
                 <th className="text-right p-2 border-b">
@@ -257,12 +275,26 @@ export default function OrderTable({ orders }: { orders: any[] }) {
                   );
                   return (
                     <>
-                      <tr key={order.id} className="border-b hover:bg-muted/40">
-                        <td>{order.orderNumber}</td>
+                      <tr
+                        key={order.id}
+                        className={
+                          "border-b hover:bg-secondary " +
+                          (isItemsOpen.orderID == order.id
+                            ? "bg-secondary"
+                            : "")
+                        }
+                      >
+                        <td>
+                          <Link href={`/dashboard/orders/${order.id}`}>
+                            {order.orderNumber}
+                          </Link>
+                        </td>
 
+                        <td className="text-center">
+                          <StatusButtons status={order.status} />
+                        </td>
                         <td>{order?.customer?.name}</td>
                         <td>{order?.marketplace?.name}</td>
-                        <td>{order?.status}</td>
                         <td>{order?.totalPrice + order?.currency}</td>
 
                         <td className="text-right">{created}</td>
@@ -270,20 +302,28 @@ export default function OrderTable({ orders }: { orders: any[] }) {
                           <div className="flex gap-0 items-center justify-end">
                             {" "}
                             <button
-                              onClick={() => setIsItemsOpen(!isItemsOpen)}
+                              onClick={() =>
+                                setIsItemsOpen((prev) => {
+                                  return {
+                                    ...prev,
+                                    orderID: prev.orderID ? null : order.id,
+                                  };
+                                })
+                              }
                             >
                               <EyeIcon size={14} />
                             </button>
-                            <OrderActions orderId={order.id} />
+                            <OrderActions order={order} />
                           </div>
                         </td>
                       </tr>
-                      {isItemsOpen && (
+                      {isItemsOpen.orderID == order.id && (
                         <tr>
-                          <td colSpan={7}>
+                          <td colSpan={7} className="py-2">
                             <table className="w-full">
                               <thead>
-                                <tr className="border-b hover:bg-muted/40">
+                                <tr className="border-b bg-secondary">
+                                  <th className="px-2"></th>
                                   <th className="px-2"></th>
                                   <th>Ürün Adı</th>
                                   <th>Fiyat</th>
@@ -291,12 +331,48 @@ export default function OrderTable({ orders }: { orders: any[] }) {
                                 </tr>
                               </thead>
                               <tbody>
-                                {order.orderItems.map((item) => (
+                                {order.orderItems.map((item, i) => (
                                   <tr
                                     key={item.id}
-                                    className="border-b hover:bg-muted/40"
+                                    className="border-b hover:bg-secondary "
                                   >
-                                    {item.orderId}
+                                    <td className="p-1">{i + 1}</td>
+                                    <td>
+                                      {" "}
+                                      {item.product.images.length > 0 && (
+                                        <div>
+                                          <Image
+                                            src={
+                                              process.env
+                                                .NEXT_PUBLIC_IMAGE_URL +
+                                              item?.product?.images[0].url
+                                            }
+                                            width={50}
+                                            height={50}
+                                            alt=""
+                                          />
+                                        </div>
+                                      )}
+                                    </td>
+                                    <td className="text-center">
+                                      <Link
+                                        href={
+                                          "/dashboard/products/" +
+                                          item?.product.id +
+                                          ""
+                                        }
+                                      >
+                                        {item?.product.name}
+                                      </Link>
+                                    </td>
+                                    <td className="text-center">
+                                      {" "}
+                                      {item?.product.salePrice + "₺"}
+                                    </td>
+                                    <td className="text-center">
+                                      {" "}
+                                      {item?.quantity}
+                                    </td>
                                   </tr>
                                 ))}
                               </tbody>
@@ -314,7 +390,7 @@ export default function OrderTable({ orders }: { orders: any[] }) {
                     colSpan={5}
                     className="text-center p-4 text-muted-foreground"
                   >
-                    Aramanıza uygun ürün bulunamadı.
+                    Aramanıza sipariş ürün bulunamadı.
                   </td>
                 </tr>
               )}

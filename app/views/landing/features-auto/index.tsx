@@ -7,6 +7,7 @@ import {
   ReceiptText,
   Users,
 } from "lucide-react";
+import Image from "next/image";
 
 const features = [
   {
@@ -14,30 +15,35 @@ const features = [
     title: "Tek panelden tüm siparişleri yönet",
     description:
       "Tüm pazaryerlerinden gelen siparişleri tek bir ekrandan takip edin, yönetin ve kargolayın.",
+    img: "/landing/orderactions2.png",
   },
   {
     icon: <Bell size={30} color="var(--primary)" />,
     title: "Gelişmiş loglama ve bildirim sistemi",
     description:
       "Tüm operasyon adımlarını takip edin, hata ve gelişmelerden anlık haberdar olun.",
+    img: "/landing/logs.png",
   },
   {
     icon: <Users size={30} color="var(--primary)" />,
     title: "Çoklu kullanıcı, çoklu firma desteği",
     description:
       "Birden fazla firma yönetin, kullanıcı rollerini belirleyerek yetkilendirin.",
+    img: "",
   },
   {
     icon: <Combine size={30} color="var(--primary)" />,
     title: "Gerçek zamanlı stok ve fiyat senkronizasyonu",
     description:
       "Stok ve fiyat bilgileri tüm satış kanallarınızda anlık olarak güncellenir.",
+    img: "",
   },
   {
     icon: <ReceiptText size={30} color="var(--primary)" />,
     title: "Muhasebe entegrasyonu ile faturasız işlem kalmasın",
     description:
       "Siparişlerden otomatik fatura oluşturun, muhasebe sisteminize anında yansıtın.",
+    img: "",
   },
 
   {
@@ -45,23 +51,41 @@ const features = [
     title: "Platformlar Arası Ürün Senkronizasyonu",
     description:
       " Her platformda güncel ve tutarlı ürün bilgileriyle satış yaparsınız.",
+    img: "",
   },
 ];
 
 function FeatureCard({
   icon,
   title,
+  img,
   description,
 }: {
   icon: any;
   title: string;
   description: string;
+  img: string;
 }) {
   return (
     <div className="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition z-[1]">
       <div className="text-3xl text-indigo-600 mb-4">{icon}</div>
-      <h3 className="text-lg font-semibold mb-2">{title}</h3>
-      <p className="text-gray-600 text-sm">{description}</p>
+      <div
+        className="relative pb-5 border rounded p-2 shadow-md bg-[#fefefe]"
+        style={{}}
+      >
+        <Image
+          src={img || "/landing/orderactions.png"}
+          alt=""
+          width={500}
+          height={500}
+          className="img"
+          objectFit="cover"
+        />
+      </div>
+      <div className=" mt-3">
+        <h3 className="text-lg font-semibold mb-2">{title}</h3>
+        <p className="text-gray-600 text-sm">{description}</p>
+      </div>
     </div>
   );
 }
@@ -117,8 +141,8 @@ export default function Highlights() {
               Satışa Uyumlu, Geleceğe Hazır{" "}
               <span className="text-primary">Entegrasyon Çözümü</span>
             </h1>
-            <div className="grid gap-6 mt-3 grid-cols-2 features">
-              {features.slice(0, 2).map((feature, index) => (
+            <div className="grid gap-6 mt-3 grid-cols-3">
+              {features.slice(0, 3).map((feature, index) => (
                 <FeatureCard key={index} {...feature} />
               ))}
             </div>

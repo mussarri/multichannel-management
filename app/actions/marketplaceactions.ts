@@ -373,17 +373,12 @@ export async function saveAttributeValueMappingAction(prev, formData) {
     });
     index++;
   }
-  console.log(formData);
-
-  console.log(mappings);
-  console.log(localAttributeValueId);
 
   try {
     const maps = await saveAttributeValueMappings(
       localAttributeValueId,
       mappings
     );
-    console.log(maps);
 
     revalidatePath("/dashboard/categories/");
     return {

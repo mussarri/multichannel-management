@@ -242,7 +242,7 @@ export function ProductTable({ products }: { products: any[] }) {
                     sortBy="stock"
                   />
                 </th>
-                <th className="text-right p-2 border-b">Platform Durumu</th>
+
                 <th className="text-right p-2 border-b">Aktiflik</th>
                 <th className="text-right p-2 border-b">
                   <SortButton
@@ -266,7 +266,7 @@ export function ProductTable({ products }: { products: any[] }) {
                       <td className="p-2"></td>
                       <td className="p-2">
                         <Link href={`/dashboard/products/${product.id}`}>
-                          {product.title}
+                          {product.name}
                         </Link>
                       </td>
                       <td className="p-2">{product.brand.name}</td>
@@ -280,7 +280,7 @@ export function ProductTable({ products }: { products: any[] }) {
                           : "Yok"}
                       </td>
                       <td className="p-2">{product.stock}</td>
-                      <td className="p-2"></td>
+
                       <td className="p-2">
                         <div className="flex justify-center items-center">
                           {product.is_active ? (

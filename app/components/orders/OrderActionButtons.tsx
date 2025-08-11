@@ -5,7 +5,7 @@ import { Menu, MenuItem, IconButton } from "@mui/material";
 import { MoreVerticalIcon } from "lucide-react";
 import { useState } from "react";
 
-export default function OrderActions({ orderId }: { orderId: string }) {
+export default function OrderActions({ order }: { order }) {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
 
@@ -20,7 +20,7 @@ export default function OrderActions({ orderId }: { orderId: string }) {
     handleClose();
 
     // Backend'e istek at
-    await fetch(`/api/orders/${orderId}/${action}`, {
+    await fetch(`/api/orders/${order.id}/${action}`, {
       method: "POST",
     });
   };

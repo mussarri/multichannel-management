@@ -36,7 +36,7 @@ const New = ({
     }
     if (message?.success) {
       toast.success(message?.message);
-      redirect("/products/");
+      redirect("/dashboard/products/");
     }
   }, [message?.error, message?.message, message?.success, message?.id]);
 
@@ -181,6 +181,8 @@ const New = ({
 
   return (
     <form
+      id="product_add"
+      action={""}
       onSubmit={(e) => {
         e.preventDefault();
         const formData = new FormData();
@@ -252,7 +254,7 @@ const New = ({
           </a>
         )}
         {index == forms.length - 1 && (
-          <Button type="submit" disabled={isPending}>
+          <Button type="submit" form="product_add" disabled={isPending}>
             Tamamla
           </Button>
         )}

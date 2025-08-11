@@ -13,7 +13,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { createAttributeAction } from "@/app/action";
 import { toast } from "react-toastify";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import { PlusCircleIcon } from "lucide-react";
 import {
   Autocomplete,
@@ -32,6 +32,7 @@ export function CreateAttribute({ attributes, category, open, setOpen }) {
   );
 
   const [form, setForm] = useState([]);
+  const router = useRouter();
 
   useEffect(() => {
     if (state?.error) {
@@ -40,16 +41,12 @@ export function CreateAttribute({ attributes, category, open, setOpen }) {
     }
     if (state?.success) {
       toast.success("Secenek kategoriye başarıyla eklendi.");
+      router.refresh();
       setOpen(false);
     }
   }, [state]);
 
   const { id } = useParams();
-
-  const filter = createFilterOptions();
-  const filterSkills = createFilterOptions();
-
-  console.log(form);
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
@@ -97,6 +94,9 @@ export function CreateAttribute({ attributes, category, open, setOpen }) {
             onKeyDown={function (e) {
               if (e.code == "Backspace") {
                 setForm((prev) => prev.slice(0, -1));
+              }
+              if (e.code == "Enter") {
+                return;
               }
             }}
             onChange={(item) => {

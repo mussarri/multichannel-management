@@ -4,22 +4,17 @@
 
 import { useState, useEffect } from "react";
 
-import Link from "next/link";
-import { Pencil, Trash, Trash2 } from "lucide-react";
+import DeleteCategory from "@/app/components/categories/DeleteCategory";
 import MakeCategoryMap from "@/app/components/categories/CategoryMap";
 import { check } from "@/app/views/CategoryList";
-
-// server actions
-// Not: server actionları çağırmak için form submit veya fetch wrapper gerekebilir, burada örnek fetch ile
+import EditCategory from "@/app/components/categories/EditCategory";
 
 export default function CategoryAttributeStepper({
   category,
   marketplaces,
-  attributes,
 }: {
   category: any;
   marketplaces: any;
-  attributes: any;
 }) {
   const [open, setOpen] = useState({
     category: null,
@@ -36,81 +31,84 @@ export default function CategoryAttributeStepper({
   return (
     <div className="overflow-x-auto box rounded-lg">
       <div className="flex justify-between items-center p-4 border-b">
-        <div>
-          <h2 className="font-semibold text-md">
-            {category.name + " Kategorisi"}
-          </h2>
-          {category?.parent?.name}
-          {category?.children?.length > 0 &&
-            category.children.map((i) => <span key={i.id}>{i.name}</span>)}
-        </div>
-        <div className="text-right">
-          <button className="bg-error rounded px-3 p-1 text-white text-sm flex gap-2 items-center">
-            <Trash size={15} /> Kategoriyi Sil
-          </button>
-        </div>
-      </div>
-
-      <div className="p-4">
-        {marketplaces.length > 0 ? (
-          <table className="attribute-table w-full shadow-sm text-sm mt-2">
-            <thead className="bg-inherit">
-              {marketplaces.length > 0 && (
-                <tr className="text-sm">
-                  <th className="text-left p-2">Pazaryeri Adı</th>{" "}
-                  <th className="text-left p-2">Kategori Adi</th>{" "}
-                  <th className="text-left p-2">İşlemler</th>{" "}
-                </tr>
-              )}
-            </thead>
-            <tbody>
-              {marketplaces.length > 0 &&
-                marketplaces.map((i) => {
-                  const mappingThisCategory =
-                    category.MarketplaceCategoryMapping.find(
-                      (m) => m.marketplaceId === parseInt(i.marketplaceId)
-                    );
-
-                  return (
-                    <tr
-                      key={i.id}
-                      className="border-4 rounded border-background bg-card hover:bg-muted/40"
-                    >
-                      <td className="p-2 capitalize">{i.marketPlace.name}</td>
-                      <td className="p-2">
-                        <div className="flex gap-2 items-center justify-start">
-                          {" "}
-                          {check(!!mappingThisCategory)}
-                          {mappingThisCategory
-                            ? mappingThisCategory.remoteCategoryName
-                            : ""}
-                        </div>
-                      </td>
-                      <td>
-                        <MakeCategoryMap
-                          category={category}
-                          marketplaces={marketplaces}
-                          open={
-                            open.category === category.id &&
-                            open.marketPlace === i.id
-                          }
-                          setOpen={(value: boolean) =>
-                            handleOpen(
-                              value ? category.id : null,
-                              value ? i.id : null
-                            )
-                          }
-                        />
-                      </td>
-                    </tr>
-                  );
-                })}
-            </tbody>
-          </table>
-        ) : (
-          <div className=""></div>
+        {category && (
+          <div>
+            <h2 className="font-semibold text-md">
+              {category?.name + " Kategorisi"}
+            </h2>
+            {category?.parent?.name}
+            {category?.children?.length > 0 &&
+              category.children.map((i) => <span key={i.id}>{i.name}</span>)}
+          </div>
         )}
+        <div className="flex gap-2">
+          <EditCategory category={category} />
+          <DeleteCategory category={category} />
+        </div>
       </div>
+
+      {category && marketplaces && (
+        <div className="p-4">
+          {marketplaces?.length > 0 ? (
+            <table className="attribute-table w-full shadow-sm text-sm mt-2">
+              <thead className="bg-inherit">
+                {marketplaces.length > 0 && (
+                  <tr className="text-sm">
+                    <th className="text-left p-2">Pazaryeri Adı</th>{" "}
+                    <th className="text-left p-2">Kategori Adi</th>{" "}
+                    <th className="text-left p-2">İşlemler</th>{" "}
+                  </tr>
+                )}
+              </thead>
+              <tbody>
+                {marketplaces.length > 0 &&
+                  marketplaces.map((i) => {
+                    const mappingThisCategory =
+                      category.MarketplaceCategoryMapping.find(
+                        (m) => m.marketplaceId === parseInt(i.marketplaceId)
+                      );
+
+                    return (
+                      <tr
+                        key={i.id}
+                        className="border-4 rounded border-background bg-card hover:bg-muted/40"
+                      >
+                        <td className="p-2 capitalize">{i.marketPlace.name}</td>
+                        <td className="p-2">
+                          <div className="flex gap-2 items-center justify-start">
+                            {" "}
+                            {check(!!mappingThisCategory)}
+                            {mappingThisCategory
+                              ? mappingThisCategory.remoteCategoryName
+                              : ""}
+                          </div>
+                        </td>
+                        <td>
+                          <MakeCategoryMap
+                            category={category}
+                            marketplaces={marketplaces}
+                            open={
+                              open.category === category.id &&
+                              open.marketPlace === i.id
+                            }
+                            setOpen={(value: boolean) =>
+                              handleOpen(
+                                value ? category.id : null,
+                                value ? i.id : null
+                              )
+                            }
+                          />
+                        </td>
+                      </tr>
+                    );
+                  })}
+              </tbody>
+            </table>
+          ) : (
+            <div className=""></div>
+          )}
+        </div>
+      )}
     </div>
   );
 }

@@ -1,11 +1,13 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
-import React, { useState } from "react";
+import React, { useActionState, useEffect, useState } from "react";
 import SelectInput from "@/app/components/settings/select-input";
 import TextInput from "@/app/components/settings/text-input";
 import { Button } from "@/components/ui/button";
 import { RefreshCcwIcon } from "lucide-react";
 import { Category, MarketplaceAccount } from "@prisma/client";
+import { createCategory } from "@/app/action";
+import { toast } from "react-toastify";
 
 const Form = ({
   categories,
@@ -19,8 +21,26 @@ const Form = ({
     category: "",
   });
 
+  const [state, formAction, isPending] = useActionState(createCategory, null);
+
+  useEffect(() => {
+    if (state?.success) {
+      toast.success(state?.meessage);
+    }
+
+    if (state?.error) {
+      toast.error(state?.meessage);
+    }
+  }, [state]);
+
   return (
-    <form action="">
+    <form
+      onSubmit={(e) => {
+        const target = e.currentTarget;
+        const formData = new FormData(target);
+        formAction(formData);
+      }}
+    >
       <div className="mt-3">
         <div className="box p-4 flex flex-col md:flex-row gap-3 items-center">
           <div className="flex-1">
@@ -61,7 +81,9 @@ const Form = ({
             />
           </div>
           <div className="text-right">
-            <Button>Kaydet</Button>
+            <Button disabled={isPending} type="submit">
+              Kaydet
+            </Button>
           </div>
         </div>
       </div>

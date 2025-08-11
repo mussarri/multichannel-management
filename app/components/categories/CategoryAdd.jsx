@@ -9,7 +9,12 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import React, { useActionState, useEffect, useState } from "react";
+import React, {
+  startTransition,
+  useActionState,
+  useEffect,
+  useState,
+} from "react";
 import { toast } from "react-toastify";
 import SelectInput from "@/app/components/settings/select-input";
 
@@ -42,11 +47,23 @@ const CategoryAdd = ({ open, setOpen, categories }) => {
 
         {state?.error && <div>{state?.meessage}</div>}
 
-        <form action={formAction} className="space-y-4 mt-2">
+        <form
+          onSubmit={(e) => {
+            console.log("submit");
+            e.preventDefault(); // parent submit engellenir
+            e.stopPropagation();
+            const target = e.currentTarget;
+            const formData = new FormData(target);
+            startTransition(() => {
+              formAction(formData);
+            });
+          }}
+          className="space-y-4 mt-2"
+        >
           <div>
             <SelectInput
               options={["Yok", ...categories]}
-              name={"parent"}
+              name={"parent_id"}
               label={"Üst Kategori"}
               required
               onChange={(v) => setParent(v)}
@@ -63,11 +80,12 @@ const CategoryAdd = ({ open, setOpen, categories }) => {
               label="Kategori adı"
               vertical={true}
               required
+              onChange={() => {}}
             />
           </div>
 
           <div className="flex justify-end">
-            <Button type="submit" disabled={isPending}>
+            <Button type="submit" className="ml-2" disabled={isPending}>
               Kaydet
             </Button>
           </div>

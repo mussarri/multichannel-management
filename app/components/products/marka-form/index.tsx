@@ -1,6 +1,6 @@
 "use client";
 
-import { useActionState, useEffect, useState } from "react";
+import { startTransition, useActionState, useEffect, useState } from "react";
 import {
   Dialog,
   DialogContent,
@@ -46,12 +46,23 @@ export function MarkaForm() {
 
         {state?.error && <div>{state?.meessage}</div>}
 
-        <form action={formAction} className="space-y-4 mt-2">
+        <form
+          onSubmit={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            const formData = new FormData(e.currentTarget);
+            startTransition(() => {
+              formAction(formData);
+            });
+          }}
+          className="space-y-4 mt-2"
+          id="brand"
+        >
           <Input placeholder="Marka adı" name="name" required />
           <input type="hidden" name="id" value={id} />
 
           <div className="flex justify-end">
-            <Button type="submit" disabled={isPending}>
+            <Button form="brand" type="submit" disabled={isPending}>
               Kaydet
             </Button>
           </div>

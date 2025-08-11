@@ -85,7 +85,7 @@ model Product {
   listPrice                 Float?
   stock                     Int                         @default(0)
   is_active                 Boolean                     @default(true)
-  desi                      String                      @default("1")
+  desi                      Float                       @default(1)
   brand                     Brand                       @relation(fields: [brandId], references: [id], onDelete: NoAction)
   category                  Category                    @relation(fields: [categoryId], references: [id], onDelete: NoAction)
   variants                  ProductVariant[]
@@ -94,6 +94,8 @@ model Product {
   createdAt                 DateTime                    @default(now())
   updatedAt                 DateTime                    @updatedAt
   MarketplaceProductMapping MarketplaceProductMapping[]
+  OrderItem                 OrderItem[]
+  WarehouseStock            WarehouseStock[]
 }
 
 model ProductVariant {
@@ -119,6 +121,7 @@ model ProductVariant {
   updatedAt                        DateTime                           @updatedAt
   attributeValues                  AttributeValue[]
   MarketplaceProductVariantMapping MarketplaceProductVariantMapping[]
+  OrderItem                        OrderItem[]
 
   @@unique([productId, sku])
 }
@@ -150,7 +153,7 @@ model MarketplaceCategoryMapping {
   remoteCategoryId   String // pazaryerindeki kategori ID’si
   remoteCategoryName String
   marketplace        Marketplace @relation(fields: [marketplaceId], references: [id])
-  category           Category    @relation(fields: [localCategoryId], references: [id])
+  category           Category    @relation(fields: [localCategoryId], references: [id], onDelete: Cascade)
 
   @@unique([marketplaceId, localCategoryId])
 }
@@ -286,8 +289,9 @@ model SyncLog {
 //order
 
 model Order {
-  id          String @id @default(cuid())
+  id          String  @id @default(cuid())
   orderNumber String // Pazaryerine ait sipariş numarası
+  note        String?
 
   // enum: TRENDYOL, HEPSIBURADA, SHOPIFY, etc.
   //accountId    String // Hangi mağaza/hesap bu siparişi aldı
@@ -312,8 +316,9 @@ model Order {
   marketplace   Marketplace @relation(fields: [marketplaceId], references: [id])
   marketplaceId Int
 
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  Invoice   Invoice[]
 
   @@unique([marketplaceId, orderNumber])
 }
@@ -323,10 +328,16 @@ model OrderItem {
   orderId String
   order   Order  @relation(fields: [orderId], references: [id])
 
-  productId String // Sistemimizdeki ürünle eşleşirse
-  quantity  Int
-  price     Float?
-  currency  String @default("TRY")
+  productId String? // Sistemimizdeki ürünle eşleşirse
+  product   Product? @relation(fields: [productId], references: [id])
+
+  variantId String? // Ürünün ürünüyle eşleşirse
+  variant   ProductVariant? @relation(fields: [variantId], references: [id])
+
+  name     String
+  quantity Int
+  price    Float?
+  currency String @default("TRY")
 }
 
 model DeliveryAddress {
@@ -346,17 +357,115 @@ model DeliveryAddress {
 model Customer {
   id    String  @id @default(cuid())
   name  String
-  email String?
+  email String? @unique
   phone String?
   Order Order[]
 }
 
+model Invoice {
+  id             Int             @id @default(autoincrement())
+  type           InvoiceType // MANUAL, E_FATURA, E_ARSIV
+  invoiceNumber  String // Manuelde elle, e-Fatura'da sistem üretir
+  issueDate      DateTime        @default(now()) // Fatura tarihi
+  invoiceProfile InvoiceProfile? // e-Fatura'da zorunlu (TEMELFATURA vb.)
+
+  orderId String
+  order   Order  @relation(fields: [orderId], references: [id], onDelete: Cascade)
+
+  // SATIŞ TARAFI (Seller Info)
+  sellerName      String? // GİB zorunlu: Firma adı
+  sellerVkn       String? // 10 haneli VKN
+  sellerTckn      String? // 11 haneli TCKN
+  sellerTaxOffice String? // Vergi dairesi
+  sellerAddress   String? // Adres
+
+  // MÜŞTERİ TARAFI (Buyer Info)
+  buyerName      String // Firma/kişi adı
+  buyerVkn       String? // 10 haneli VKN
+  buyerTckn      String? // 11 haneli TCKN
+  buyerTaxOffice String? // Vergi dairesi
+  buyerAddress   String? // Adres
+
+  // TUTARLAR
+  currency      String   @default("TRY")
+  subtotal      Decimal  @db.Decimal(10, 2) // Ara toplam
+  taxTotal      Decimal  @db.Decimal(10, 2) // KDV toplam
+  discountTotal Decimal? @db.Decimal(10, 2)
+  totalAmount   Decimal  @db.Decimal(10, 2) // Genel toplam
+
+  // DURUM & DOSYALAR
+  status InvoiceStatus @default(PENDING) // PENDING, SENT, CANCELLED
+  xmlUrl String? // e-Fatura XML linki
+  pdfUrl String? // PDF linki
+
+  // LOG
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // İlişkiler
+  items InvoiceItem[]
+}
+
+model InvoiceItem {
+  id        Int     @id @default(autoincrement())
+  invoiceId Int
+  invoice   Invoice @relation(fields: [invoiceId], references: [id], onDelete: Cascade)
+
+  productCode String? // SKU veya GTIP kodu
+  description String
+  quantity    Decimal  @db.Decimal(10, 2)
+  unitPrice   Decimal  @db.Decimal(10, 2)
+  taxRate     Decimal  @db.Decimal(5, 2) // KDV oranı %
+  discount    Decimal? @db.Decimal(10, 2)
+  total       Decimal  @db.Decimal(10, 2) // Vergi dahil kalem toplamı
+}
+
+model Warehouse {
+  id      String           @id @default(cuid())
+  name    String
+  address String?
+  stocks  WarehouseStock[]
+}
+
+model WarehouseStock {
+  id          Int    @id @default(autoincrement())
+  warehouseId String
+  productId   String
+  quantity    Int
+
+  warehouse Warehouse @relation(fields: [warehouseId], references: [id])
+  product   Product   @relation(fields: [productId], references: [id])
+}
+
+enum InvoiceType {
+  MANUAL
+  E_FATURA
+  E_ARSIV
+}
+
+enum InvoiceStatus {
+  PENDING
+  SENT
+  CANCELLED
+}
+
+enum InvoiceProfile {
+  TEMELFATURA
+  TICARIFATURA
+}
+
 enum OrderStatus {
   PENDING
+  PICKING
+  INVOICED
   SHIPPED
   DELIVERED
   CANCELLED
+  UNSUPLIED
+  UNDELIVERED
   RETURNED
+  ATCOLLECTIONPOINT
+  UNPACKED
 }
 
 enum Role {

@@ -5,6 +5,7 @@ import React, { Suspense } from "react";
 import prisma from "@/lib/prisma";
 import OrdersTable from "@/app/views/orders/orders-table";
 import Loading from "@/app/components/general/Loading";
+import { OrderStatus, Status } from "@prisma/client";
 
 const RenderOrders = async () => {
   const orders = await prisma.order.findMany({
@@ -12,7 +13,16 @@ const RenderOrders = async () => {
       customer: true,
       marketplace: true,
       address: true,
-      orderItems: true,
+
+      orderItems: {
+        include: {
+          product: {
+            include: {
+              images: true,
+            },
+          },
+        },
+      },
     },
   });
 

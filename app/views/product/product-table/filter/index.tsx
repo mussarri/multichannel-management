@@ -14,6 +14,8 @@ export default function ProductFilters({
     search: "",
     active: undefined,
     brand: "",
+    sku: "",
+    barkod: "",
     hasVariant: undefined, // 'yes', 'no', 'all'
     minPrice: "",
     maxPrice: "",
@@ -70,6 +72,28 @@ export default function ProductFilters({
           handleChange();
         }}
         placeholder="Marka adi ile ara"
+        className="border focus:border-2 focus:border-gray-100"
+      />
+      <input
+        type="text"
+        name="sku"
+        value={filters.sku}
+        onChange={(e) => {
+          handleInput(e);
+          handleChange();
+        }}
+        placeholder="SKU ile ara"
+        className="border focus:border-2 focus:border-gray-100"
+      />
+      <input
+        type="text"
+        name="barkod"
+        value={filters.barkod}
+        onChange={(e) => {
+          handleInput(e);
+          handleChange();
+        }}
+        placeholder="Barkod ile ara"
         className="border focus:border-2 focus:border-gray-100"
       />
 

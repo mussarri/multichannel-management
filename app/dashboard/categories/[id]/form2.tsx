@@ -13,6 +13,7 @@ import AttributeMap from "@/app/components/attribute/AttributeMap";
 import { CreateAttribute } from "@/app/components/attribute/CreateAttribute";
 import CreateValue from "@/app/components/attribute/CreateValue";
 import DeleteAttribute from "@/app/components/attribute/DeleteAttribute";
+import DeleteValue from "@/app/components/attribute/DeleteValue";
 
 // server actions
 // Not: server actionları çağırmak için form submit veya fetch wrapper gerekebilir, burada örnek fetch ile
@@ -166,7 +167,7 @@ export default function CategoryAttributeStepper({
                                 value={value}
                                 marketplaces={marketplaces}
                               />
-                              <DeleteAttribute id={attr1.id} />
+                              <DeleteValue attrId={attr1.id} value={value} />
                             </div>
                           </td>
                         </tr>

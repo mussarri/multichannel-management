@@ -154,7 +154,7 @@ const index = ({
                     value={category.id}
                   />
                   <TextInput
-                    name="name"
+                    name="attributeName"
                     label="Ürün Seçeneği"
                     error={false}
                     type="text"

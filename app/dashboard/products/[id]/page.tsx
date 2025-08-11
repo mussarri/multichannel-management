@@ -46,6 +46,12 @@ async function ProductDetailsSection({ id }: { id: string }) {
       sub_title: true,
       images: true,
       name: true,
+      MarketplaceProductMapping: true,
+      variants: {
+        include: {
+          MarketplaceProductVariantMapping: true,
+        },
+      },
       // ProductCard ihtiyaç duyuyorsa daha fazlasını ekle veya include kullan
     },
   });
@@ -62,7 +68,11 @@ async function ProductDetailsSection({ id }: { id: string }) {
 
   return (
     <>
-      <ProductStatus id={product.id} isActive={product.is_active} />
+      <ProductStatus
+        product={product}
+        isActive={product.is_active}
+        marketplaces={marketplaces}
+      />
       <ProductCard data={product} marketplaces={marketplaces} />
       <ProductDescription id={product.id} description={product.description} />
       <ProductImages id={product.id} images={product.images} />
