@@ -153,9 +153,9 @@ input[type="checkbox"] {
   height: 13px;
 }
 
-path {
+/* path {
   fill: inherit;
-}
+} */
 
 button:not(.hover-no):hover {
   filter: brightness(110%);

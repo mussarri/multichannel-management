@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
@@ -55,15 +56,15 @@ const menuItems = [
       { label: "Depo Listesi", href: "/dashboard/warehouses" },
     ],
   },
-  {
-    label: "Müşteriler",
-    icon: <Users size={18} />,
-    href: "/dashboard/customers",
-    submenu: [
-      { label: "Müşteri Listesi", href: "/dashboard/customers" },
-      { label: "Gruplar", href: "/dashboard/customers/groups" },
-    ],
-  },
+  // {
+  //   label: "Müşteriler",
+  //   icon: <Users size={18} />,
+  //   href: "/dashboard/customers",
+  //   submenu: [
+  //     { label: "Müşteri Listesi", href: "/dashboard/customers" },
+  //     { label: "Gruplar", href: "/dashboard/customers/groups" },
+  //   ],
+  // },
   {
     label: "Entegrasyonlar",
     icon: <Blocks size={18} />,
@@ -77,17 +78,17 @@ const menuItems = [
       {
         label: "E-Ticaret",
         icon: <Globe2Icon size={15} />,
-        href: "/dashboard/integrations/ecommerce",
+        href: "/dashboard/integrations/",
       },
       {
         label: "Muhasebe",
         icon: <Calculator size={15} />,
-        href: "/dashboard/integrations/accounting",
+        href: "/dashboard/integrations/",
       },
       {
         label: "Kargo",
         icon: <Truck size={15} />,
-        href: "/dashboard/integrations/shipping",
+        href: "/dashboard/integrations/",
       },
     ],
   },

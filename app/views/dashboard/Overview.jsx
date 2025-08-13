@@ -20,10 +20,16 @@ import {
   Tooltip,
   BarChart,
   Bar,
+  CartesianChartProps,
 } from "recharts";
 import { useState } from "react";
 import { OrderStatus } from "@prisma/client";
 import Link from "next/link";
+import { PieChart } from "@mui/x-charts/PieChart";
+import { dataset, valueFormatter } from "./data";
+import ReactApexChart from "react-apexcharts";
+console.log(dataset);
+
 const salesData = [
   { date: "07-01", sales: 4300 },
   { date: "07-02", sales: 5200 },
@@ -47,12 +53,12 @@ const orderData = [
 function IntegrationStatusCard({ integration }) {
   const { platform, status, lastSyncAt, lastErrorMessage } = integration;
 
-  const formatTime = (iso: string | null) => {
+  const formatTime = (is) => {
     if (!iso) return "Hiç senkronize edilmedi";
     const dt = new Date(iso);
     return dt.toLocaleString("tr-TR", { hour12: false });
   };
-  const statusColors: { [key: string]: string } = {
+  const statusColors = {
     ok: "text-green-500",
     error: "text-red-500",
     disconnected: "text-gray-500",
@@ -99,9 +105,19 @@ function IntegrationStatusCard({ integration }) {
   );
 }
 
+const chartSetting = {
+  yAxis: [
+    {
+      label: "rainfall (mm)",
+      width: 60,
+    },
+  ],
+  height: 300,
+};
+
 export default function DashboardPage({ orders }) {
-  const [range, setRange] = useState<{ from: Date; to: Date }>();
-  const handleDateChange = (range: { from: Date; to: Date }) => {
+  const [range, setRange] = useState();
+  const handleDateChange = (range) => {
     // API çağrısı burada yapılır
     setRange(range);
   };
@@ -127,7 +143,7 @@ export default function DashboardPage({ orders }) {
       <div className="grid gap-2">
         <NotificationCard
           type="error"
-          message="Shopify ile bağlantı kesildi. Lütfen API anahtarınızı kontrol edin."
+          message="Trendyol ile bağlantı kesildi. Lütfen API anahtarınızı kontrol edin."
         />
         <Link href={"/dashboard/orders"}>
           <NotificationCard
@@ -144,7 +160,7 @@ export default function DashboardPage({ orders }) {
           icon={<Package />}
         />
         <StatCard
-          title="Bekleyen Sipariş"
+          title="Kargolanmayi Bekleyen"
           value={pendingOrders}
           icon={<Clock />}
         />
@@ -152,70 +168,36 @@ export default function DashboardPage({ orders }) {
         <StatCard title="Iade Edilen" value={iadeEdilen} icon={<FileText />} />
         <StatCard
           title="İade Oranı"
-          value={(iadeEdilen / orders.length) * 100 + "%"}
+          value={((iadeEdilen / orders.length) * 100 || 0) + "%"}
           icon={<RotateCcw />}
         />
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-        <Card>
+      <div className="flex gap-4">
+        <div className="box p-4 col-span-2 flex-1">
+          <h2 className="font-semibold mb-2">Satış Grafiği</h2>
+          <ApexChart />
+        </div>
+
+        <div className="box h-fit">
           <CardContent className="p-4">
-            <h2 className="font-semibold mb-2">Satışlar (₺)</h2>
-            <ResponsiveContainer width="100%" height={200}>
-              <LineChart data={salesData}>
-                <XAxis dataKey="date" />
-                <YAxis />
-                <Tooltip />
-                <Line type="monotone" dataKey="sales" stroke="#222222" />
-              </LineChart>
-            </ResponsiveContainer>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent className="p-4">
-            <h2 className="font-semibold mb-2">Sipariş Adedi</h2>
-            <ResponsiveContainer width="100%" height={200}>
-              <BarChart data={orderData}>
-                <XAxis dataKey="date" />
-                <YAxis />
-                <Tooltip />
-                <Bar dataKey="orders" fill="var(--primary)" />
-              </BarChart>
-            </ResponsiveContainer>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent className="p-4">
-            <h2 className="font-semibold">Entegre Edilmiş Pazaryerleri</h2>
-            <div className="grid gap-4 md:grid-cols-1">
-              {[
+            <h2 className="font-semibold mb-2">Pazaryeri Dagilimi (%)</h2>
+            <PieChart
+              colors={["var(--chart-1)", "var(--chart-2)", "var(--chart-3)"]} // Use palette
+              series={[
                 {
-                  id: 123,
-                  platform: "trendyol",
-                  status: "ok",
-                  lastSyncAt: "22.11.2025",
-                  lastErrorMessage: "key is incorrect",
+                  data: [
+                    { id: 0, value: 25, label: "Trendyol" },
+                    { id: 1, value: 35, label: "Hepsiburada" },
+                    { id: 2, value: 40, label: "GittiGidiyor" },
+                  ],
                 },
-                {
-                  id: 12313,
-                  platform: "amazon",
-                  status: "ok",
-                  lastSyncAt: "22.11.2025",
-                  lastErrorMessage: "key is incorrect",
-                },
-                {
-                  id: 12313,
-                  platform: "gittigidiyor",
-                  status: "ok",
-                  lastSyncAt: "22.11.2025",
-                  lastErrorMessage: "key is incorrect",
-                },
-              ].map((i) => (
-                <IntegrationStatusCard key={i.id} integration={i} />
-              ))}
-            </div>
+              ]}
+              width={200}
+              height={200}
+            />
           </CardContent>
-        </Card>
+        </div>
       </div>
 
       {/* Quick Actions */}
@@ -231,15 +213,7 @@ export default function DashboardPage({ orders }) {
   );
 }
 
-function StatCard({
-  title,
-  value,
-  icon,
-}: {
-  title: string;
-  value: string;
-  icon: any;
-}) {
+function StatCard({ title, value, icon }) {
   return (
     <div className="flex gap-4 p-4 box items-center">
       <div className="text-blue-600 bg-blue-50 p-2 rounded-full">{icon}</div>
@@ -251,19 +225,114 @@ function StatCard({
   );
 }
 
-function NotificationCard({
-  type,
-  message,
-}: {
-  type: string;
-  message: string;
-}) {
+function NotificationCard({ type, message }) {
   const color = type === "error" ? "text-red-600" : "text-yellow-600";
   const Icon = type === "error" ? AlertTriangle : RefreshCw;
   return (
     <div className={`flex items-center gap-2 p-3 border rounded-md ${color}`}>
       <Icon className="w-4 h-4" />
       <span className="text-sm">{message}</span>
+    </div>
+  );
+}
+
+function ApexChart() {
+  const [state, setState] = useState({
+    series: [
+      {
+        name: "Inflation",
+        data: [24, 31, 40, 61, 40, 36, 32, 23, 14, 9, 15, 20],
+      },
+    ],
+    options: {
+      chart: {
+        height: 350,
+        type: "bar",
+      },
+      plotOptions: {
+        bar: {
+          borderRadius: 10,
+          dataLabels: {
+            position: "top", // top, center, bottom
+          },
+        },
+      },
+      dataLabels: {
+        enabled: true,
+
+        offsetY: -20,
+        style: {
+          fontSize: "12px",
+          colors: ["#304758"],
+        },
+      },
+
+      xaxis: {
+        categories: [
+          "Jan",
+          "Feb",
+          "Mar",
+          "Apr",
+          "May",
+          "Jun",
+          "Jul",
+          "Aug",
+          "Sep",
+          "Oct",
+          "Nov",
+          "Dec",
+        ],
+        position: "bottom",
+        axisBorder: {
+          show: false,
+        },
+        axisTicks: {
+          show: false,
+        },
+        crosshairs: {
+          fill: {
+            type: "gradient",
+            gradient: {
+              colorFrom: "#D8E3F0",
+              colorTo: "#BED1E6",
+              stops: [0, 100],
+              opacityFrom: 0.4,
+              opacityTo: 0.5,
+            },
+          },
+        },
+        tooltip: {
+          enabled: true,
+        },
+      },
+      yaxis: {
+        axisBorder: {
+          show: false,
+        },
+        axisTicks: {
+          show: false,
+        },
+        labels: {
+          show: false,
+          formatter: function (val) {
+            return val + "%";
+          },
+        },
+      },
+    },
+  });
+
+  return (
+    <div>
+      <div id="chart">
+        <ReactApexChart
+          options={state.options}
+          series={state.series}
+          type="bar"
+          height={350}
+        />
+      </div>
+      <div id="html-dist"></div>
     </div>
   );
 }

@@ -1,6 +1,6 @@
 // app/layout.tsx
-
-import "./globals.css";
+ 
+ import "./globals.css";
 import Providers from "./providers";
 
 export const metadata = {
@@ -13,6 +13,7 @@ export default async function RootLayout({
 }: {
   children: React.ReactNode;
 }) {
+
   return (
     <html lang="en" suppressHydrationWarning>
       <body>

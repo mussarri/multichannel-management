@@ -13,7 +13,7 @@ import {
 import { Button } from "@/components/ui/button";
 import image from "@/public/logo/bg-hero-17.svg";
 import Link from "next/link";
-
+ 
 function HeroSection16() {
   const [open, setOpen] = React.useState(false);
   const handleOpen = () => setOpen((cur) => !cur);

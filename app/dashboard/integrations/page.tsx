@@ -28,7 +28,7 @@ const page = () => {
           </div>
         </Link>
         <Link
-          href={"/dashboard/integrations/ecommerce"}
+          href={"/dashboard/integrations"}
           className="w-full rounded-lg overflow-hidden border shadow-sm flex flex-col max-w-[160px]"
           style={{ aspectRatio: 0.8 }}
         >
@@ -43,7 +43,7 @@ const page = () => {
           </div>
         </Link>
         <Link
-          href={"/dashboard/integrations/shipping"}
+          href={"/dashboard/integrations"}
           className="w-full rounded-lg overflow-hidden border shadow-sm flex flex-col max-w-[160px]"
           style={{ aspectRatio: 0.8 }}
         >
@@ -58,7 +58,7 @@ const page = () => {
           </div>
         </Link>
         <Link
-          href={"/dashboard/integrations/accounting"}
+          href={"/dashboard/integrations"}
           className="w-full rounded-lg overflow-hidden border shadow-sm flex flex-col max-w-[160px]"
           style={{ aspectRatio: 0.8 }}
         >

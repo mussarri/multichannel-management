@@ -285,12 +285,17 @@ export default function OrderTable({ orders }: { orders: any[] }) {
                         }
                       >
                         <td>
-                          <Link href={`/dashboard/orders/${order.id}`}>
+                          <Link
+                            href={`/dashboard/orders/${order.id}`}
+                            style={{
+                              textDecoration: "underline",
+                            }}
+                          >
                             {order.orderNumber}
                           </Link>
                         </td>
 
-                        <td className="text-center">
+                        <td className="text-center py-1">
                           <StatusButtons status={order.status} />
                         </td>
                         <td>{order?.customer?.name}</td>
@@ -299,7 +304,7 @@ export default function OrderTable({ orders }: { orders: any[] }) {
 
                         <td className="text-right">{created}</td>
                         <td className="text-right">
-                          <div className="flex gap-0 items-center justify-end">
+                          <div className="flex gap-2 items-center justify-end">
                             {" "}
                             <button
                               onClick={() =>
