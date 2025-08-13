@@ -421,10 +421,11 @@ model InvoiceItem {
 }
 
 model Warehouse {
-  id      String           @id @default(cuid())
-  name    String
-  address String?
-  stocks  WarehouseStock[]
+  id        String           @id @default(cuid())
+  name      String
+  address   String?
+  stocks    WarehouseStock[]
+  createdAt DateTime         @default(now())
 }
 
 model WarehouseStock {
@@ -435,6 +436,11 @@ model WarehouseStock {
 
   warehouse Warehouse @relation(fields: [warehouseId], references: [id])
   product   Product   @relation(fields: [productId], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([warehouseId, productId])
 }
 
 enum InvoiceType {

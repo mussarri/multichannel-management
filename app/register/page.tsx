@@ -24,7 +24,7 @@ export default function RegisterPage() {
       event.preventDefault();
       const formData = new FormData(event.currentTarget);
 
-      const user = await formAction(formData);
+      const user = formAction(formData);
 
       console.log(user);
 

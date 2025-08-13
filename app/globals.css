@@ -344,6 +344,22 @@ table.order-details thead tr th {
   @apply text-foreground font-semibold text-[13px];
 }
 
+table.table {
+  @apply w-full rounded-md;
+}
+table.table thead tr th, table.table thead tr td {
+  @apply font-bold text-[14px] text-right p-2 border;
+}
+table.table tbody tr th, table.table tbody tr td {
+  @apply text-right border p-1;
+}
+table.table thead tr th:first-child, table.table thead tr td:first-child {
+  @apply text-left;
+}
+table.table tbody tr th:first-child, table.table tbody tr td:first-child {
+  @apply text-left;
+}
+
 .market li {
   display: flex;
   align-items: center;

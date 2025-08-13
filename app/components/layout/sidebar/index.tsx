@@ -12,6 +12,7 @@ import {
   ChevronRight,
   CreditCardIcon,
   Globe2Icon,
+  PackageCheck,
   ShoppingBag,
   Truck,
 } from "lucide-react";
@@ -43,6 +44,15 @@ const menuItems = [
     submenu: [
       { label: "Sipariş Listesi", href: "/dashboard/orders" },
       { label: "Sipariş Oluştur", href: "/dashboard/orders/new" },
+    ],
+  },
+  {
+    label: "Stok Yönetimi",
+    icon: <PackageCheck size={18} />,
+    href: "/dashboard/stock",
+    submenu: [
+      { label: "Stok Panel", href: "/dashboard/stock" },
+      { label: "Depo Listesi", href: "/dashboard/warehouses" },
     ],
   },
   {
@@ -107,12 +117,19 @@ const menuItems = [
 
 export function Sidebar() {
   const pathname = usePathname();
-  const isActive = (href: string) =>
-    pathname === href ||
-    (href.startsWith("/dashboard/categories") && pathname.startsWith(href)) ||
-    (href.startsWith("/dashboard/products/") && pathname.startsWith(href));
-
+  const isActive = (href: string) => pathname === href;
   const mobile = useMediaQuery("(max-width: 1024px)");
+  const isPathIncludeHref = (href: string) => {
+    return (
+      pathname.startsWith(href) ||
+      (pathname.startsWith("/dashboard/warehouses") &&
+        href.startsWith("/dashboard/stock")) ||
+      (pathname.startsWith("/dashboard/categories") &&
+        href.startsWith("/dashboard/products")) ||
+      (pathname.startsWith("/dashboard/brands") &&
+        href.startsWith("/dashboard/products"))
+    );
+  };
 
   if (mobile) return <Mobile menuItems={menuItems} isActive={isActive} />;
   else
@@ -139,26 +156,21 @@ export function Sidebar() {
                 href={item.href}
                 className={
                   "w-full flex items-center justify-between py-3 px-4 rounded hover:bg-hover text-md " +
-                  ((pathname.startsWith(item.href) ||
-                    (pathname == "/dashboard/categories" &&
-                      item.href.startsWith("/dashboard/products"))) &&
-                    " active font-semibold")
+                  (isPathIncludeHref(item.href) && " active font-semibold")
                 }
               >
                 <div className="flex items-center gap-2">
                   {item.icon}
                   {item.label}
                 </div>
-                {pathname.startsWith(item.href) ? (
+                {isPathIncludeHref(item.href) ? (
                   <ChevronDown size={16} />
                 ) : (
                   <ChevronRight size={16} />
                 )}
               </Link>
 
-              {(pathname.startsWith(item.href) ||
-                (pathname == "/dashboard/categories" &&
-                  item.href.startsWith("/dashboard/products"))) && (
+              {isPathIncludeHref(item.href) && (
                 <div className="mt-1 ml-6 flex flex-col space-y-1">
                   {item.submenu.map((sub) => (
                     <Link

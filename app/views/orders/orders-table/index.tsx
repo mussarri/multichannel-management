@@ -313,7 +313,10 @@ export default function OrderTable({ orders }: { orders: any[] }) {
                             >
                               <EyeIcon size={14} />
                             </button>
-                            <OrderActions order={order} />
+                            {/* <OrderActions order={order} /> */}
+                            <Link href={`/dashboard/orders/${order.id}`}>
+                              <Pencil size={14} />
+                            </Link>
                           </div>
                         </td>
                       </tr>
