@@ -11,109 +11,11 @@ import {
   RefreshCw,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import {
-  ResponsiveContainer,
-  LineChart,
-  Line,
-  XAxis,
-  YAxis,
-  Tooltip,
-  BarChart,
-  Bar,
-  CartesianChartProps,
-} from "recharts";
 import { useState } from "react";
 import { OrderStatus } from "@prisma/client";
 import Link from "next/link";
 import { PieChart } from "@mui/x-charts/PieChart";
-import { dataset, valueFormatter } from "./data";
 import ReactApexChart from "react-apexcharts";
-console.log(dataset);
-
-const salesData = [
-  { date: "07-01", sales: 4300 },
-  { date: "07-02", sales: 5200 },
-  { date: "07-03", sales: 3400 },
-  { date: "07-04", sales: 6100 },
-  { date: "07-05", sales: 2900 },
-  { date: "07-06", sales: 4500 },
-  { date: "07-07", sales: 3800 },
-];
-
-const orderData = [
-  { date: "07-01", orders: 43 },
-  { date: "07-02", orders: 52 },
-  { date: "07-03", orders: 34 },
-  { date: "07-04", orders: 61 },
-  { date: "07-05", orders: 29 },
-  { date: "07-06", orders: 45 },
-  { date: "07-07", orders: 38 },
-];
-
-function IntegrationStatusCard({ integration }) {
-  const { platform, status, lastSyncAt, lastErrorMessage } = integration;
-
-  const formatTime = (is) => {
-    if (!iso) return "Hiç senkronize edilmedi";
-    const dt = new Date(iso);
-    return dt.toLocaleString("tr-TR", { hour12: false });
-  };
-  const statusColors = {
-    ok: "text-green-500",
-    error: "text-red-500",
-    disconnected: "text-gray-500",
-  };
-
-  return (
-    <div className="bg-white p-2 rounded shadow flex items-center gap-4">
-      <div className="flex-shrink-0">
-        {/* Placeholder logo; gerçekte platforma göre ikon koy */}
-        <div className="w-12 h-12 bg-gray-100 rounded flex items-center justify-center">
-          <span className="uppercase font-bold text-sm">
-            {platform.slice(0, 2)}
-          </span>
-        </div>
-      </div>
-      <div className="flex-1">
-        <div className="flex justify-between">
-          <h3 className="font-semibold">
-            {platform.charAt(0).toUpperCase() + platform.slice(1)}
-          </h3>
-          <div
-            className={`font-medium ${statusColors[status] || "text-gray-500"}`}
-          >
-            {status === "ok"
-              ? "Bağlı"
-              : status === "error"
-              ? "Hata"
-              : status === "disconnected"
-              ? "Bağlı Değil"
-              : status}
-          </div>
-        </div>
-
-        {status === "error" && lastErrorMessage && (
-          <p
-            className="text-xs text-red-500 mt-1 truncate"
-            title={lastErrorMessage}
-          >
-            Hata: {lastErrorMessage}
-          </p>
-        )}
-      </div>
-    </div>
-  );
-}
-
-const chartSetting = {
-  yAxis: [
-    {
-      label: "rainfall (mm)",
-      width: 60,
-    },
-  ],
-  height: 300,
-};
 
 export default function DashboardPage({ orders }) {
   const [range, setRange] = useState();
