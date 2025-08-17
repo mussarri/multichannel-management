@@ -4,7 +4,7 @@ import React, { useActionState, useEffect } from "react";
 // import TextInput from "@/app/components/settings/text-input";
 import { Button } from "@/components/ui/button";
 import { toast } from "react-toastify";
-import { createWarehouse } from "@/app/action";
+import { createWarehouse } from "@/app/actions/stockactions";
 
 const CreateWarehouse = () => {
   const [state, formAction, pending] = useActionState(createWarehouse, null);

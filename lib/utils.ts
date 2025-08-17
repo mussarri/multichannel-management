@@ -1,8 +1,7 @@
 import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
- 
-
-
+import { compareItems, rankItem } from "@tanstack/match-sorter-utils";
+import { sortingFns } from "@tanstack/react-table";
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -2267,4 +2266,30 @@ export const slugify = function string_to_slug(str) {
     .replace(/-+/g, "-"); // collapse dashes
 
   return str;
+};
+
+export const fuzzyFilter = (row, columnId, value, addMeta) => {
+  // rank the item
+  const itemRank = rankItem(row.getValue(columnId), value);
+
+  // store the ranking info
+  addMeta(itemRank);
+
+  // return if the item should be filtered in/out
+  return itemRank.passed;
+};
+
+export const fuzzySort = (rowA, rowB, columnId) => {
+  let dir = 0;
+
+  // only sort by rank if the column has ranking information
+  if (rowA.columnFiltersMeta[columnId]) {
+    dir = compareItems(
+      rowA.columnFiltersMeta[columnId],
+      rowB.columnFiltersMeta[columnId]
+    );
+  }
+
+  // provide an alphanumeric fallback for when the item ranks are equal
+  return dir === 0 ? sortingFns.alphanumeric(rowA, rowB, columnId) : dir;
 };

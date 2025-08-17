@@ -7,7 +7,10 @@ import {
   getCoreRowModel,
   useReactTable,
 } from "@tanstack/react-table";
+import { Pencil, Trash2 } from "lucide-react";
+import Link from "next/link";
 import React, { useMemo } from "react";
+import DeleteWarehouse from "@/app/components/warehouse/DeleteWarehouse";
 
 const StocksTable = ({ warehouses }) => {
   const data = warehouses;
@@ -17,6 +20,13 @@ const StocksTable = ({ warehouses }) => {
       {
         accessorKey: "name", // Accessor key for the "name" field from data object
         header: "Depo Adı", // Column header
+        cell: ({ row }) => {
+          return (
+            <Link href={`/dashboard/warehouses/${row.original.id}`}>
+              {row.original.name}
+            </Link>
+          );
+        },
       },
       {
         accessorKey: "address",
@@ -34,10 +44,32 @@ const StocksTable = ({ warehouses }) => {
         accessorKey: "createdAt",
         header: "Olusturlma Tarihi",
         cell: ({ row }) => {
+          console.log(row.original.createdAt);
+
           const date = new Date(row.original.createdAt);
           return (
             <div>
               {date.toLocaleDateString() + " " + date.toLocaleTimeString()}
+            </div>
+          );
+        },
+      },
+      {
+        header: "İşlemler",
+        cell: ({ row }) => {
+          return (
+            <div className="flex items-center justify-end text-right space-x-2">
+              <Link
+                href={`/dashboard/warehouses/${row.original.id}`}
+                className=""
+              >
+                <Pencil
+                  size={16}
+                  className="hover:scale-110 duration-200 hover:cursor-pointer"
+                  color="var(--warning)"
+                />
+              </Link>
+              <DeleteWarehouse warehouse={row.original} />
             </div>
           );
         },
@@ -113,6 +145,13 @@ const StocksTable = ({ warehouses }) => {
           </tbody>
         </table>
       </div>
+      {warehouses.length == 0 && (
+        <div className="text-sm text-secondary-foreground">
+          {" "}
+          Deponuz bulunmuyor. Tek bir deponumuz var ise varsayilan bir depo
+          ekleyin.
+        </div>
+      )}
     </div>
   );
 };

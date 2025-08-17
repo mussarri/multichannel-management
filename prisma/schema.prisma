@@ -429,7 +429,7 @@ model Warehouse {
 }
 
 model WarehouseStock {
-  id          Int    @id @default(autoincrement())
+  id          String @id @default(cuid())
   warehouseId String
   productId   String
   quantity    Int

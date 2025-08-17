@@ -732,29 +732,3 @@ export async function deleteValueAction(prevState: any, formData: FormData) {
     };
   }
 }
-
-export async function createWarehouse(prevState: any, formData: FormData) {
-  const name = formData.get("name").toString();
-  const address = formData.get("address").toString();
-  try {
-    await prisma.warehouse.create({
-      data: {
-        name: name,
-        address: address,
-      },
-    });
-    revalidatePath("dashboard/warehouses");
-    return {
-      success: true,
-      message: "Depo başarıyla eklendi.",
-    };
-  } catch (error) {
-    console.error("Server Action: Depo eklenirken hata oluştu");
-    console.log(error);
-
-    return {
-      error: true,
-      message: "Depo eklenirken bir hata oluştu",
-    };
-  }
-}

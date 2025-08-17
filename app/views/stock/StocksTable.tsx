@@ -4,9 +4,19 @@ import {
   createColumnHelper,
   flexRender,
   getCoreRowModel,
+  getFilteredRowModel,
   useReactTable,
 } from "@tanstack/react-table";
-import React, { useMemo } from "react";
+import React, { useMemo, useState } from "react";
+import UpdateStock from "@/app/components/warehouse/UpdateStock";
+import { XIcon } from "lucide-react";
+import { rankItem } from "@tanstack/match-sorter-utils";
+
+const fuzzyFilter = (row, columnId, value, addMeta) => {
+  const itemRank = rankItem(row.getValue(columnId), value);
+  addMeta({ itemRank });
+  return itemRank.passed;
+};
 
 const StocksTable = ({ products, warehouses }) => {
   const columnHelper = createColumnHelper();
@@ -27,25 +37,52 @@ const StocksTable = ({ products, warehouses }) => {
       {
         accessorKey: "stock",
         header: "Stok",
+        cell: ({ row }) => {
+          return (
+            <div>
+              {row.original.stock}{" "}
+              {row.original.WarehouseStock.length == 0 && (
+                <UpdateStock product={row.original} warehouseId={"0"} />
+              )}
+            </div>
+          );
+        },
       },
     ],
     []
   );
 
-  console.log(products);
-
   const getColumns = (maxQtyLength: number, array) => {
-    const quantityColumns = Array.from(
-      { length: maxQtyLength },
-      (_, index) => ({
+    const quantityColumns = Array.from({ length: maxQtyLength }, (_, index) => {
+      return {
         id: `qty_${index}`,
         header: `${array[index].name}`,
-        cell: ({ row }) =>
-          row.original.WarehouseStock.find(
-            (stock) => array[index].name == stock.warehouse.name
-          ) ?? "-",
-      })
-    );
+        headerClassName: "text-right",
+        cell: ({ row }) => {
+          if (row.original.WarehouseStock.length == 0)
+            return (
+              <div className="flex  justify-end">
+                <XIcon />
+              </div>
+            );
+          return (
+            <div>
+              {row.original.WarehouseStock.find(
+                (stock) => array[index].name == stock.warehouse.name
+              ) ?? "-"}
+              <UpdateStock
+                product={row.original.id}
+                warehouseId={
+                  row.original.WarehouseStock.find(
+                    (stock) => array[index].name == stock.warehouse.name
+                  )?.warehouseId || "0"
+                }
+              />
+            </div>
+          );
+        },
+      };
+    });
 
     return [
       ...basecolumns,
@@ -66,16 +103,39 @@ const StocksTable = ({ products, warehouses }) => {
   };
   const maxLength = Math.max(warehouses.length);
   const columns = getColumns(maxLength, warehouses);
+  const [columnFilters, setColumnFilters] = useState([]);
+
   const table = useReactTable({
     data,
     columns,
     getCoreRowModel: getCoreRowModel(),
+    state: { columnFilters },
+    onColumnFiltersChange: setColumnFilters,
+    filterFns: { fuzzy: fuzzyFilter },
+    getFilteredRowModel: getFilteredRowModel(),
   });
 
   return (
     <div className="box p-4 space-y-2">
       <div className="flex font-semibold justify-between items-center">
         <h2>Tablo</h2>
+      </div>
+      <div>
+        <div style={{ display: "flex", gap: "1rem", marginBottom: "1rem" }}>
+          {table.getHeaderGroups()[0].headers.map((header) => {
+            if (header.column.getCanFilter()) {
+              return (
+                <input
+                  key={header.id}
+                  placeholder={`${header.column.columnDef.header} filtrele`}
+                  value={(header.column.getFilterValue() as string) ?? ""}
+                  onChange={(e) => header.column.setFilterValue(e.target.value)}
+                />
+              );
+            }
+            return null;
+          })}
+        </div>
       </div>
       <div className="overflow-x-auto border rounded-lg shadow-sm">
         <table className="table">

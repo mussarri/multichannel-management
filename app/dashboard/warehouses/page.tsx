@@ -28,12 +28,7 @@ const RenderWarehousesTable = async () => {
     include: {
       stocks: true,
     },
-  });
-  console.log(warehouses);
-
-  if (!warehouses) {
-    return <div>{"Hata!"}</div>;
-  }
+  }); 
 
   return <WarehouseTable warehouses={warehouses} />;
 };

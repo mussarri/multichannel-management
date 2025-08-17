@@ -38,9 +38,15 @@
   --sidebar-accent-foreground: oklch(0.21 0.006 285.885);
   --sidebar-border: oklch(0.92 0.004 286.32);
   --sidebar-ring: oklch(0.705 0.015 286.067);
-  --error: #ff3448;
+  --error-light: #ff1f35;
+  --error: #e00016;
+  --error-dark: #b80012;
+  --warning-light: #ffc65c;
   --warning: #ffb933;
+  --warning-dark: #dc9208;
+  --success-light: #55f969;
   --success: #22bb33;
+  --success-dark: #038e13;
   --opacity-input: 1;
   --bg-url: url("../public/logo/bg-logo2.png");
 }
@@ -80,9 +86,15 @@
   --sidebar-accent-foreground: oklch(0.985 0 0);
   --sidebar-border: oklch(1 0 0 / 10%);
   --sidebar-ring: oklch(0.552 0.016 285.938);
-  --error: #cc0003;
-  --warning: #ff8702;
+  --error-light: #ff1f35;
+  --error: #e00016;
+  --error-dark: #b80012;
+  --warning-light: #ffc65c;
+  --warning: #ffb933;
+  --warning-dark: #dc9208;
+  --success-light: #55f969;
   --success: #22bb33;
+  --success-dark: #038e13;
   --opacity-input: 0.4;
   --bg-url: url("../public/logo/bg-logo.png");
 }
@@ -347,16 +359,20 @@ table.order-details thead tr th {
 table.table {
   @apply w-full rounded-md;
 }
-table.table thead tr th, table.table thead tr td {
+table.table thead tr th,
+table.table thead tr td {
   @apply font-bold text-[14px] text-right p-2 border;
 }
-table.table tbody tr th, table.table tbody tr td {
+table.table tbody tr th,
+table.table tbody tr td {
   @apply text-right border p-1;
 }
-table.table thead tr th:first-child, table.table thead tr td:first-child {
+table.table thead tr th:first-child,
+table.table thead tr td:first-child {
   @apply text-left;
 }
-table.table tbody tr th:first-child, table.table tbody tr td:first-child {
+table.table tbody tr th:first-child,
+table.table tbody tr td:first-child {
   @apply text-left;
 }
 

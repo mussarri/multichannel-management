@@ -35,7 +35,7 @@ const menuItems = [
       { label: "Ürün Listesi", href: "/dashboard/products" },
       { label: "Kategoriler", href: "/dashboard/categories" },
       { label: "Markalar", href: "/dashboard/brands" },
-      { label: "Varyantlar", href: "/dashboard/variants" },
+      // { label: "Varyantlar", href: "/dashboard/variants" },
     ],
   },
   {
